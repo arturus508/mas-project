@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Meal Plans</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>Meal Plans</header>
+<div class="content">
+  <a th:href="@{/meal-plans/add}" class="add-button">Add New Meal Plan</a>
+  <div th:each="mealPlan : ${mealPlans}" class="meal-plan-card">
+    <h3 th:text="${mealPlan.planName}"></h3>
+    <p th:text="'Description: ' + ${mealPlan.description}"></p>
+    <p th:text="'Dietary Restriction: ' + ${mealPlan.dietaryRestriction}"></p>
+    <p th:text="'Start Date: ' + ${mealPlan.startDate}"></p>
+    <p th:text="'End Date: ' + ${mealPlan.endDate}"></p>
+    <div class="actions">
+      <a th:href="@{/meal-plans/edit/{id}(id=${mealPlan.mealPlanId})}" class="edit-button">Edit</a>
+      <a th:href="@{/meal-plans/delete/{id}(id=${mealPlan.mealPlanId})}" class="delete-button">Delete</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+

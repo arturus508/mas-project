@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Edit Workout Plan</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>Edit Workout Plan</header>
+<div class="content">
+  <div class="card">
+    <form th:action="@{/workout-plans/edit/{id}(id=${workoutPlan.workoutPlanId})}" method="post">
+      <label for="planName">Plan Name:</label>
+      <input type="text" id="planName" name="planName" th:value="${workoutPlan.planName}" required>
+
+      <label for="description">Description:</label>
+      <input type="text" id="description" name="description" th:value="${workoutPlan.description}" required>
+
+      <label for="startDate">Start Date:</label>
+      <input type="date" id="startDate" name="startDate" th:value="${workoutPlan.startDate}" required>
+
+      <label for="endDate">End Date:</label>
+      <input type="date" id="endDate" name="endDate" th:value="${workoutPlan.endDate}" required>
+
+      <label for="daysPerWeek">Days Per Week:</label>
+      <input type="number" id="daysPerWeek" name="daysPerWeek" th:value="${workoutPlan.daysPerWeek}" min="1" max="7" required>
+
+      <button type="submit" class="btn">Update Plan</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
+
+

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Meal Plan</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>Add Meal Plan</header>
+<nav>
+  <ul>
+    <li><a th:href="@{/}">Dashboard</a></li>
+    <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
+    <li><a th:href="@{/notifications}">Notifications</a></li>
+  </ul>
+</nav>
+<div class="content">
+  <form th:action="@{/meal-plans/add}" method="post">
+    <label for="planName">Plan Name:</label>
+    <input type="text" id="planName" name="planName" placeholder="Enter plan name" required>
+
+    <label for="description">Description:</label>
+    <input type="text" id="description" name="description" placeholder="Enter description" required>
+
+    <label for="dietaryRestriction">Dietary Restriction:</label>
+    <input type="text" id="dietaryRestriction" name="dietaryRestriction" placeholder="Enter dietary restriction" required>
+
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" name="startDate" required>
+
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" name="endDate" required>
+
+    <button type="submit">Add Meal Plan</button>
+  </form>
+</div>
+</body>
+</html>
+
+
+

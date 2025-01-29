@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: example_password # Root password for MySQL
+      MYSQL_DATABASE: example_db # Name of the default database
+      MYSQL_USER: example_user # Non-root MySQL user
+      MYSQL_PASSWORD: user_password # Password for the non-root user
+    ports:
+      - "3307:3306" # Expose MySQL on port 3306
+    volumes:
+      - mysql-data:/var/lib/mysql # Persistent storage for MySQL data
+    networks:
+      - mysql-network
+
+volumes:
+  mysql-data:
+
+networks:
+  mysql-network:
+    driver: bridge

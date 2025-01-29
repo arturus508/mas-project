@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Notifications</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>Notifications</header>
+<div class="content">
+  <ul class="notification-list">
+    <li th:each="notification : ${notifications}" th:classappend="${notification.read} ? '' : 'unread'" class="notification-item">
+      <p th:text="${notification.message}"></p>
+      <a th:href="@{'/notifications/mark-read/' + ${notification.notificationId}}" class="mark-as-read">Mark as Read</a>
+    </li>
+  </ul>
+</div>
+</body>
+</html>
+
+

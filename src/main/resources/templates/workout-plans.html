@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Workout Plans</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>Workout Plans</header>
+<div class="content">
+    <a th:href="@{/workout-plans/add}" class="add-button">Add New Workout Plan</a>
+    <div th:each="plan : ${workoutPlans}" class="card">
+        <h3 th:text="${plan.planName}"></h3>
+        <p th:text="${plan.description}"></p>
+        <p>Days Per Week: <span th:text="${plan.daysPerWeek}"></span></p>
+        <div class="actions">
+            <a th:href="@{/workout-plans/edit/{id}(id=${plan.workoutPlanId})}" class="edit-button">Edit</a>
+            <a th:href="@{/workout-plans/delete/{id}(id=${plan.workoutPlanId})}" class="delete-button">Delete</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+
+
+

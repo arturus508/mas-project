@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>Dashboard</header>
+<nav>
+  <ul>
+    <li><a th:href="@{/workout-plans?userId=1}">Workout Plans</a></li>
+    <li><a th:href="@{/meal-plans?userId=1}">Meal Plans</a></li>
+    <li><a th:href="@{/body-stats?userId=1}">Body Stats</a></li>
+    <li><a th:href="@{/notifications?userId=1}">Notifications</a></li>
+    <li><a th:href="@{/membership?userId=1}">Membership</a></li>
+    <li><a th:href="@{/settings}">Settings</a></li>
+  </ul>
+</nav>
+<div class="content">
+  <h1>Welcome to the Dashboard!</h1>
+  <p>Select a section from the navigation menu above to proceed.</p>
+</div>
+<footer>
+  © 2025 Fitness App. All Rights Reserved.
+</footer>
+</body>
+</html>
+
+
+

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Membership</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>Membership</header>
+<div class="content">
+  <div class="subscription-details" th:if="${membership}">
+    <p th:text="'Subscription Type: ' + ${membership.membershipType}"></p>
+    <p th:text="'Status: ' + ${membership.status}"></p>
+    <p th:text="'Next Billing Date: ' + ${membership.endDate}"></p>
+  </div>
+  <button th:href="@{/membership/upgrade}">Upgrade Membership</button>
+  <button th:href="@{/membership/cancel}" style="margin-left: 10px;">Cancel Membership</button>
+</div>
+</body>
+</html>
