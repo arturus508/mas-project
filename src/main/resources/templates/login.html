@@ -8,10 +8,20 @@
 <body>
 <div class="login-container">
   <h1>Login</h1>
+
+  <div th:if="${param.error}" class="error-message">
+    <p>Invalid email or password. Please try again.</p>
+  </div>
+
+  <div th:if="${param.logout}" class="success-message">
+    <p>You have been logged out.</p>
+  </div>
+
+  <!-- 🔹 Ensure the form action matches SecurityConfig loginProcessingUrl -->
   <form th:action="@{/login}" method="post">
     <div class="form-group">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" placeholder="Enter your email" required>
+      <label for="username">Email:</label>
+      <input type="text" id="username" name="username" placeholder="Enter your email" required>
     </div>
     <div class="form-group">
       <label for="password">Password:</label>
@@ -20,10 +30,11 @@
     <div class="form-group">
       <button type="submit" class="btn">Login</button>
     </div>
-    <div class="register-link">
-      <p>Don't have an account? <a th:href="@{/register}">Register</a></p>
-    </div>
   </form>
+
+  <div class="register-link">
+    <p>Don't have an account? <a th:href="@{/register}">Register</a></p>
+  </div>
 </div>
 </body>
 </html>

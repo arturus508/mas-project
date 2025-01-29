@@ -3,8 +3,10 @@ package com.example.healthfitness.service;
 import com.example.healthfitness.model.*;
 import com.example.healthfitness.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.List;
 
 @Service
@@ -31,6 +33,9 @@ public class UserService {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder; // Use Spring Security's password encoder
+
     public User saveUser(User user) {
         if (user.getMembership() != null) {
             Membership membership = membershipRepository.findById(user.getMembership().getMembershipId())
@@ -49,40 +54,32 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email.toLowerCase()); // Convert to lowercase
+    }
 
     public List<WorkoutPlan> getWorkoutPlansByUserId(Long userId) {
-        User user = getUserById(userId);
-        return user.getWorkoutPlans();
+        return getUserById(userId).getWorkoutPlans();
     }
-
 
     public List<MealPlan> getMealPlansByUserId(Long userId) {
-        User user = getUserById(userId);
-        return user.getMealPlans();
+        return getUserById(userId).getMealPlans();
     }
-
 
     public List<BodyStats> getBodyStatsByUserId(Long userId) {
-        User user = getUserById(userId);
-        return user.getBodyStats();
+        return getUserById(userId).getBodyStats();
     }
-
 
     public List<Notification> getNotificationsByUserId(Long userId) {
-        User user = getUserById(userId);
-        return user.getNotifications();
+        return getUserById(userId).getNotifications();
     }
-
 
     public List<Payment> getPaymentsByUserId(Long userId) {
-        User user = getUserById(userId);
-        return user.getPayments();
+        return getUserById(userId).getPayments();
     }
 
-
     public Membership getMembershipByUserId(Long userId) {
-        User user = getUserById(userId);
-        return user.getMembership();
+        return getUserById(userId).getMembership();
     }
 
     public WorkoutPlan addWorkoutPlanToUser(Long userId, WorkoutPlan workoutPlan) {
@@ -102,23 +99,37 @@ public class UserService {
         bodyStats.setUser(user);
         return bodyStatsRepository.save(bodyStats);
     }
+
     public Notification addNotificationToUser(Long userId, Notification notification) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        User user = getUserById(userId);
         notification.setUser(user);
         return notificationRepository.save(notification);
     }
+
     public Payment addPaymentToUser(Long userId, Payment payment) {
         User user = getUserById(userId);
         payment.setUser(user);
         return paymentRepository.save(payment);
     }
 
-    public User authenticate(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password).orElse(null);
+    public User registerUser(String name, String email, String password) {
+        if (userRepository.findByEmail(email.toLowerCase()).isPresent()) {
+            throw new RuntimeException("User already exists!");
+        }
+
+        String hashedPassword = passwordEncoder.encode(password); // 🔹 Hash before saving
+        User user = new User(name, email.toLowerCase(), hashedPassword);
+        return userRepository.save(user);
+    }
+
+    public boolean authenticate(String email, String rawPassword) {
+        Optional<User> userOpt = userRepository.findByEmail(email.toLowerCase());
+
+        return userOpt.isPresent() && passwordEncoder.matches(rawPassword, userOpt.get().getPassword());
     }
 
 
 }
+
 
 

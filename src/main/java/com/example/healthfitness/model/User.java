@@ -2,12 +2,14 @@ package com.example.healthfitness.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "user")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "dtype")
 public class User {
 
     @Id
@@ -19,12 +21,15 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<WorkoutPlan> workoutPlans = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<MealPlan> mealPlans = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<BodyStats> bodyStats = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -39,69 +44,47 @@ public class User {
     @JsonManagedReference
     private Membership membership;
 
+    public User() {}
 
-
-    // Getters and Setters
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public User(String name, String email, String password) {
         this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
         this.email = email;
+        this.password = hashPassword(password);
     }
 
-    public String getPassword() {
-        return password;
+
+
+    private String hashPassword(String password) {
+        return new BCryptPasswordEncoder().encode(password);
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+
+    public boolean checkPassword(String rawPassword) {
+        return new BCryptPasswordEncoder().matches(rawPassword, this.password);
     }
 
-    public List<WorkoutPlan> getWorkoutPlans() {
-        return workoutPlans;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public void setWorkoutPlans(List<WorkoutPlan> workoutPlans) {
-        this.workoutPlans = workoutPlans;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public List<MealPlan> getMealPlans() {
-        return mealPlans;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public void setMealPlans(List<MealPlan> mealPlans) {
-        this.mealPlans = mealPlans;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = hashPassword(password); }
 
-    public List<BodyStats> getBodyStats() {
-        return bodyStats;
-    }
+    public List<WorkoutPlan> getWorkoutPlans() { return workoutPlans; }
+    public void setWorkoutPlans(List<WorkoutPlan> workoutPlans) { this.workoutPlans = workoutPlans; }
 
-    public void setBodyStats(List<BodyStats> bodyStats) {
-        this.bodyStats = bodyStats;
-    }
+    public List<MealPlan> getMealPlans() { return mealPlans; }
+    public void setMealPlans(List<MealPlan> mealPlans) { this.mealPlans = mealPlans; }
 
-    public Membership getMembership() {
-        return membership;
-    }
+    public List<BodyStats> getBodyStats() { return bodyStats; }
+    public void setBodyStats(List<BodyStats> bodyStats) { this.bodyStats = bodyStats; }
 
+    public Membership getMembership() { return membership; }
     public void setMembership(Membership membership) {
         this.membership = membership;
         if (membership != null) {
@@ -109,23 +92,12 @@ public class User {
         }
     }
 
-    public List<Notification> getNotifications() {
-        return notifications;
-    }
+    public List<Notification> getNotifications() { return notifications; }
+    public void setNotifications(List<Notification> notifications) { this.notifications = notifications; }
 
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
-    }
-
-    public List<Payment> getPayments() {
-        return payments;
-    }
-
-    public void setPayments(List<Payment> payments) {
-        this.payments = payments;
-    }
+    public List<Payment> getPayments() { return payments; }
+    public void setPayments(List<Payment> payments) { this.payments = payments; }
 }
-
 
 
 
