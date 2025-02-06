@@ -2,25 +2,47 @@ package com.example.healthfitness.controller;
 
 import com.example.healthfitness.model.Meal;
 import com.example.healthfitness.service.MealService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.healthfitness.service.UserService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/meals")
+@RequestMapping("/api/meals")
 public class MealController {
 
-    @Autowired
-    private MealService mealService;
+    private final MealService mealService;
+    private final UserService userService;
 
-    @GetMapping
-    public List<Meal> getAllMeals() {
-        return mealService.getAllMeals();
+    public MealController(MealService mealService, UserService userService) {
+        this.mealService = mealService;
+        this.userService = userService;
     }
 
-    @PostMapping
-    public Meal createMeal(@RequestBody Meal meal) {
-        return mealService.saveMeal(meal);
+
+
+
+
+    @GetMapping("/meal-plan/{mealPlanId}")
+    public List<Meal> getMealsForMealPlan(@PathVariable Long mealPlanId) {
+        return mealService.getMealsByMealPlan(mealPlanId);
+    }
+
+
+    @PostMapping("/meal-plan/{mealPlanId}/add")
+    public Meal addMeal(@PathVariable Long mealPlanId, @RequestBody Meal meal) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found")).getUserId();
+
+        return mealService.saveMeal(meal, userId, mealPlanId);
+    }
+
+
+
+    @DeleteMapping("/delete/{mealId}")
+    public void deleteMeal(@PathVariable Long mealId) {
+        mealService.deleteMeal(mealId);
     }
 }

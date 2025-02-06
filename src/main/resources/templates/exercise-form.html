@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Exercise</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>
+    <h1>Create New Exercise</h1>
+</header>
+<div class="content">
+    <form th:action="@{/exercises/add}" method="post" th:object="${exercise}">
+        <div class="form-group">
+            <label for="exerciseName">Exercise Name:</label>
+            <input type="text" id="exerciseName" th:field="*{exerciseName}" placeholder="Enter exercise name" required>
+        </div>
+        <div class="form-group">
+            <label for="muscleGroup">Muscle Group:</label>
+            <input type="text" id="muscleGroup" th:field="*{muscleGroup}" placeholder="Enter muscle group" required>
+        </div>
+        <div class="form-group">
+            <label for="intensityLevel">Intensity Level:</label>
+            <input type="text" id="intensityLevel" th:field="*{intensityLevel}" placeholder="Enter intensity level" required>
+        </div>
+        <button type="submit" class="btn">Create Exercise</button>
+    </form>
+    <br/>
+    <a th:href="@{/exercises}" class="back-button">Back to Global Exercises</a>
+</div>
+</body>
+</html>
+
+

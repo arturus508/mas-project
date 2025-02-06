@@ -10,9 +10,7 @@ public class Ingredient {
     private Long ingredientId;
 
     private String name;
-
     private int quantity;
-
     private int caloriesPerPortion;
 
     @ManyToOne
@@ -20,6 +18,7 @@ public class Ingredient {
     private Meal meal;
 
     // Getters and Setters
+
     public Long getIngredientId() {
         return ingredientId;
     }
@@ -60,3 +59,4 @@ public class Ingredient {
         this.meal = meal;
     }
 }
+

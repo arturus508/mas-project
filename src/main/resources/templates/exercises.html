@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Global Exercises</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>
+  <h1>Global Exercises</h1>
+  <nav>
+    <ul>
+      <li><a th:href="@{/dashboard}">Dashboard</a></li>
+    </ul>
+  </nav>
+</header>
+<div class="content">
+  <div th:each="ex : ${exercises}" class="card">
+    <h3 th:text="${ex.exerciseName}"></h3>
+    <p>Muscle Group: <span th:text="${ex.muscleGroup}"></span></p>
+    <p>Intensity: <span th:text="${ex.intensityLevel}"></span></p>
+  </div>
+  <br/>
+  <a th:href="@{/exercises/add}" class="add-button">Create New Exercise</a>
+  <br/><br/>
+  <a th:href="@{/dashboard}" class="back-button">Back to Dashboard</a>
+</div>
+</body>
+</html>

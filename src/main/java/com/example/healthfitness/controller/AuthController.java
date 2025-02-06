@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -19,46 +18,32 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @GetMapping("/login")
-    public String showLoginPage(HttpSession session) {
-        // If user is already logged in, redirect to dashboard
-        if (session.getAttribute("user") != null) {
-            return "redirect:/dashboard";
-        }
-        return "login";  // Serve login.html
+    // Show the registration form (GET /register)
+    @GetMapping("/register")
+    public String showRegisterForm() {
+        return "register"; // register.html in templates
     }
 
-    @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password, HttpSession session, Model model) {
-        Optional<User> userOpt = userService.findByEmail(username);
-
-        if (userOpt.isEmpty() || !userOpt.get().checkPassword(password)) {
-            model.addAttribute("error", "Invalid email or password");
-            return "login";
-        }
-
-        session.setAttribute("user", userOpt.get());
-        return "redirect:/dashboard";  // Redirect to dashboard after successful login
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login?logout=true";
-    }
-
+    // Handle form submission for registration (POST /register)
     @PostMapping("/register")
-    public String register(@RequestParam String name, @RequestParam String email, @RequestParam String password, Model model) {
+    public String register(@RequestParam String name,
+                           @RequestParam String email,
+                           @RequestParam String password,
+                           Model model) {
         Optional<User> existingUser = userService.findByEmail(email);
         if (existingUser.isPresent()) {
+            // If user with this email already exists, show error
             model.addAttribute("error", "User already exists!");
             return "register";
         }
+
         userService.registerUser(name, email, password);
+        // After success, redirect to /login with a flag
         return "redirect:/login?registered=true";
     }
-
 }
+
+
 
 
 

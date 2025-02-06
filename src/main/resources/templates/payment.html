@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Membership Payment</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .payment-buttons a {
+            padding: 10px 20px;
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        .payment-buttons a:hover {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+        .back-button {
+            padding: 10px 20px;
+            background-color: #444;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Membership Payment</h1>
+</header>
+<div class="content">
+    <p>Your current membership price is: $<span th:text="${membership.price}"></span></p>
+    <div class="payment-buttons">
+        <a th:href="@{/payment/confirm}" class="pay-button">Confirm Payment</a>
+        <a th:href="@{/payment/cancel}" class="cancel-button">Cancel Payment</a>
+    </div>
+    <br/>
+    <a th:href="@{/membership}" class="back-button">Back to Membership</a>
+</div>
+</body>
+</html>
+
+
+

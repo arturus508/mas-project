@@ -40,5 +40,10 @@ public class BodyStatsService {
         bodyStatsRepository.save(bodyStats);
     }
 
+    public void deleteBodyStats(Long id) {
+        bodyStatsRepository.deleteById(id);
+    }
+
+
 
 }

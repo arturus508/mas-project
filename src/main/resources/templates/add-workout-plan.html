@@ -1,41 +1,45 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Workout Plan</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <header>Add Workout Plan</header>
 <div class="content">
-    <form th:action="@{/workout-plans/add}" method="post">
-        <div class="form-group">
-            <label for="planName">Plan Name:</label>
-            <input type="text" id="planName" name="planName" placeholder="Enter workout plan name" required>
-        </div>
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea id="description" name="description" placeholder="Enter plan description"></textarea>
-        </div>
-        <div class="form-group">
-            <label for="startDate">Start Date:</label>
-            <input type="date" id="startDate" name="startDate" required>
-        </div>
-        <div class="form-group">
-            <label for="endDate">End Date:</label>
-            <input type="date" id="endDate" name="endDate" required>
-        </div>
+    <form th:action="@{/workout-plans/add}" method="post" th:object="${workoutPlan}">
+        <label for="planName">Plan Name:</label>
+        <input type="text" id="planName" th:field="*{planName}" placeholder="Enter workout plan name" required>
 
-        <div class="form-group">
-            <label for="daysPerWeek">Days per Week:</label>
-            <input type="number" id="daysPerWeek" name="daysPerWeek" min="1" max="7" placeholder="Enter days per week" required>
-        </div>
+        <label for="description">Description:</label>
+        <textarea id="description" th:field="*{description}" placeholder="Enter plan description"></textarea>
+
+        <label for="status">Status:</label>
+        <select id="status" th:field="*{status}" required>
+            <option value="" disabled selected>-- Select Status --</option>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+        </select>
+
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" th:field="*{startDate}" required>
+
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" th:field="*{endDate}" required>
+
+        <label for="daysPerWeek">Days per Week:</label>
+        <input type="number" id="daysPerWeek" th:field="*{daysPerWeek}" min="1" max="7" required>
 
         <button type="submit" class="btn">Add Plan</button>
     </form>
+    <br/>
+    <a th:href="@{/workout-plans}" class="back-button">Back to Workout Plans</a>
 </div>
 </body>
 </html>
+
+
+
 
 

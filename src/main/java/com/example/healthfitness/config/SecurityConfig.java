@@ -24,28 +24,40 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/register", "/login"))
+                // If you want to keep CSRF, remove ".ignoringRequestMatchers(...)"
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Anyone can access /login, /register, and static resources
                         .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
-                        .requestMatchers("/dashboard").authenticated()
-                        .anyRequest().permitAll()
+                        // Everything else requires login
+                        .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
+                        // The login page is GET /login
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")  // 🔹 Ensure this matches `th:action`
+                        // The form will POST to /login
+                        .loginProcessingUrl("/login")
+                        // The form fields are name="email" and name="password"
+                        .usernameParameter("email")
+                        .passwordParameter("password")
+                        // On success, go to /dashboard
                         .defaultSuccessUrl("/dashboard", true)
+                        // On failure, append ?error
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
+                        // Logging out is done at /logout
                         .logoutUrl("/logout")
+                        // After logout, go back to /login?logout=true
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
@@ -53,12 +65,9 @@ public class SecurityConfig {
                 )
                 .build();
     }
-
-
-
-
-
 }
+
+
 
 
 

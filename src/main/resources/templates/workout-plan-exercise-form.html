@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Exercise to Workout Plan</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>
+    <h1>Add Exercise</h1>
+</header>
+<div class="content">
+    <form th:action="@{'/workout-plans/' + ${workoutPlanId} + '/exercises/add'}" method="post" th:object="${workoutPlanExercise}">
+        <div class="form-group">
+            <label for="exerciseSelect">Exercise:</label>
+            <select id="exerciseSelect" name="exercise.exerciseId" required>
+                <option value="" disabled selected>-- Select an Exercise --</option>
+                <option th:each="ex : ${globalExercises}"
+                        th:value="${ex.exerciseId}"
+                        th:text="${ex.exerciseName}">
+                </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="sets">Sets:</label>
+            <input type="number" id="sets" th:field="*{sets}" placeholder="Number of sets" required>
+        </div>
+        <div class="form-group">
+            <label for="reps">Reps:</label>
+            <input type="number" id="reps" th:field="*{reps}" placeholder="Repetitions" required>
+        </div>
+        <div class="form-group">
+            <label for="restTime">Rest Time (sec):</label>
+            <input type="number" id="restTime" th:field="*{restTime}" placeholder="Rest time in seconds" required>
+        </div>
+        <button type="submit" class="btn">Add Exercise</button>
+    </form>
+    <br/>
+    <!-- Link to create a new Exercise in the global list -->
+    <a th:href="@{/exercises/add}" class="add-button">Create New Exercise</a>
+    <br/><br/>
+    <a th:href="@{'/workout-plans/' + ${workoutPlanId} + '/exercises'}" class="back-button">Back to Plan Details</a>
+</div>
+</body>
+</html>
+
+
+

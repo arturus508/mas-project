@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Ingredient</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>
+    <h1>Add Ingredient</h1>
+</header>
+<div class="content">
+    <form th:action="@{/global-ingredients/add}" method="post" th:object="${ingredient}">
+        <label for="name">Name:</label>
+        <input type="text" id="name" th:field="*{name}" placeholder="Ingredient name" required>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" th:field="*{quantity}" placeholder="Quantity" required>
+
+        <label for="caloriesPerPortion">Calories Per Portion:</label>
+        <input type="number" id="caloriesPerPortion" th:field="*{caloriesPerPortion}" placeholder="Calories" required>
+
+        <button type="submit">Add Ingredient</button>
+    </form>
+    <br/>
+    <a th:href="@{/global-ingredients}" class="back-button">Back to Ingredients</a>
+</div>
+</body>
+</html>

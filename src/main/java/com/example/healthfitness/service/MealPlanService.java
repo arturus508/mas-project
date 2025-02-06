@@ -16,13 +16,12 @@ public class MealPlanService {
         this.mealPlanRepository = mealPlanRepository;
     }
 
-    public List<MealPlan> getAllMealPlans() {
-        return mealPlanRepository.findAll();
+    public List<MealPlan> getMealPlansByUser(Long userId) {
+        return mealPlanRepository.findByUser_UserId(userId);
     }
 
     public MealPlan getMealPlanById(Long id) {
-        Optional<MealPlan> mealPlan = mealPlanRepository.findById(id);
-        return mealPlan.orElse(null);
+        return mealPlanRepository.findById(id).orElse(null);
     }
 
     public MealPlan saveMealPlan(MealPlan mealPlan) {
@@ -48,6 +47,7 @@ public class MealPlanService {
         mealPlanRepository.deleteById(id);
     }
 }
+
 
 
 

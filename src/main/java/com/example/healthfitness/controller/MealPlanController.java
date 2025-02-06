@@ -14,10 +14,7 @@ public class MealPlanController {
     @Autowired
     private MealPlanService mealPlanService;
 
-    @GetMapping
-    public List<MealPlan> getAllMealPlans() {
-        return mealPlanService.getAllMealPlans();
-    }
+
 
     @GetMapping("/{id}")
     public MealPlan getMealPlanById(@PathVariable Long id) {

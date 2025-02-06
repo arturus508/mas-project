@@ -1,8 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Membership</title>
   <link rel="stylesheet" th:href="@{/css/style.css}">
+  <style>
+    .membership-actions a {
+      padding: 10px 20px;
+      border: 1px solid #4CAF50;
+      color: #4CAF50;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    .membership-actions a:hover {
+      background-color: #4CAF50;
+      color: #fff;
+    }
+    .back-button {
+      padding: 10px 20px;
+      background-color: #444;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 15px;
+      display: inline-block;
+    }
+  </style>
 </head>
 <body>
 <header>Membership</header>
@@ -11,9 +35,18 @@
     <p th:text="'Subscription Type: ' + ${membership.membershipType}"></p>
     <p th:text="'Status: ' + ${membership.status}"></p>
     <p th:text="'Next Billing Date: ' + ${membership.endDate}"></p>
+    <p th:text="'Price: $' + ${membership.price}"></p>
   </div>
-  <button th:href="@{/membership/upgrade}">Upgrade Membership</button>
-  <button th:href="@{/membership/cancel}" style="margin-left: 10px;">Cancel Membership</button>
+  <div class="membership-actions">
+    <a th:href="@{/membership/upgrade}" class="upgrade-button">Upgrade Membership</a>
+    <a th:href="@{/membership/payment}" class="pay-button">Pay Membership</a>
+    <a th:href="@{/membership/cancel}" class="cancel-button">Cancel Membership</a>
+  </div>
+  <br/>
+  <a th:href="@{/dashboard}" class="back-button">Back to Dashboard</a>
 </div>
 </body>
 </html>
+
+
+

@@ -6,26 +6,41 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<header>Edit Meal Plan</header>
+<header>
+    <h1>Edit Meal Plan</h1>
+    <nav>
+        <ul>
+            <li><a th:href="@{/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
+        </ul>
+    </nav>
+</header>
 <div class="content">
-    <form th:action="@{/meal-plans/edit/{id}(id=${mealPlan.mealPlanId})}" method="post" th:object="${mealPlan}">
-        <label for="planName">Plan Name:</label>
-        <input type="text" id="planName" name="planName" th:value="*{planName}" required><br>
+    <div class="card">
+        <form th:action="@{'/meal-plans/edit/' + ${mealPlan.mealPlanId}}" method="post" th:object="${mealPlan}">
+            <label for="planName">Plan Name:</label>
+            <input type="text" id="planName" th:field="*{planName}" required>
 
-        <label for="description">Description:</label>
-        <input type="text" id="description" name="description" th:value="*{description}" required><br>
+            <label for="description">Description:</label>
+            <input type="text" id="description" th:field="*{description}" required>
 
-        <label for="dietaryRestriction">Dietary Restriction:</label>
-        <input type="text" id="dietaryRestriction" name="dietaryRestriction" th:value="*{dietaryRestriction}"><br>
+            <label for="dietaryRestriction">Dietary Restriction:</label>
+            <input type="text" id="dietaryRestriction" th:field="*{dietaryRestriction}" required>
 
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDate" name="startDate" th:value="*{startDate}" required><br>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" th:field="*{startDate}" required>
 
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDate" name="endDate" th:value="*{endDate}" required><br>
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" th:field="*{endDate}" required>
 
-        <button type="submit" class="btn">Save Changes</button>
-    </form>
+            <button type="submit" class="btn">Save Changes</button>
+        </form>
+    </div>
+    <br/>
+    <!-- Back button to return to the Meal Plan Details page -->
+    <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals'}" class="back-button">Back to Meal Plan Details</a>
 </div>
 </body>
 </html>
+
+

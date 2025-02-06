@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Workout Plan Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>
+    <h1>Workout Plan Details</h1>
+    <nav>
+        <ul>
+            <li><a th:href="@{/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/workout-plans}">Workout Plans</a></li>
+        </ul>
+    </nav>
+</header>
+<div class="content">
+    <div class="card">
+        <h2 th:text="${workoutPlan.planName}">Plan Name</h2>
+        <p><strong>Description:</strong> <span th:text="${workoutPlan.description}"></span></p>
+        <p><strong>Status:</strong> <span th:text="${workoutPlan.status}"></span></p>
+        <p><strong>Start Date:</strong> <span th:text="${workoutPlan.startDate}"></span></p>
+        <p><strong>End Date:</strong> <span th:text="${workoutPlan.endDate}"></span></p>
+        <p><strong>Days per Week:</strong> <span th:text="${workoutPlan.daysPerWeek}"></span></p>
+        <a th:href="@{'/workout-plans/edit/' + ${workoutPlan.workoutPlanId}}" class="edit-button">Edit Plan</a>
+    </div>
+
+    <h3>Exercises in this Plan</h3>
+    <a th:href="@{'/workout-plans/' + ${workoutPlan.workoutPlanId} + '/exercises/add'}" class="add-button">Add Exercise</a>
+    <br/><br/>
+    <table>
+        <thead>
+        <tr>
+            <th>Exercise Name</th>
+            <th>Sets</th>
+            <th>Reps</th>
+            <th>Rest Time (sec)</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="wpe : ${exercises}">
+            <td th:text="${wpe.exercise != null ? wpe.exercise.exerciseName : 'N/A'}"></td>
+            <td th:text="${wpe.sets}"></td>
+            <td th:text="${wpe.reps}"></td>
+            <td th:text="${wpe.restTime}"></td>
+            <td>
+                <a th:href="@{'/workout-plans/' + ${workoutPlan.workoutPlanId} + '/exercises/delete/' + ${wpe.wpExerciseId}}" class="delete-button">Delete</a>
+                <!-- Optionally, add an Edit link if you later implement editing for workout plan exercises -->
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+    <a th:href="@{/workout-plans}" class="back-button">Back to Workout Plans</a>
+</div>
+</body>
+</html>
+
+

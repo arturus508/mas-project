@@ -1,11 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Workout Plans</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<header>Workout Plans</header>
+<header>
+    <h1>Workout Plans</h1>
+    <nav>
+        <ul>
+            <li><a th:href="@{/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/workout-plans}">Workout Plans</a></li>
+        </ul>
+    </nav>
+</header>
 <div class="content">
     <a th:href="@{/workout-plans/add}" class="add-button">Add New Workout Plan</a>
     <div th:each="plan : ${workoutPlans}" class="card">
@@ -13,13 +22,15 @@
         <p th:text="${plan.description}"></p>
         <p>Days Per Week: <span th:text="${plan.daysPerWeek}"></span></p>
         <div class="actions">
-            <a th:href="@{/workout-plans/edit/{id}(id=${plan.workoutPlanId})}" class="edit-button">Edit</a>
-            <a th:href="@{/workout-plans/delete/{id}(id=${plan.workoutPlanId})}" class="delete-button">Delete</a>
+            <a th:href="@{'/workout-plans/edit/' + ${plan.workoutPlanId}}" class="edit-button">Edit</a>
+            <a th:href="@{'/workout-plans/delete/' + ${plan.workoutPlanId}}" class="delete-button">Delete</a>
+            <a th:href="@{'/workout-plans/' + ${plan.workoutPlanId} + '/exercises'}" class="edit-button">Go</a>
         </div>
     </div>
 </div>
 </body>
 </html>
+
 
 
 

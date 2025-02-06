@@ -2,13 +2,11 @@ package com.example.healthfitness.service;
 
 import com.example.healthfitness.model.User;
 import com.example.healthfitness.repository.UserRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Collections;
 
 @Service
 public class DetailsService implements UserDetailsService {
@@ -21,19 +19,18 @@ public class DetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<User> userOpt = userRepository.findByEmail(email.toLowerCase());
+        User user = userRepository.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        if (userOpt.isEmpty()) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
-        }
-
-        User user = userOpt.get();
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
-                .password(user.getPassword())  // Password already hashed in DB
-                .roles("USER")  // You can extend this for roles like ADMIN
+                .password(user.getPassword()) // It's already hashed in the DB
+                .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
                 .build();
     }
 }
+
+
+
 
 

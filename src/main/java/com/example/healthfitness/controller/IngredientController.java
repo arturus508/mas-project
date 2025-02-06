@@ -24,3 +24,4 @@ public class IngredientController {
         return ingredientService.saveIngredient(ingredient);
     }
 }
+

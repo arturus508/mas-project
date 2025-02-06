@@ -10,9 +10,12 @@
 <header>Settings</header>
 <div class="content">
     <div class="settings-buttons">
-        <button th:onclick="window.location.href='@{/settings/change-password}'">Change Password</button>
-        <button th:onclick="window.location.href='@{/logout}'">Logout</button>
+        <!-- Only Logout button remains. -->
+        <a th:href="@{/logout}" class="logout-button">Logout</a>
     </div>
+    <br/>
+    <a th:href="@{/dashboard}" class="back-button">Back to Dashboard</a>
 </div>
 </body>
 </html>
+

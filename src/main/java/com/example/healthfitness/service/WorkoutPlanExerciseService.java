@@ -4,7 +4,6 @@ import com.example.healthfitness.model.WorkoutPlanExercise;
 import com.example.healthfitness.repository.WorkoutPlanExerciseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service

@@ -1,27 +1,24 @@
 package com.example.healthfitness.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class WorkoutPlan {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workoutPlanId;
 
     private String planName;
     private String description;
+    private String status; // e.g., "active", "completed"
     private String startDate;
     private String endDate;
     private Integer daysPerWeek;
 
     @ManyToOne
-    @JsonBackReference
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -29,30 +26,7 @@ public class WorkoutPlan {
     @JsonManagedReference
     private List<WorkoutPlanExercise> workoutPlanExercises = new ArrayList<>();
 
-    public WorkoutPlan() {}
-
-    public WorkoutPlan(String planName, String description, String startDate, String endDate, Integer daysPerWeek, User user) {
-        this.planName = planName;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.daysPerWeek = daysPerWeek;
-        this.user = user;
-    }
-
-
-    public void addExercise(WorkoutPlanExercise exercise) {
-        this.workoutPlanExercises.add(exercise);
-        exercise.setWorkoutPlan(this);
-    }
-
-
-    public void removeExercise(WorkoutPlanExercise exercise) {
-        this.workoutPlanExercises.remove(exercise);
-        exercise.setWorkoutPlan(null);
-    }
-
-
+    // Getters and setters
     public Long getWorkoutPlanId() { return workoutPlanId; }
     public void setWorkoutPlanId(Long workoutPlanId) { this.workoutPlanId = workoutPlanId; }
 
@@ -61,6 +35,9 @@ public class WorkoutPlan {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public String getStartDate() { return startDate; }
     public void setStartDate(String startDate) { this.startDate = startDate; }
@@ -76,7 +53,19 @@ public class WorkoutPlan {
 
     public List<WorkoutPlanExercise> getWorkoutPlanExercises() { return workoutPlanExercises; }
     public void setWorkoutPlanExercises(List<WorkoutPlanExercise> workoutPlanExercises) { this.workoutPlanExercises = workoutPlanExercises; }
+
+    public void addWorkoutPlanExercise(WorkoutPlanExercise wpe) {
+        workoutPlanExercises.add(wpe);
+        wpe.setWorkoutPlan(this);
+    }
+
+    public void removeWorkoutPlanExercise(WorkoutPlanExercise wpe) {
+        workoutPlanExercises.remove(wpe);
+        wpe.setWorkoutPlan(null);
+    }
 }
+
+
 
 
 

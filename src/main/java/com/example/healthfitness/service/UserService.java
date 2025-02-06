@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -34,9 +34,11 @@ public class UserService {
     private PaymentRepository paymentRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder; // Use Spring Security's password encoder
+    private BCryptPasswordEncoder passwordEncoder; // We'll use this to hash once
 
+    // Save user (not specifically for registration)
     public User saveUser(User user) {
+        // If there's membership, we find and set it
         if (user.getMembership() != null) {
             Membership membership = membershipRepository.findById(user.getMembership().getMembershipId())
                     .orElseThrow(() -> new RuntimeException("Membership not found"));
@@ -45,19 +47,23 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    // Return all users (only "User" type in SINGLE_TABLE)
     public List<User> getAllUsers() {
         return userRepository.findAllUsers();
     }
 
+    // Return user by ID
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
+    // Return user by email (optional)
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email.toLowerCase()); // Convert to lowercase
+        return userRepository.findByEmail(email.toLowerCase());
     }
 
+    // Example usage to get workout plans, meal plans, etc.
     public List<WorkoutPlan> getWorkoutPlansByUserId(Long userId) {
         return getUserById(userId).getWorkoutPlans();
     }
@@ -112,24 +118,28 @@ public class UserService {
         return paymentRepository.save(payment);
     }
 
+    // The main registration method that hashes the password exactly once
     public User registerUser(String name, String email, String password) {
+        // Check if user with the same email exists
         if (userRepository.findByEmail(email.toLowerCase()).isPresent()) {
             throw new RuntimeException("User already exists!");
         }
 
-        String hashedPassword = passwordEncoder.encode(password); // 🔹 Hash before saving
+        // Hash the password once
+        String hashedPassword = passwordEncoder.encode(password);
         User user = new User(name, email.toLowerCase(), hashedPassword);
+
+        // Save new user
         return userRepository.save(user);
     }
 
+    // For manual authentication if needed
     public boolean authenticate(String email, String rawPassword) {
         Optional<User> userOpt = userRepository.findByEmail(email.toLowerCase());
-
         return userOpt.isPresent() && passwordEncoder.matches(rawPassword, userOpt.get().getPassword());
     }
-
-
 }
+
 
 
 

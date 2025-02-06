@@ -6,9 +6,20 @@
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<header>Meal Plans</header>
+<header>
+  <h1>Meal Plans</h1>
+  <nav>
+    <ul>
+      <li><a th:href="@{/dashboard}">Dashboard</a></li>
+      <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
+    </ul>
+  </nav>
+</header>
 <div class="content">
+  <!-- Button to add a new meal plan -->
   <a th:href="@{/meal-plans/add}" class="add-button">Add New Meal Plan</a>
+
+  <!-- List of Meal Plans -->
   <div th:each="mealPlan : ${mealPlans}" class="meal-plan-card">
     <h3 th:text="${mealPlan.planName}"></h3>
     <p th:text="'Description: ' + ${mealPlan.description}"></p>
@@ -16,11 +27,14 @@
     <p th:text="'Start Date: ' + ${mealPlan.startDate}"></p>
     <p th:text="'End Date: ' + ${mealPlan.endDate}"></p>
     <div class="actions">
-      <a th:href="@{/meal-plans/edit/{id}(id=${mealPlan.mealPlanId})}" class="edit-button">Edit</a>
-      <a th:href="@{/meal-plans/delete/{id}(id=${mealPlan.mealPlanId})}" class="delete-button">Delete</a>
+      <!-- "Go" button takes you to the Meal Plan Details page (which is at /meal-plans/{id}/meals) -->
+      <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals'}" class="edit-button">Go</a>
+      <!-- "Delete" button removes the meal plan -->
+      <a th:href="@{'/meal-plans/delete/' + ${mealPlan.mealPlanId}}" class="delete-button">Delete</a>
     </div>
   </div>
 </div>
 </body>
 </html>
+
 

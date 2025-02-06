@@ -1,5 +1,6 @@
 package com.example.healthfitness.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,21 +13,26 @@ public class Meal {
     private Long mealId;
 
     private String mealName;
-
     private String date;
-
     private String time;
-
     private int totalCalories;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "meal_plan_id")
     private MealPlan mealPlan;
 
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    // NEW: One-to-many relationship to Ingredient.
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingredient> ingredients = new ArrayList<>();
 
-    // Getters and Setters
+    // Getters and setters
+
     public Long getMealId() {
         return mealId;
     }
@@ -75,6 +81,14 @@ public class Meal {
         this.mealPlan = mealPlan;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public List<Ingredient> getIngredients() {
         return ingredients;
     }
@@ -83,3 +97,4 @@ public class Meal {
         this.ingredients = ingredients;
     }
 }
+

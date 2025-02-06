@@ -1,21 +1,68 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Meal Plans</title>
+    <meta charset="UTF-8">
+    <title>Meal Plan Details</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<header>Meal Plans</header>
+<header>
+    <h1>Meal Plan Details</h1>
+    <nav>
+        <ul>
+            <li><a th:href="@{/dashboard}">Dashboard</a></li>
+            <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
+        </ul>
+    </nav>
+</header>
 <div class="content">
-    <a th:href="@{/meal-plans/add}" class="add-button">Add New Meal Plan</a>
-    <div th:each="mealPlan : ${mealPlans}" class="meal-plan-card">
-        <h3 th:text="${mealPlan.planName}"></h3>
-        <p th:text="'Description: ' + ${mealPlan.description}"></p>
-        <div class="actions">
-            <a th:href="@{'/meal-plans/edit/' + ${mealPlan.mealPlanId}}" class="edit-button">Edit</a>
-            <a th:href="@{'/meal-plans/delete/' + ${mealPlan.mealPlanId}}" class="delete-button">Delete</a>
-        </div>
+    <!-- Card for Meal Plan Details -->
+    <div class="card">
+        <h2 th:text="${mealPlan.planName}">Plan Name</h2>
+        <p><strong>Description:</strong> <span th:text="${mealPlan.description}"></span></p>
+        <p><strong>Dietary Restriction:</strong> <span th:text="${mealPlan.dietaryRestriction}"></span></p>
+        <p><strong>Start Date:</strong> <span th:text="${mealPlan.startDate}"></span></p>
+        <p><strong>End Date:</strong> <span th:text="${mealPlan.endDate}"></span></p>
+        <!-- Link to edit the meal plan details -->
+        <a th:href="@{'/meal-plans/edit/' + ${mealPlan.mealPlanId}}" class="edit-button">Edit Meal Plan</a>
     </div>
+
+    <h3>Meals</h3>
+    <!-- Button to add a new meal -->
+    <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals/add'}" class="add-button">Add Meal</a>
+    <br/><br/>
+    <!-- Table showing all meals attached to the meal plan -->
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Calories</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="meal : ${meals}">
+            <td th:text="${meal.mealName}">Meal Name</td>
+            <td th:text="${meal.date}">Date</td>
+            <td th:text="${meal.time}">Time</td>
+            <td th:text="${meal.totalCalories}">Calories</td>
+            <td>
+                <!-- Link to edit a specific meal -->
+                <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals/edit/' + ${meal.mealId}}" class="edit-button">Edit</a>
+                <!-- Link to delete a specific meal -->
+                <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals/delete/' + ${meal.mealId}}" class="delete-button">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <br/>
+    <!-- Back button to return to the list of meal plans -->
+    <a th:href="@{/meal-plans}" class="back-button">Back to Meal Plans</a>
 </div>
 </body>
 </html>
+
+
+

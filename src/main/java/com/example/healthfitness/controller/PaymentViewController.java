@@ -2,11 +2,9 @@ package com.example.healthfitness.controller;
 
 import com.example.healthfitness.model.Membership;
 import com.example.healthfitness.model.Notification;
-import com.example.healthfitness.model.User;
 import com.example.healthfitness.service.MembershipService;
 import com.example.healthfitness.service.NotificationService;
 import com.example.healthfitness.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -16,36 +14,39 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.time.LocalDate;
 
 @Controller
-public class MembershipController {
+public class PaymentViewController {
 
-    @Autowired
-    private MembershipService membershipService;
+    private final MembershipService membershipService;
+    private final NotificationService notificationService;
+    private final UserService userService;
 
-    @Autowired
-    private NotificationService notificationService;
-
-    @Autowired
-    private UserService userService;
-
-    @GetMapping("/membership")
-    public String showMembership(Model model) {
-        Membership membership = membershipService.getCurrentMembership();
-        model.addAttribute("membership", membership);
-        return "membership"; // Renders membership.html
+    public PaymentViewController(MembershipService membershipService,
+                                 NotificationService notificationService,
+                                 UserService userService) {
+        this.membershipService = membershipService;
+        this.notificationService = notificationService;
+        this.userService = userService;
     }
 
-    @GetMapping("/membership/upgrade")
-    public String upgradeMembership() {
-        // For demo, we use membership ID 1.
-        membershipService.upgradeMembership(1L);
-        // Get current user from security context
+    // Display the Payment page.
+    @GetMapping("/payment")
+    public String showPaymentPage(Model model) {
+        Membership membership = membershipService.getCurrentMembership();
+        model.addAttribute("membership", membership);
+        return "payment"; // renders payment.html
+    }
+
+    // Confirm payment: simulate a successful payment.
+    @GetMapping("/payment/confirm")
+    public String confirmPayment() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
-        User currentUser = userService.findByEmail(email)
+        // Use current user directly
+        var currentUser = userService.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found: " + email));
 
         Notification notif = new Notification();
-        notif.setMessage("Membership upgraded successfully.");
+        notif.setMessage("Membership paid successfully.");
         notif.setNotificationType("Membership");
         notif.setDateCreated(LocalDate.now().toString());
         notif.setRead(false);
@@ -54,12 +55,13 @@ public class MembershipController {
         return "redirect:/membership";
     }
 
-    @GetMapping("/membership/cancel")
-    public String cancelMembership() {
+    // Cancel payment from the Payment page: simulate cancellation.
+    @GetMapping("/payment/cancel")
+    public String cancelPayment() {
         membershipService.cancelMembership(1L);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
-        User currentUser = userService.findByEmail(email)
+        var currentUser = userService.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found: " + email));
 
         Notification notif = new Notification();
@@ -71,15 +73,6 @@ public class MembershipController {
         notificationService.saveNotification(notif);
         return "redirect:/membership";
     }
-
-    @GetMapping("/membership/payment")
-    public String membershipPayment() {
-        // Instead of processing payment immediately, this endpoint now shows the Payment page.
-        return "redirect:/payment";
-    }
 }
-
-
-
 
 

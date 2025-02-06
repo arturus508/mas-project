@@ -2,16 +2,17 @@ package com.example.healthfitness.service;
 
 import com.example.healthfitness.model.Ingredient;
 import com.example.healthfitness.repository.IngredientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
 public class IngredientService {
 
-    @Autowired
-    private IngredientRepository ingredientRepository;
+    private final IngredientRepository ingredientRepository;
+
+    public IngredientService(IngredientRepository ingredientRepository) {
+        this.ingredientRepository = ingredientRepository;
+    }
 
     public Ingredient saveIngredient(Ingredient ingredient) {
         return ingredientRepository.save(ingredient);
@@ -29,4 +30,10 @@ public class IngredientService {
     public void deleteIngredient(Long id) {
         ingredientRepository.deleteById(id);
     }
+
+    public Ingredient findByName(String name) {
+        return ingredientRepository.findByName(name).orElse(null);
+    }
 }
+
+
