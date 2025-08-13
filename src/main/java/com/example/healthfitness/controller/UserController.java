@@ -1,4 +1,5 @@
 package com.example.healthfitness.controller;
+
 import org.springframework.ui.Model;
 import com.example.healthfitness.model.*;
 import com.example.healthfitness.service.MembershipService;
@@ -30,15 +31,9 @@ public class UserController {
         return "profile";
     }
 
-
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
-    }
-
-    @PostMapping("/{userId}/notifications")
-    public Notification addNotification(@PathVariable Long userId, @RequestBody Notification notification) {
-        return userService.addNotificationToUser(userId, notification);
     }
 
     @PostMapping
@@ -76,14 +71,14 @@ public class UserController {
         return userService.addBodyStatsToUser(userId, bodyStats);
     }
 
-    @GetMapping("/{userId}/notifications")
-    public List<Notification> getNotifications(@PathVariable Long userId) {
-        return userService.getNotificationsByUserId(userId);
-    }
-
     @GetMapping("/{userId}/payments")
     public List<Payment> getPayments(@PathVariable Long userId) {
         return userService.getPaymentsByUserId(userId);
+    }
+
+    @PostMapping("/{userId}/payments")
+    public Payment addPaymentToUser(@PathVariable Long userId, @RequestBody Payment payment) {
+        return userService.addPaymentToUser(userId, payment);
     }
 
     @GetMapping("/{userId}/membership")
@@ -94,11 +89,6 @@ public class UserController {
     @PostMapping("/{userId}/membership")
     public Membership addOrUpdateMembership(@PathVariable Long userId, @RequestBody Membership membership) {
         return membershipService.saveMembershipForUser(userId, membership);
-    }
-
-    @PostMapping("/{userId}/payments")
-    public Payment addPaymentToUser(@PathVariable Long userId, @RequestBody Payment payment) {
-        return userService.addPaymentToUser(userId, payment);
     }
 }
 
