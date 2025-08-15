@@ -1,13 +1,18 @@
 package com.example.healthfitness.controller;
 
-import com.example.healthfitness.model.User;
+import com.example.healthfitness.service.SleepService;
 import com.example.healthfitness.service.UserService;
+import com.example.healthfitness.service.GuideService;
+import com.example.healthfitness.model.Guide;
+import com.example.healthfitness.model.GuideCategory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.time.LocalDate;
+import java.util.*;
 
 @Controller
 public class HomeController {
@@ -15,20 +20,44 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/dashboard")
-    public String showDashboard(Model model) {
-        // 1. Get current email from security context
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String currentEmail = auth.getName(); // The logged-in user's email
+    @Autowired
+    private SleepService sleepService;
 
-        // 2. Find the actual User in the DB
-        User user = userService.findByEmail(currentEmail)
-                .orElseThrow(() -> new RuntimeException("User not found: " + currentEmail));
+    @Autowired
+    private GuideService guideService;
 
-        // 3. Put the user in the model so Thymeleaf can do user.userId
-        model.addAttribute("user", user);
+    @GetMapping({"/", "/dashboard"})
+    public String dashboard(Model model) {
+        var auth  = SecurityContextHolder.getContext().getAuthentication();
+        var email = auth != null ? auth.getName() : null;
 
-        // 4. Render dashboard.html
+        Long userId = null;
+        if (email != null) {
+            var user = userService.findByEmail(email).orElse(null);
+            if (user != null) userId = user.getUserId();
+        }
+
+        var yesterdayText = "No data";
+        if (userId != null) {
+            var y = LocalDate.now().minusDays(1);
+            var se = sleepService.getYesterday(userId);
+            if (se.isPresent()) {
+                var e = se.get();
+                var mins = java.time.Duration.between(e.getSleepStart(), e.getSleepEnd());
+                if (mins.isNegative()) mins = mins.plusDays(1);
+                yesterdayText = mins.toHours() + "h " + mins.toMinutesPart() + "m  ·  q" + e.getQuality();
+            }
+        }
+
+        List<Guide> mindRecs = Collections.emptyList();
+        if (userId != null) {
+            mindRecs = guideService.recommendMindGuides(userId, 2);
+        }
+
+        model.addAttribute("pageTitle", "Dashboard");
+        model.addAttribute("yesterdaySleep", yesterdayText);
+        model.addAttribute("mindGuides", mindRecs);
+
         return "dashboard";
     }
 }

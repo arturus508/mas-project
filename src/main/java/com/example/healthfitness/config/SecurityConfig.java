@@ -32,32 +32,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // If you want to keep CSRF, remove ".ignoringRequestMatchers(...)"
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Anyone can access /login, /register, and static resources
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
-                        // Everything else requires login
+                        .requestMatchers("/login", "/register", "/css/**", "/js/**", "/img/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
-                        // The login page is GET /login
                         .loginPage("/login")
-                        // The form will POST to /login
                         .loginProcessingUrl("/login")
-                        // The form fields are name="email" and name="password"
                         .usernameParameter("email")
                         .passwordParameter("password")
-                        // On success, go to /dashboard
                         .defaultSuccessUrl("/dashboard", true)
-                        // On failure, append ?error
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        // Logging out is done at /logout
                         .logoutUrl("/logout")
-                        // After logout, go back to /login?logout=true
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
@@ -66,7 +55,6 @@ public class SecurityConfig {
                 .build();
     }
 }
-
 
 
 

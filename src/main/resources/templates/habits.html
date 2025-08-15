@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: head"></head>
+<body class="bg-light">
+
+<div th:replace="fragments/nav :: body"></div>
+
+<div class="container py-4">
+
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h3 class="m-0">Habits · <span th:text="${date}">2025-08-15</span></h3>
+    <form class="d-flex gap-2" method="get" action="/flow/habits">
+      <input type="date" class="form-control" name="date" th:value="${date}">
+      <button class="btn btn-outline-primary">Go</button>
+    </form>
+  </div>
+
+  <div class="row g-3">
+    <!-- Add habit form -->
+    <div class="col-12 col-lg-5">
+      <div class="card h-100">
+        <div class="card-header">Add habit</div>
+        <div class="card-body">
+          <form method="post" action="/flow/habits">
+            <div th:replace="fragments/csrf :: csrf"></div>
+            <div class="mb-2">
+              <label class="form-label">Name</label>
+              <input class="form-control" name="name" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Cadence</label>
+              <select class="form-select" name="cadence">
+                <option value="DAILY">DAILY</option>
+                <option value="WEEKLY">WEEKLY</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Target per day</label>
+              <input class="form-control" type="number" min="1" name="targetPerDay" value="1">
+            </div>
+            <button class="btn btn-success">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's habits -->
+    <div class="col-12 col-lg-7">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between">
+          <span>Today’s habits</span>
+          <span class="text-muted small" th:text="${#lists.size(habits)} + ' total'">0 total</span>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0 align-middle">
+            <thead>
+              <tr>
+                <th style="width:42px;"></th>
+                <th>Name</th>
+                <th>Cadence</th>
+                <th>Target</th>
+                <th style="width: 1%;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="h : ${habits}">
+                <td>
+                  <form method="post" th:action="@{'/flow/habits/toggle/' + ${h.id}}">
+                    <div th:replace="fragments/csrf :: csrf"></div>
+                    <input type="hidden" name="date" th:value="${date}">
+                    <button class="btn btn-sm"
+                            th:classappend="${today[h.id]} ? 'btn-success' : 'btn-outline-secondary'">
+                      <span th:text="${today[h.id]} ? '✔' : '○'">○</span>
+                    </button>
+                  </form>
+                </td>
+                <td>
+                  <div th:text="${h.name}">Drink water</div>
+                  <div class="text-muted small" th:if="${not today[h.id]}">not done</div>
+                  <div class="text-success small" th:if="${today[h.id]}">done</div>
+                </td>
+                <td th:text="${h.cadence}">DAILY</td>
+                <td th:text="${h.targetPerDay}">1</td>
+                <td>
+                  <form method="post" th:action="@{'/flow/habits/' + ${h.id} + '/delete'}"
+                        onsubmit="return confirm('Delete habit?');">
+                    <div th:replace="fragments/csrf :: csrf"></div>
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(habits)}">
+                <td colspan="5" class="text-center text-muted p-3">No habits yet</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer text-muted small">
+          Click the circle to toggle today’s status.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
+
