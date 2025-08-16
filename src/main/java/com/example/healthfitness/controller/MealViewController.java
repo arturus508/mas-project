@@ -1,98 +1,84 @@
 package com.example.healthfitness.controller;
 
-
 import com.example.healthfitness.model.Meal;
 import com.example.healthfitness.model.MealPlan;
+import com.example.healthfitness.model.MealType;
 import com.example.healthfitness.model.User;
-import com.example.healthfitness.service.MealPlanService;
-import com.example.healthfitness.service.MealService;
+import com.example.healthfitness.repository.MealPlanRepository;
+import com.example.healthfitness.repository.MealRepository;
 import com.example.healthfitness.service.UserService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+
 @Controller
-@RequestMapping("/meal-plans")
 public class MealViewController {
 
-    private final MealService mealService;
+    private final MealRepository meals;
+    private final MealPlanRepository plans;
     private final UserService userService;
-    private final MealPlanService mealPlanService;
 
-    public MealViewController(MealService mealService, UserService userService, MealPlanService mealPlanService) {
-        this.mealService = mealService;
+    public MealViewController(MealRepository meals,
+                              MealPlanRepository plans,
+                              UserService userService) {
+        this.meals = meals;
+        this.plans = plans;
         this.userService = userService;
-        this.mealPlanService = mealPlanService;
     }
 
-    // Show the Meal Plan Details page (with its list of Meals)
-    @GetMapping("/{id}/meals")
-    public String getMealsForPlan(@PathVariable Long id, Model model) {
-        MealPlan mealPlan = mealPlanService.getMealPlanById(id);
-        if (mealPlan == null) {
-            throw new RuntimeException("MealPlan not found with id: " + id);
-        }
-        model.addAttribute("mealPlan", mealPlan);
-        model.addAttribute("meals", mealService.getMealsByMealPlan(id));
-        model.addAttribute("mealPlanId", id);
-        return "meal-plan";  // corresponds to meal-plan.html
-    }
-
-    // Display the Add Meal form.
-    @GetMapping("/{id}/meals/add")
-    public String addMealPage(@PathVariable Long id, Model model) {
-        model.addAttribute("meal", new Meal());
-        model.addAttribute("mealPlanId", id);
-        return "meal-form";  // corresponds to meal-form.html
-    }
-
-    // Process the Add Meal form submission.
-    @PostMapping("/{id}/meals/add")
-    public String addMeal(@PathVariable Long id, @ModelAttribute Meal meal) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found: " + email));
-        mealService.saveMeal(meal, user.getUserId(), id);
-        return "redirect:/meal-plans/" + id + "/meals";
-    }
-
-    // Delete a Meal (note: now mapped under /meal-plans/{mealPlanId}/meals/delete/{mealId})
-    @GetMapping("/{mealPlanId}/meals/delete/{mealId}")
-    public String deleteMeal(@PathVariable("mealPlanId") Long mealPlanId,
-                             @PathVariable("mealId") Long mealId) {
-        mealService.deleteMeal(mealId);
-        return "redirect:/meal-plans/" + mealPlanId + "/meals";
-    }
-
-    // ===== NEW: Edit Meal Endpoints =====
-
-    // Display the Edit Meal form.
-    @GetMapping("/{mealPlanId}/meals/edit/{mealId}")
-    public String editMealPage(@PathVariable("mealPlanId") Long mealPlanId,
-                               @PathVariable("mealId") Long mealId,
-                               Model model) {
-        Meal meal = mealService.getMealById(mealId);
-        if (meal == null) {
-            throw new RuntimeException("Meal not found with id: " + mealId);
-        }
-        model.addAttribute("meal", meal);
+    @GetMapping("/meals/add")
+    public String addForm(@RequestParam(value = "date", required = false) String dateStr,
+                          @RequestParam(value = "type", required = false) String type,
+                          @RequestParam(value = "mealPlanId", required = false) Long mealPlanId,
+                          Model model) {
+        LocalDate date = dateStr != null ? LocalDate.parse(dateStr) : LocalDate.now();
+        model.addAttribute("date", date);
+        model.addAttribute("type", type);
+        model.addAttribute("types", Arrays.asList(MealType.values()));
         model.addAttribute("mealPlanId", mealPlanId);
-        return "meal-edit";  // corresponds to meal-edit.html
+        return "meals-add";
     }
 
-    // Process the Edit Meal form submission.
-    @PostMapping("/{mealPlanId}/meals/edit/{mealId}")
-    public String editMeal(@PathVariable("mealPlanId") Long mealPlanId,
-                           @PathVariable("mealId") Long mealId,
-                           @ModelAttribute Meal meal) {
-        // Ensure the meal remains linked to the correct MealPlan.
-        MealPlan mealPlan = mealPlanService.getMealPlanById(mealPlanId);
-        meal.setMealId(mealId);
-        meal.setMealPlan(mealPlan);
-        mealService.updateMeal(meal);
-        return "redirect:/meal-plans/" + mealPlanId + "/meals";
+    @PostMapping("/meals/add")
+    public String save(@RequestParam(value = "date", required = false) String dateStr,
+                       @RequestParam(value = "type", required = false) String type,
+                       @RequestParam(value = "kcal", required = false) Integer kcal,
+                       @RequestParam(value = "protein", required = false) Integer protein,
+                       @RequestParam(value = "fat", required = false) Integer fat,
+                       @RequestParam(value = "carbs", required = false) Integer carbs,
+                       @RequestParam(value = "mealPlanId", required = false) Long mealPlanId) {
+
+        LocalDate date = dateStr != null ? LocalDate.parse(dateStr) : LocalDate.now();
+        String typeStr = (type != null && !type.isBlank()) ? type : MealType.BREAKFAST.name();
+        MealType mealType = MealType.valueOf(typeStr);
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User u = userService.findByEmail(email).orElseThrow();
+
+        Meal m = new Meal();
+        m.setUser(u);
+        m.setDate(date);
+        m.setMealType(mealType);
+        m.setKcalManual(kcal);
+        m.setProteinManual(protein);
+        m.setFatManual(fat);
+        m.setCarbsManual(carbs);
+
+        if (mealPlanId != null) {
+            MealPlan plan = plans.findById(mealPlanId).orElse(null);
+            m.setMealPlan(plan);
+        }
+
+        meals.save(m);
+
+        if (mealPlanId != null) {
+            return "redirect:/meal-plans/edit/" + mealPlanId;
+        }
+        return "redirect:/meal-plans/day?date=" + date;
     }
 }
-
 

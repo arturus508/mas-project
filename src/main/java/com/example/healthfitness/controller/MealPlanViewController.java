@@ -78,6 +78,26 @@ public class MealPlanViewController {
         mealPlanService.deleteMealPlan(id);
         return "redirect:/meal-plans";
     }
+
+@GetMapping("/{id}")
+public String details(@PathVariable Long id, Model model) {
+    MealPlan mealPlan = mealPlanService.getMealPlanById(id);
+    if (mealPlan == null) {
+        throw new RuntimeException("MealPlan not found with id: " + id);
+    }
+    model.addAttribute("mealPlan", mealPlan);
+    model.addAttribute("meals", mealPlan.getMeals());
+    return "meal-plan-details";
+}
+
+@GetMapping("/{id}/meals")
+public String legacyMeals(@PathVariable Long id) {
+    return "redirect:/meal-plans/edit/" + id;
+}
+
+
+
+
 }
 
 

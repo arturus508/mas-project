@@ -31,21 +31,43 @@ public class Meal {
     @Column(nullable = false)
     private LocalDate date;
 
-    
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MealItem> items = new ArrayList<>();
 
-    //  legacy:  stara  lista składników 
     @OneToMany(mappedBy = "meal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingredient> ingredients = new ArrayList<>();
 
-    // quick-meal override
+    @Column(name = "kcal_manual")
     private Integer kcalManual;
+
+    @Column(name = "protein_manual")
     private Integer proteinManual;
+
+    @Column(name = "fat_manual")
     private Integer fatManual;
+
+    @Column(name = "carbs_manual")
     private Integer carbsManual;
 
-    public Meal() {}
+    @Column(name = "total_calories", nullable = false)
+    private Integer totalCalories;
+
+    @PrePersist
+    @PreUpdate
+    void preCompute() {
+        Integer kc = this.kcalManual;
+        if (kc == null) {
+            Integer p = this.proteinManual;
+            Integer f = this.fatManual;
+            Integer c = this.carbsManual;
+            if (p != null || f != null || c != null) {
+                kc = (p == null ? 0 : p) * 4
+                   + (f == null ? 0 : f) * 9
+                   + (c == null ? 0 : c) * 4;
+            }
+        }
+        this.totalCalories = kc == null ? 0 : Math.max(0, kc);
+    }
 
     public Long getMealId() { return mealId; }
     public void setMealId(Long mealId) { this.mealId = mealId; }
@@ -65,7 +87,6 @@ public class Meal {
     public List<MealItem> getItems() { return items; }
     public void setItems(List<MealItem> items) { this.items = items; }
 
-    // legacy getters/setters for old Ingredient flow
     public List<Ingredient> getIngredients() { return ingredients; }
     public void setIngredients(List<Ingredient> ingredients) { this.ingredients = ingredients; }
 
@@ -80,4 +101,7 @@ public class Meal {
 
     public Integer getCarbsManual() { return carbsManual; }
     public void setCarbsManual(Integer carbsManual) { this.carbsManual = carbsManual; }
+
+    public Integer getTotalCalories() { return totalCalories; }
+    public void setTotalCalories(Integer totalCalories) { this.totalCalories = totalCalories; }
 }

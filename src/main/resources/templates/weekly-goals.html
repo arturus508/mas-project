@@ -1,100 +1,76 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head}"></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head :: head"></head>
 <body>
-<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="fragments/nav :: body"></div>
 
-<div class="container" style="max-width: 980px; margin-top: 24px;">
-    <h2>Weekly Goals</h2>
+<main class="container my-4">
+  <h2 class="mb-1">Weekly Review</h2>
+  <p class="text-muted">Week:
+    <span th:text="${weekStart}">2025-08-11</span> — <span th:text="${weekEnd}">2025-08-17</span>
+  </p>
 
-    <div style="margin:16px 0; padding:12px; border:1px solid #ddd; border-radius:8px;">
-        <h3 style="margin:0 0 8px;">Add goal</h3>
-        <form method="post" th:action="@{/flow/weekly-goals/add}">
-            <div th:replace="~{fragments/csrf :: csrf}"></div>
-            <div style="display:grid; grid-template-columns: 1fr 140px 150px 150px 120px auto; gap:8px;">
-                <input name="title" placeholder="Title" required>
-                <select name="type" required>
-                    <option th:each="t : ${types}" th:value="${t}" th:text="${t}">HABIT</option>
-                </select>
-                <input name="weekStart" type="date" th:value="${defStart}">
-                <input name="weekEnd"   type="date" th:value="${defEnd}">
-                <input name="targetValue" type="number" min="1" value="1">
-                <button type="submit">Add</button>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">Tasks done this week</div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-1">
+            <div><strong th:text="${tasksDone}">0</strong> / <span th:text="${tasksTotal}">0</span></div>
+            <div><span th:text="${tasksPct}">0</span>%</div>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" role="progressbar"
+                 th:style="|width: ${tasksPct}%|"
+                 th:text="|${tasksPct}%|">0%
             </div>
-        </form>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h3 style="margin:16px 0 8px;">Your weekly goals</h3>
-    <table style="width:100%; border-collapse:collapse;">
-        <thead>
-        <tr>
-            <th style="text-align:left;  border-bottom:1px solid #ddd; padding:6px;">Title</th>
-            <th style="text-align:left;  border-bottom:1px solid #ddd; padding:6px;">Type</th>
-            <th style="text-align:left;  border-bottom:1px solid #ddd; padding:6px;">Week</th>
-            <th style="text-align:right; border-bottom:1px solid #ddd; padding:6px;">Progress</th>
-            <th style="text-align:left;  border-bottom:1px solid #ddd; padding:6px;">Completed</th>
-            <th style="border-bottom:1px solid #ddd; padding:6px;"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="g : ${goals}">
-            <td style="padding:6px;">
-                <details>
-                    <summary th:text="${g.title}">Goal title</summary>
-                    <form method="post" th:action="@{/flow/weekly-goals/update/{id}(id=${g.id})}" style="margin-top:6px;">
-                        <div th:replace="~{fragments/csrf :: csrf}"></div>
-                        <div style="display:grid; grid-template-columns: 1fr 140px 150px 150px 120px 120px 120px auto; gap:8px;">
-                            <input name="title" th:value="${g.title}" required>
-                            <select name="type">
-                                <option th:each="t : ${types}" th:value="${t}" th:selected="${t}==${g.type}"
-                                        th:text="${t}">HABIT</option>
-                            </select>
-                            <input name="weekStart" type="date" th:value="${g.weekStart}">
-                            <input name="weekEnd"   type="date" th:value="${g.weekEnd}">
-                            <input name="targetValue"  type="number" min="1" th:value="${g.targetValue}">
-                            <input name="currentValue" type="number" min="0" th:value="${g.currentValue}">
-                            <label style="display:flex; align-items:center; gap:6px;">
-                                <input type="checkbox" name="completed" th:checked="${g.completed}"> Completed
-                            </label>
-                            <div>
-                                <button type="submit">Save</button>
-                            </div>
-                        </div>
-                    </form>
-                </details>
-            </td>
-            <td style="padding:6px;" th:text="${g.type}">HABIT</td>
-            <td style="padding:6px;" th:text="${g.weekStart} + ' — ' + ${g.weekEnd}">2025-08-11 — 2025-08-17</td>
-            <td style="padding:6px; text-align:right;">
-                <span th:text="${g.currentValue} + ' / ' + ${g.targetValue}">0 / 1</span>
-                <form method="post" th:action="@{/flow/weekly-goals/inc/{id}(id=${g.id})}" style="display:inline; margin-left:8px;">
-                    <div th:replace="~{fragments/csrf :: csrf}"></div>
-                    <input type="hidden" name="by" value="1">
-                    <button type="submit">+1</button>
-                </form>
-                <form method="post" th:action="@{/flow/weekly-goals/dec/{id}(id=${g.id})}" style="display:inline; margin-left:4px;">
-                    <div th:replace="~{fragments/csrf :: csrf}"></div>
-                    <input type="hidden" name="by" value="1">
-                    <button type="submit">−1</button>
-                </form>
-            </td>
-            <td style="padding:6px;">
-                <form method="post" th:action="@{/flow/weekly-goals/toggle/{id}(id=${g.id})}">
-                    <div th:replace="~{fragments/csrf :: csrf}"></div>
-                    <button type="submit" th:text="${g.completed} ? 'Undo' : 'Complete'">Complete</button>
-                </form>
-                <div style="font-size:12px; color:#666;" th:text="${g.completedDate}"> </div>
-            </td>
-            <td style="padding:6px; text-align:right;">
-                <form method="post" th:action="@{/flow/weekly-goals/delete/{id}(id=${g.id})}" style="display:inline;">
-                    <div th:replace="~{fragments/csrf :: csrf}"></div>
-                    <button type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header">Habits streak (rolling 7)</div>
+        <div class="card-body">
+          <div class="d-flex gap-2 mb-2">
+            <div th:each="v : ${heat}"
+                 th:classappend="${v == 1} ? 'bg-success' : 'bg-secondary'"
+                 class="rounded" style="width:24px;height:12px;"></div>
+          </div>
+          <div class="mt-1"><strong th:text="|${streak7} day streak|">0 day streak</strong></div>
+        </div>
+      </div>
+    </div>
 
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">Quote of the day</div>
+        <div class="card-body">
+          <blockquote class="blockquote mb-0">
+            <p th:text="|“${quoteText}”|">“Discipline equals freedom.”</p>
+            <footer class="blockquote-footer" th:text="${quoteAuthor}">Jocko Willink</footer>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">This week focus</div>
+        <div class="card-body">
+          <ul class="mb-0">
+            <li>Priority #1</li>
+            <li>Priority #2</li>
+            <li>Priority #3</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
