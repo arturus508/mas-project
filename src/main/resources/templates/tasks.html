@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container" style="max-width: 820px; margin-top: 24px;">
+  <h2>Tasks — daily checklist</h2>
+
+  <form method="get" action="#" style="margin: 8px 0 16px;">
+    <label for="date">Date:</label>
+    <input id="date" name="date" type="date" th:value="${date}">
+    <button type="submit">Go</button>
+  </form>
+
+  <div style="margin: 12px 0; padding: 12px; border:1px solid #ddd; border-radius:8px;">
+    <h3 style="margin:0 0 8px;">Add task</h3>
+    <form method="post" th:action="@{/flow/tasks/add}">
+      <div th:replace="~{fragments/csrf :: csrf}"></div>
+      <input type="hidden" name="date" th:value="${date}">
+      <div style="display:grid; grid-template-columns: 1fr auto; gap:8px;">
+        <input name="title" placeholder="Task title" required>
+        <button type="submit">Add</button>
+      </div>
+    </form>
+  </div>
+
+  <h3 style="margin: 12px 0 6px;">Tasks for <span th:text="${date}">today</span></h3>
+  <div th:if="${#lists.isEmpty(tasks)}" style="color:#666;">No tasks yet.</div>
+
+  <ul style="list-style:none; padding:0; margin:0;">
+    <li th:each="t : ${tasks}" style="display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #f0f0f0;">
+      <form method="post" th:action="@{/flow/tasks/toggle/{id}(id=${t.id})}">
+        <div th:replace="~{fragments/csrf :: csrf}"></div>
+        <input type="hidden" name="date" th:value="${date}">
+        <button type="submit"
+                style="width:26px; height:26px; border:1px solid #bbb; border-radius:4px; background:#fff;"
+                th:text="${t.done} ? '✓' : ''" aria-label="toggle"></button>
+      </form>
+
+      <div th:text="${t.title}" th:style="${t.done} ? 'text-decoration: line-through; color:#888;' : ''">Task title</div>
+
+      <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+        <span style="font-size:12px; color:#666;" th:text="${t.completedDate}"> </span>
+        <form method="post" th:action="@{/flow/tasks/delete/{id}(id=${t.id})}">
+          <div th:replace="~{fragments/csrf :: csrf}"></div>
+          <input type="hidden" name="date" th:value="${date}">
+          <button type="submit">Delete</button>
+        </form>
+      </div>
+    </li>
+  </ul>
+</div>
+
+</body>
+</html>

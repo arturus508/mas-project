@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container" style="max-width: 820px; margin-top: 24px;">
+  <h2>Stress Relief — Breathing Timer</h2>
+
+  <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:end;">
+      <label>Pattern
+        <select id="pattern">
+          <option value="44">Calm 4–4</option>
+          <option value="46">Relax 4–6</option>
+          <option value="33">Focus 3–3</option>
+          <option value="55">Slow 5–5</option>
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+
+      <div id="customRow" style="display:none; grid-template-columns: 1fr 1fr; gap:8px;">
+        <label>Inhale (s) <input id="inS" type="number" min="1" value="4"></label>
+        <label>Exhale (s) <input id="exS" type="number" min="1" value="4"></label>
+      </div>
+
+      <div>
+        <button id="startBtn">Start</button>
+        <button id="stopBtn" disabled>Stop</button>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; align-items:center; gap:10px; padding:18px;">
+      <div id="circle" style="width:200px; height:200px; border-radius:50%; background:#eef6ff; transition: transform .9s ease; transform:scale(1.00);"></div>
+      <div id="phase" style="font-size:20px; font-weight:600;">Ready</div>
+      <div id="countdown" style="font-size:14px; color:#666;"></div>
+      <div style="font-size:12px; color:#888;">Runs until stopped • Inhale / Exhale only</div>
+    </div>
+  </div>
+</div>
+
+
+<script th:src="@{/js/breathing.js}" defer></script>
+</body>
+</html>
+

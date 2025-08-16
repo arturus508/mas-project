@@ -1,109 +1,92 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head :: head"></head>
-<body class="bg-light">
+<head th:replace="~{fragments/head :: head}"></head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
 
-<div th:replace="fragments/nav :: body"></div>
+<div class="container" style="max-width: 980px; margin-top: 24px;">
+  <h2>Habits — streak + mini heatmap (28d)</h2>
 
-<div class="container py-4">
+  <form method="get" action="#" style="margin:8px 0 16px;">
+    <label for="date">Reference date:</label>
+    <input id="date" name="date" type="date" th:value="${date}">
+    <button type="submit">Go</button>
+    <span style="font-size:12px; color:#666; margin-left:8px;">Heatmap kończy się w tej dacie</span>
+  </form>
 
-  <div class="d-flex align-items-center justify-content-between mb-3">
-    <h3 class="m-0">Habits · <span th:text="${date}">2025-08-15</span></h3>
-    <form class="d-flex gap-2" method="get" action="/flow/habits">
-      <input type="date" class="form-control" name="date" th:value="${date}">
-      <button class="btn btn-outline-primary">Go</button>
+  <style>
+    .heat{ display:flex; gap:4px; align-items:center; }
+    .cell{ width:14px; height:14px; border:1px solid #d0d7de; background:#fff; border-radius:3px; padding:0; }
+    .cell.on{ background:#2ea043; border-color:#2ea043; }
+    .cell:focus{ outline:1px solid #57606a; }
+    .name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:420px; }
+    .row{ display:grid; grid-template-columns: 1fr auto; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f0f0f0; }
+    .streak{ font-size:12px; color:#666; }
+    .target{ font-weight:600; margin-left:6px; color:#444; }
+  </style>
+
+  <div style="margin: 12px 0; padding: 12px; border:1px solid #ddd; border-radius:8px;">
+    <h3 style="margin:0 0 8px;">Add habit</h3>
+    <form method="post" th:action="@{/flow/habits}">
+      <div th:replace="~{fragments/csrf :: csrf}"></div>
+      <input type="hidden" name="date" th:value="${date}">
+      <div style="display:grid; grid-template-columns: 1fr 140px auto; gap:8px;">
+        <input name="name" placeholder="Habit name" required>
+        <input name="targetPerDay" type="number" min="1" value="1">
+        <button type="submit">Add</button>
+      </div>
     </form>
   </div>
 
-  <div class="row g-3">
-    <!-- Add habit form -->
-    <div class="col-12 col-lg-5">
-      <div class="card h-100">
-        <div class="card-header">Add habit</div>
-        <div class="card-body">
-          <form method="post" action="/flow/habits">
-            <div th:replace="fragments/csrf :: csrf"></div>
-            <div class="mb-2">
-              <label class="form-label">Name</label>
-              <input class="form-control" name="name" required>
-            </div>
-            <div class="mb-2">
-              <label class="form-label">Cadence</label>
-              <select class="form-select" name="cadence">
-                <option value="DAILY">DAILY</option>
-                <option value="WEEKLY">WEEKLY</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Target per day</label>
-              <input class="form-control" type="number" min="1" name="targetPerDay" value="1">
-            </div>
-            <button class="btn btn-success">Save</button>
-          </form>
-        </div>
-      </div>
+  <h3 style="margin: 12px 0 6px;">Your habits</h3>
+  <div th:if="${#lists.isEmpty(habits)}" style="color:#666;">No habits yet.</div>
+
+  <div th:each="h : ${habits}" class="row">
+    <div class="name">
+      <strong th:text="${h.name}">Habit</strong>
+      <span class="target"
+            th:text="' ×' + ${h.targetPerDay}"
+            th:title="${h.targetPerDay} + (${h.targetPerDay}==1 ? ' time' : ' times')"> ×1</span>
+      <span class="streak"> • 🔥 <span th:text="${streaks[h.id]}">0</span> day streak</span>
     </div>
 
-    <!-- Today's habits -->
-    <div class="col-12 col-lg-7">
-      <div class="card h-100">
-        <div class="card-header d-flex justify-content-between">
-          <span>Today’s habits</span>
-          <span class="text-muted small" th:text="${#lists.size(habits)} + ' total'">0 total</span>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-sm mb-0 align-middle">
-            <thead>
-              <tr>
-                <th style="width:42px;"></th>
-                <th>Name</th>
-                <th>Cadence</th>
-                <th>Target</th>
-                <th style="width: 1%;"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr th:each="h : ${habits}">
-                <td>
-                  <form method="post" th:action="@{'/flow/habits/toggle/' + ${h.id}}">
-                    <div th:replace="fragments/csrf :: csrf"></div>
-                    <input type="hidden" name="date" th:value="${date}">
-                    <button class="btn btn-sm"
-                            th:classappend="${today[h.id]} ? 'btn-success' : 'btn-outline-secondary'">
-                      <span th:text="${today[h.id]} ? '✔' : '○'">○</span>
-                    </button>
-                  </form>
-                </td>
-                <td>
-                  <div th:text="${h.name}">Drink water</div>
-                  <div class="text-muted small" th:if="${not today[h.id]}">not done</div>
-                  <div class="text-success small" th:if="${today[h.id]}">done</div>
-                </td>
-                <td th:text="${h.cadence}">DAILY</td>
-                <td th:text="${h.targetPerDay}">1</td>
-                <td>
-                  <form method="post" th:action="@{'/flow/habits/' + ${h.id} + '/delete'}"
-                        onsubmit="return confirm('Delete habit?');">
-                    <div th:replace="fragments/csrf :: csrf"></div>
-                    <button class="btn btn-sm btn-outline-danger">Delete</button>
-                  </form>
-                </td>
-              </tr>
-              <tr th:if="${#lists.isEmpty(habits)}">
-                <td colspan="5" class="text-center text-muted p-3">No habits yet</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card-footer text-muted small">
-          Click the circle to toggle today’s status.
-        </div>
+    <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end;">
+      <form method="post" th:action="@{/flow/habits/toggle/{id}(id=${h.id})}" style="display:inline;">
+        <div th:replace="~{fragments/csrf :: csrf}"></div>
+        <input type="hidden" name="date" th:value="${date}">
+        <input type="hidden" name="refDate" th:value="${date}">
+        <button type="submit"
+                style="width:26px; height:26px; border:1px solid #bbb; border-radius:4px; background:#fff;"
+                th:text="${today[h.id]} ? '✓' : ''" aria-label="toggle today"></button>
+      </form>
+
+      <form method="post" th:action="@{/flow/habits/{id}/delete(id=${h.id})}" style="display:inline;">
+        <div th:replace="~{fragments/csrf :: csrf}"></div>
+        <input type="hidden" name="date" th:value="${date}">
+        <button type="submit">Delete</button>
+      </form>
+    </div>
+
+    <div class="heat" style="grid-column: 1 / -1;">
+      <div th:each="d : ${windowDays}" style="display:inline;">
+        <form method="post" th:action="@{/flow/habits/toggle/{id}(id=${h.id})}" style="display:inline;">
+          <div th:replace="~{fragments/csrf :: csrf}"></div>
+          <input type="hidden" name="date"    th:value="${#temporals.format(d,'yyyy-MM-dd')}">
+          <input type="hidden" name="refDate" th:value="${date}">
+          <button type="submit" class="cell"
+                  th:classappend="${heat[h.id][#temporals.format(d,'yyyy-MM-dd')]} ? ' on' : ''"
+                  th:title="${#temporals.format(d,'EEE, yyyy-MM-dd')}"></button>
+        </form>
       </div>
     </div>
   </div>
-
 </div>
 
 </body>
 </html>
+
+
+
+
+
 
