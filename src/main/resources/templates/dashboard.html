@@ -1,63 +1,56 @@
 <!DOCTYPE html>
-<html  xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/head :: head"></head>
-<body  class="bg-light">
+<body class="bg-light">
 
 <div th:replace="fragments/nav :: body"></div>
 
-<div class="container  py-4">
-  <div class="row  g-3">
+<div class="container py-4">
+  <div class="row g-3">
 
-    <div class="col-12  col-lg-4">
-      <div class="card  h-100">
+    <div class="col-12 col-lg-4">
+      <div class="card h-100">
         <div class="card-header">Fitness</div>
         <div class="card-body">
-          <div class="mb-2  text-muted">Last Workout:  —  (link soon)</div>
-          <div class="mb-2  text-muted">Today’s Meal Plan:  —</div>
+          <div class="mb-2 text-muted">Last Workout: — (link soon)</div>
+          <div class="mb-2 text-muted">Today’s Meal Plan: —</div>
           <canvas id="chartFitness" height="140"></canvas>
         </div>
-        <div class="card-footer  d-flex  gap-2">
+        <div class="card-footer d-flex gap-2">
           <a href="/workout-plans" class="btn btn-outline-primary btn-sm">Workouts</a>
-          <a href="/meal-plans"    class="btn btn-outline-primary btn-sm">Meals</a>
-          <a href="/body-stats"    class="btn btn-outline-primary btn-sm">Body Stats</a>
+          <a href="/meal-plans" class="btn btn-outline-primary btn-sm">Meals</a>
+          <a href="/body-stats" class="btn btn-outline-primary btn-sm">Body Stats</a>
         </div>
       </div>
     </div>
 
-    <div class="col-12  col-lg-4">
-      <div class="card  h-100">
+    <div class="col-12 col-lg-4">
+      <div class="card h-100">
         <div class="card-header">Mind</div>
         <div class="card-body">
-          <div class="mb-2"><strong>Yesterday</strong>:  <span th:text="${yesterdaySleep}">No data</span></div>
-          <div class="mb-2"><strong>Guides</strong>:</div>
-          <ul class="list-unstyled  small">
-            <li th:each="g : ${mindGuides}">
-              <a th:href="@{'/guides/' + ${g.slug}}" th:text="${g.title}">Guide</a>
-              <span class="text-muted"> · <span th:text="${g.estReadingMin}">5</span> min</span>
-            </li>
-            <li th:if="${#lists.isEmpty(mindGuides)}" class="text-muted">No suggestions</li>
-          </ul>
+          <div class="mb-2"><strong>Yesterday</strong>: <span th:text="${yesterdaySleep}">No data</span></div>
+          
           <a href="/mind/stress-relief" class="btn btn-outline-success btn-sm">Stress Relief</a>
         </div>
-        <div class="card-footer">
+        <div class="card-footer d-flex gap-2">
           <a href="/mind/sleep" class="btn btn-outline-primary btn-sm">Sleep</a>
-          <a href="/guides?category=MIND" class="btn btn-outline-primary btn-sm">Guides</a>
+       
         </div>
       </div>
     </div>
 
-    <div class="col-12  col-lg-4">
-      <div class="card  h-100">
+    <div class="col-12 col-lg-4">
+      <div class="card h-100">
         <div class="card-header">Daily Flow</div>
         <div class="card-body">
-          <div class="mb-2  text-muted">Habits today:  —</div>
-          <div class="mb-2  text-muted">Top Tasks:  —</div>
-          <div class="mb-2  text-muted">Weekly Goals:  —</div>
+          <div class="mb-2 text-muted">Habits today: —</div>
+          <div class="mb-2 text-muted">Top Tasks: —</div>
+          <div class="mb-2 text-muted">Weekly Goals: —</div>
           <canvas id="chartFlow" height="140"></canvas>
         </div>
-        <div class="card-footer  d-flex  gap-2">
+        <div class="card-footer d-flex gap-2">
           <a href="/flow/habits" class="btn btn-outline-primary btn-sm">Habits</a>
-          <a href="/flow/tasks"  class="btn btn-outline-primary btn-sm">Tasks</a>
+          <a href="/flow/tasks" class="btn btn-outline-primary btn-sm">Tasks</a>
           <a href="/flow/weekly-goals" class="btn btn-outline-primary btn-sm">Weekly Goals</a>
         </div>
       </div>
@@ -71,9 +64,9 @@
     var ctx1 = document.getElementById('chartFitness');
     if (ctx1) {
       new Chart(ctx1, { type: 'line',
-        data: { labels: ['-4','-3','-2','-1','0'],  datasets:[
-          { label: 'Weight', data:[ ], tension: .3 },
-          { label: 'Body Fat', data:[ ], tension: .3 }
+        data: { labels: ['-4','-3','-2','-1','0'], datasets:[
+          { label: 'Weight', data:[], tension:.3 },
+          { label: 'Body Fat', data:[], tension:.3 }
         ]},
         options: { responsive:true, plugins:{ legend:{ display:true } } }
       });
@@ -81,8 +74,8 @@
     var ctx2 = document.getElementById('chartFlow');
     if (ctx2) {
       new Chart(ctx2, { type: 'bar',
-        data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],  datasets:[
-          { label: 'Habits done', data:[ ], }
+        data: { labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], datasets:[
+          { label: 'Habits done', data:[] }
         ]},
         options: { responsive:true, plugins:{ legend:{ display:true } } }
       });
@@ -92,7 +85,6 @@
 
 </body>
 </html>
-
 
 
 

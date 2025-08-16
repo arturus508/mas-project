@@ -1,51 +1,64 @@
 <!DOCTYPE html>
-<html  xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <body>
-<nav class="navbar navbar-expand-lg  navbar-light  bg-white  border-bottom">
-  <div class="container">
-    <a class="navbar-brand" href="/">SelfImprovement</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMain">
-      <ul class="navbar-nav  me-auto  mb-2  mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="/dashboard">Home</a></li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Fitness</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/workout-plans">Workout Plans</a></li>
-            <li><a class="dropdown-item" href="/meal-plans">Meal Plans</a></li>
-            <li><a class="dropdown-item" href="/body-stats">Body Stats</a></li>
-            <li><a class="dropdown-item" href="/guides?category=FITNESS">Guides</a></li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Mind</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/mind/sleep">Sleep</a></li>
-            <li><a class="dropdown-item" href="/guides?category=MIND">Guides</a></li>
-            <li><a class="dropdown-item" href="/mind/stress-relief">Stress Relief</a></li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Daily Flow</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/flow/habits">Habits</a></li>
-            <li><a class="dropdown-item" href="/flow/tasks">Tasks</a></li>
-            <li><a class="dropdown-item" href="/flow/weekly-goals">Weekly Goals</a></li>
-          </ul>
-        </li>
-        <li class="nav-item"><a class="nav-link" href="/guides">Guides</a></li>
-      </ul>
+<div th:fragment="nav">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="container">
+      <a class="navbar-brand" th:href="@{/}">SelfImprovement</a>
 
-      <ul class="navbar-nav">
-        <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
-        <li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
-        <li class="nav-item"><a class="btn btn-outline-danger btn-sm ms-lg-2" href="/logout">Logout</a></li>
-      </ul>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"
+              aria-controls="navMain" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navMain">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/dashboard}">Home</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Fitness</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" th:href="@{/workout-plans}">Workout Plans</a></li>
+              <li><a class="dropdown-item" th:href="@{/meal-plans}">Meal Plans</a></li>
+              <li><a class="dropdown-item" th:href="@{/body-stats}">Body Stats</a></li>
+              <!-- usunięto Guides -->
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Mind</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" th:href="@{/mind/sleep}">Sleep</a></li>
+              <li><a class="dropdown-item" th:href="@{/mind/stress-relief}">Stress Relief</a></li>
+              <!-- usunięto Guides -->
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Daily Flow</a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" th:href="@{/flow/habits}">Habits</a></li>
+              <li><a class="dropdown-item" th:href="@{/flow/tasks}">Tasks</a></li>
+              <li><a class="dropdown-item" th:href="@{/flow/weekly-goals}">Weekly Goals</a></li>
+            </ul>
+          </li>
+
+        </ul>
+
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" th:href="@{/profile}">Profile</a></li>
+          <li class="nav-item"><a class="nav-link" th:href="@{/settings}">Settings</a></li>
+          <li class="nav-item">
+            <a class="btn btn-outline-danger btn-sm ms-lg-2" th:href="@{/logout}">Logout</a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </nav>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</div>
 </body>
 </html>
