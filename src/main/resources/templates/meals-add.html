@@ -1,58 +1,60 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head('Add meal')}"></head>
-<body class="bg-light">
-<div th:replace="~{fragments/nav :: body}"></div>
+<head>
+  <meta charset="UTF-8">
+  <title>Add meal</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>
+  <h1>Add meal</h1>
+  <nav>
+    <ul>
+      <li><a th:href="@{/dashboard}">Dashboard</a></li>
+      <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
+    </ul>
+  </nav>
+</header>
 
-<div class="container py-4" style="max-width: 720px;">
-  <h2 class="mb-3">Add meal</h2>
+<div class="content">
+  <div class="card">
+    <form action="/meals/add" method="post">
+      <!-- CSRF (jeśli masz fragment, można go użyć bez parametrów) -->
+      <div th:replace="~{fragments/csrf :: csrf}"></div>
 
-  <form th:action="@{/meals/add}" method="post" class="card p-3">
-    <div th:replace="~{fragments/csrf :: csrf}"></div>
+      <!-- Hidden: mealPlanId (bierzemy z modelu lub z query-param) -->
+      <input type="hidden" name="mealPlanId"
+             th:value="${mealPlanId} ?: ${param.mealPlanId}"/>
 
-    <input type="hidden" name="mealPlanId" th:value="${mealPlanId}">
+      <label for="date">Date</label>
+      <input id="date" name="date" type="date"
+             th:value="${date} ?: ${#temporals.format(#temporals.createNow(),'yyyy-MM-dd')}" />
 
-    <div class="row g-3">
-      <div class="col-6">
-        <label class="form-label">Date</label>
-        <input class="form-control" type="date" name="date" th:value="${date}">
-      </div>
-      <div class="col-6">
-        <label class="form-label">Type</label>
-        <select class="form-select" name="type" th:if="${type == null}">
-          <option th:each="t : ${types}" th:value="${t}" th:text="${t}">BREAKFAST</option>
-        </select>
-        <input th:if="${type != null}" type="hidden" name="type" th:value="${type}">
-        <div th:if="${type != null}" class="form-control" th:text="${type}"></div>
-      </div>
+      <label for="type">Type</label>
+      <select id="type" name="type">
+        <!-- iterujemy po enumie bez zależności od kontrolera -->
+        <option th:each="t : ${T(com.example.healthfitness.model.MealType).values()}"
+                th:value="${t}" th:text="${t}">BREAKFAST</option>
+      </select>
 
-      <div class="col-6">
-        <label class="form-label">Kcal</label>
-        <input class="form-control" type="number" name="kcal" min="0" step="1">
-      </div>
-      <div class="col-6 d-flex align-items-end">
-        <div class="text-muted small">Leave empty to compute from macros.</div>
-      </div>
+      <label for="kcal">Calories</label>
+      <input id="kcal" name="kcal" type="number" min="0" step="1" value="0"/>
 
-      <div class="col-4">
-        <label class="form-label">Protein (g)</label>
-        <input class="form-control" type="number" name="protein" min="0" step="1">
-      </div>
-      <div class="col-4">
-        <label class="form-label">Fat (g)</label>
-        <input class="form-control" type="number" name="fat" min="0" step="1">
-      </div>
-      <div class="col-4">
-        <label class="form-label">Carbs (g)</label>
-        <input class="form-control" type="number" name="carbs" min="0" step="1">
-      </div>
-    </div>
+      <label for="protein">Protein (g)</label>
+      <input id="protein" name="protein" type="number" min="0" step="1" value="0"/>
 
-    <div class="mt-3 d-flex gap-2">
-      <button class="btn btn-primary" type="submit">Save</button>
-      <a th:href="@{/meal-plans}" class="btn btn-outline-secondary">Cancel</a>
-    </div>
-  </form>
+      <label for="fat">Fat (g)</label>
+      <input id="fat" name="fat" type="number" min="0" step="1" value="0"/>
+
+      <label for="carbs">Carbs (g)</label>
+      <input id="carbs" name="carbs" type="number" min="0" step="1" value="0"/>
+
+      <div class="actions">
+        <button type="submit" class="btn">Save</button>
+        <a th:href="@{/meal-plans}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
 </div>
 </body>
 </html>

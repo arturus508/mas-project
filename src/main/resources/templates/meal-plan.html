@@ -1,68 +1,65 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Meal Plan Details</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+  <meta charset="UTF-8">
+  <title>Meal Plan Details</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <header>
-    <h1>Meal Plan Details</h1>
-    <nav>
-        <ul>
-            <li><a th:href="@{/dashboard}">Dashboard</a></li>
-            <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
-        </ul>
-    </nav>
+  <h1>Meal Plan Details</h1>
+  <nav>
+    <ul>
+      <li><a th:href="@{/dashboard}">Dashboard</a></li>
+      <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
+    </ul>
+  </nav>
 </header>
-<div class="content">
-    <!-- Card for Meal Plan Details -->
-    <div class="card">
-        <h2 th:text="${mealPlan.planName}">Plan Name</h2>
-        <p><strong>Description:</strong> <span th:text="${mealPlan.description}"></span></p>
-        <p><strong>Dietary Restriction:</strong> <span th:text="${mealPlan.dietaryRestriction}"></span></p>
-        <p><strong>Start Date:</strong> <span th:text="${mealPlan.startDate}"></span></p>
-        <p><strong>End Date:</strong> <span th:text="${mealPlan.endDate}"></span></p>
-        <!-- Link to edit the meal plan details -->
-        <a th:href="@{'/meal-plans/edit/' + ${mealPlan.mealPlanId}}" class="edit-button">Edit Meal Plan</a>
-    </div>
 
-    <h3>Meals</h3>
-    <!-- Button to add a new meal -->
-    <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals/add'}" class="add-button">Add Meal</a>
-    <br/><br/>
-    <!-- Table showing all meals attached to the meal plan -->
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Calories</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="meal : ${meals}">
-            <td th:text="${meal.mealName}">Meal Name</td>
-            <td th:text="${meal.date}">Date</td>
-            <td th:text="${meal.time}">Time</td>
-            <td th:text="${meal.totalCalories}">Calories</td>
-            <td>
-                <!-- Link to edit a specific meal -->
-                <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals/edit/' + ${meal.mealId}}" class="edit-button">Edit</a>
-                <!-- Link to delete a specific meal -->
-                <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals/delete/' + ${meal.mealId}}" class="delete-button">Delete</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <br/>
-    <!-- Back button to return to the list of meal plans -->
-    <a th:href="@{/meal-plans}" class="back-button">Back to Meal Plans</a>
+<div class="content">
+  <div class="card">
+    <h2 th:text="${mealPlan.planName}">Plan Name</h2>
+    <p><strong>Description:</strong> <span th:text="${mealPlan.description}"></span></p>
+    <p><strong>Dietary Restriction:</strong> <span th:text="${mealPlan.dietaryRestriction}"></span></p>
+    <p><strong>Start Date:</strong> <span th:text="${mealPlan.startDate}"></span></p>
+    <p><strong>End Date:</strong> <span th:text="${mealPlan.endDate}"></span></p>
+    <a th:href="@{'/meal-plans/edit/' + ${mealPlan.mealPlanId}}" class="edit-button">Edit Meal Plan</a>
+  </div>
+
+  <h3>Meals</h3>
+  <a th:href="@{'/meals/add?mealPlanId=' + ${mealPlan.mealPlanId}}" class="add-button">Add Meal</a>
+  <br/><br/>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Date</th>
+      <th>Type</th>
+      <th>Calories</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:if="${#lists.isEmpty(mealPlan.meals)}">
+      <td colspan="4" class="text-muted">No meals yet. Click “Add Meal”.</td>
+    </tr>
+    <tr th:each="meal : ${mealPlan.meals}">
+      <td th:text="${meal.date}">2025-08-16</td>
+      <td th:text="${meal.mealType}">BREAKFAST</td>
+      <td th:text="${meal.totalCalories}">0</td>
+      <td>
+        <a th:href="@{'/meal-plans/meals/delete/' + ${meal.mealId} + '?mealPlanId=' + ${mealPlan.mealPlanId}}"
+           class="delete-button"
+           onclick="return confirm('Delete this meal?');">Delete</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <br/>
+  <a th:href="@{/meal-plans}" class="back-button">Back to Meal Plans</a>
 </div>
 </body>
 </html>
-
 
 
