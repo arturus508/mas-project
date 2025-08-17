@@ -3,7 +3,7 @@ package com.example.healthfitness.service;
 import com.example.healthfitness.model.*;
 import com.example.healthfitness.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class UserService {
     private PaymentRepository paymentRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     public User saveUser(User user) {
         if (user.getMembership() != null) {
