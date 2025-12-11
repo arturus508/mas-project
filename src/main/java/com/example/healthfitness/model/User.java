@@ -33,13 +33,9 @@ public class User {
     @JsonManagedReference
     private List<BodyStats> bodyStats = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Payment> payments = new ArrayList<>();
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private Membership membership;
+    // Removed payments and membership relationships. The user no longer tracks payments or membership directly.
+    // private List<Payment> payments = new ArrayList<>();
+    // private Membership membership;
 
     public User() {}
 
@@ -74,18 +70,5 @@ public class User {
     public List<BodyStats> getBodyStats() { return bodyStats; }
     public void setBodyStats(List<BodyStats> bodyStats) { this.bodyStats = bodyStats; }
 
-    public List<Payment> getPayments() { return payments; }
-    public void setPayments(List<Payment> payments) { this.payments = payments; }
-
-    public Membership getMembership() { return membership; }
-    public void setMembership(Membership membership) {
-        this.membership = membership;
-        if (membership != null) {
-            membership.setUser(this);
-        }
-    }
+    // removed getters/setters for payments and membership
 }
-
-
-
-

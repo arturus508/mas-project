@@ -35,16 +35,19 @@ public class BodyStatsViewController {
     }
 
     @PostMapping("/body-stats/add")
-    public String addBodyStats(@RequestParam String dateRecorded,
-                               @RequestParam double weight,
-                               @RequestParam double bodyFatPercent) {
+    public String addBodyStats(
+            @RequestParam("dateRecorded")
+            @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
+            java.time.LocalDate dateRecorded,
+            @RequestParam("weight") double weight,
+            @RequestParam("bodyFatPercent") double bodyFatPercent) {
         // Get current user
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        User user = userService.findByEmail(email)
+        String email       = auth.getName();
+        User user          = userService.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found: " + email));
 
-        // Create BodyStats & associate with user
+        // Build BodyStats using the LocalDate constructor and associate with user
         BodyStats stats = new BodyStats(dateRecorded, weight, bodyFatPercent);
         bodyStatsService.addBodyStatsToUser(user.getUserId(), stats);
         return "redirect:/body-stats";

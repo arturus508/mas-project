@@ -91,7 +91,8 @@ public class WorkoutPlanViewController {
             throw new RuntimeException("Workout plan not found with id: " + id);
         }
         model.addAttribute("workoutPlan", plan);
-        model.addAttribute("exercises", plan.getWorkoutPlanExercises());
+        // Fetch exercises via service to avoid lazy initialization issues
+        model.addAttribute("exercises", workoutPlanService.getExercisesByWorkoutPlan(id));
         model.addAttribute("workoutPlanId", id);
         return "workout-plan-details"; // corresponds to workout-plan-details.html
     }
@@ -127,9 +128,10 @@ public class WorkoutPlanViewController {
     @GetMapping("/{workoutPlanId}/exercises/delete/{wpExId}")
     public String deleteWorkoutPlanExercise(@PathVariable Long workoutPlanId,
                                             @PathVariable Long wpExId) {
-        WorkoutPlan plan = workoutPlanService.getWorkoutPlanById(workoutPlanId);
-        plan.getWorkoutPlanExercises().removeIf(e -> e.getWpExerciseId().equals(wpExId));
-        workoutPlanService.updateWorkoutPlan(workoutPlanId, plan);
+        // Use service method to delete the exercise directly instead of manipulating the
+        // lazy-loaded exercises collection on the WorkoutPlan. This avoids triggering
+        // LazyInitializationException.
+        workoutPlanService.removeExerciseFromWorkoutPlan(workoutPlanId, wpExId);
         return "redirect:/workout-plans/" + workoutPlanId + "/exercises";
     }
 }

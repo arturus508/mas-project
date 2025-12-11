@@ -64,9 +64,24 @@ public class WorkoutPlanService {
     }
 
     // Get the list of exercises attached to a workout plan.
+    // Fetch via repository method to avoid lazy loading issues on the WorkoutPlan entity.
     public List<WorkoutPlanExercise> getExercisesByWorkoutPlan(Long workoutPlanId) {
-        WorkoutPlan workoutPlan = getWorkoutPlanById(workoutPlanId);
-        return workoutPlan.getWorkoutPlanExercises();
+        return workoutPlanExerciseRepository.findByWorkoutPlan_WorkoutPlanId(workoutPlanId);
+    }
+
+    /**
+     * Remove an exercise from a workout plan. This directly deletes the
+     * WorkoutPlanExercise entity by its id instead of manipulating the
+     * WorkoutPlan entity's collection, which could trigger lazy loading
+     * issues if the collection is not initialized. By deleting at the
+     * repository layer, we avoid the need to load the entire workout plan
+     * and its exercises.
+     *
+     * @param workoutPlanId the id of the workout plan (unused but kept for symmetry)
+     * @param wpExId        the id of the WorkoutPlanExercise to remove
+     */
+    public void removeExerciseFromWorkoutPlan(Long workoutPlanId, Long wpExId) {
+        workoutPlanExerciseRepository.deleteById(wpExId);
     }
 }
 

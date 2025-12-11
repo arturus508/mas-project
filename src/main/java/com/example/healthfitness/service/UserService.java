@@ -15,8 +15,6 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private MembershipRepository membershipRepository;
 
     @Autowired
     private WorkoutPlanRepository workoutPlanRepository;
@@ -27,18 +25,12 @@ public class UserService {
     @Autowired
     private BodyStatsRepository bodyStatsRepository;
 
-    @Autowired
-    private PaymentRepository paymentRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     public User saveUser(User user) {
-        if (user.getMembership() != null) {
-            Membership membership = membershipRepository.findById(user.getMembership().getMembershipId())
-                    .orElseThrow(() -> new RuntimeException("Membership not found"));
-            user.setMembership(membership);
-        }
+        // Persist the user without handling membership or payments (module removed).
         return userRepository.save(user);
     }
 
@@ -56,24 +48,22 @@ public class UserService {
     }
 
     public List<WorkoutPlan> getWorkoutPlansByUserId(Long userId) {
-        return getUserById(userId).getWorkoutPlans();
+        // Fetch workout plans directly via repository to avoid lazy-loading issues. This retrieves
+        // all workout plans associated with the given user id without requiring the user entity
+        // to remain in an active Hibernate session.
+        return workoutPlanRepository.findByUser_UserId(userId);
     }
 
     public List<MealPlan> getMealPlansByUserId(Long userId) {
-        return getUserById(userId).getMealPlans();
+        // Fetch meal plans directly via repository to avoid LazyInitializationException.
+        return mealPlanRepository.findByUser_UserId(userId);
     }
 
     public List<BodyStats> getBodyStatsByUserId(Long userId) {
-        return getUserById(userId).getBodyStats();
+        // Retrieve body stats in a safe way via repository ordering by date recorded descending.
+        return bodyStatsRepository.findByUserUserIdOrderByDateRecordedDesc(userId);
     }
 
-    public List<Payment> getPaymentsByUserId(Long userId) {
-        return getUserById(userId).getPayments();
-    }
-
-    public Membership getMembershipByUserId(Long userId) {
-        return getUserById(userId).getMembership();
-    }
 
     public WorkoutPlan addWorkoutPlanToUser(Long userId, WorkoutPlan workoutPlan) {
         User user = getUserById(userId);
@@ -93,11 +83,7 @@ public class UserService {
         return bodyStatsRepository.save(bodyStats);
     }
 
-    public Payment addPaymentToUser(Long userId, Payment payment) {
-        User user = getUserById(userId);
-        payment.setUser(user);
-        return paymentRepository.save(payment);
-    }
+    // Removed methods related to payments and membership because those modules have been removed
 
     public User registerUser(String name, String email, String password) {
         if (userRepository.findByEmail(email.toLowerCase()).isPresent()) {
@@ -113,7 +99,6 @@ public class UserService {
         return userOpt.isPresent() && passwordEncoder.matches(rawPassword, userOpt.get().getPassword());
     }
 }
-
 
 
 

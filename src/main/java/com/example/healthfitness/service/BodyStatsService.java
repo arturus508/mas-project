@@ -28,9 +28,8 @@ public class BodyStatsService {
         return bodyStatsRepository.save(bodyStats);
     }
     public List<BodyStats> getBodyStatsByUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-        return user.getBodyStats();
+        
+        return bodyStatsRepository.findByUserUserIdOrderByDateRecordedDesc(userId);
     }
 
     public void addBodyStatsToUser(Long userId, BodyStats bodyStats) {
