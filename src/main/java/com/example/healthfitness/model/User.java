@@ -70,5 +70,5 @@ public class User {
     public List<BodyStats> getBodyStats() { return bodyStats; }
     public void setBodyStats(List<BodyStats> bodyStats) { this.bodyStats = bodyStats; }
 
-    // removed getters/setters for payments and membership
+  
 }

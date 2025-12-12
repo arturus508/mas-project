@@ -55,12 +55,13 @@ public class MealMacroService {
         int kcal=0, p=0, f=0, c=0;
         for (var it : m.getItems()) {
             var fi = it.getFoodItem();
-            if ("g".equalsIgnoreCase(fi.getUnit())) {
+            // interpretacja ilości zależnie od enum Unit
+            if (fi.getUnit() == Unit.G) {
                 double k = it.getQuantity() / 100.0;
-                kcal += Math.round( fi.getKcal100()    * k );
-                p    += Math.round( fi.getProtein100() * k );
-                f    += Math.round( fi.getFat100()     * k );
-                c    += Math.round( fi.getCarbs100()   * k );
+                kcal += Math.round(fi.getKcal100()    * k);
+                p    += Math.round(fi.getProtein100() * k);
+                f    += Math.round(fi.getFat100()     * k);
+                c    += Math.round(fi.getCarbs100()   * k);
             } else {
                 kcal += fi.getKcal100()    * it.getQuantity();
                 p    += fi.getProtein100() * it.getQuantity();

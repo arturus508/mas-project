@@ -2,7 +2,6 @@ package com.example.healthfitness.controller;
 
 import org.springframework.ui.Model;
 import com.example.healthfitness.model.*;
-import com.example.healthfitness.service.MembershipService;
 import com.example.healthfitness.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +14,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private MembershipService membershipService;
 
     @GetMapping
     public List<User> getAllUsers() {
@@ -71,26 +67,14 @@ public class UserController {
         return userService.addBodyStatsToUser(userId, bodyStats);
     }
 
-    @GetMapping("/{userId}/payments")
-    public List<Payment> getPayments(@PathVariable Long userId) {
-        return userService.getPaymentsByUserId(userId);
-    }
-
-    @PostMapping("/{userId}/payments")
-    public Payment addPaymentToUser(@PathVariable Long userId, @RequestBody Payment payment) {
-        return userService.addPaymentToUser(userId, payment);
-    }
-
-    @GetMapping("/{userId}/membership")
-    public Membership getMembership(@PathVariable Long userId) {
-        return userService.getMembershipByUserId(userId);
-    }
-
-    @PostMapping("/{userId}/membership")
-    public Membership addOrUpdateMembership(@PathVariable Long userId, @RequestBody Membership membership) {
-        return membershipService.saveMembershipForUser(userId, membership);
-    }
+    
 }
+
+
+
+
+
+
 
 
 
