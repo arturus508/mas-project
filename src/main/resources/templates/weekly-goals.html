@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head :: head"></head>
+<head th:replace="~{fragments/head :: headNoArg}"></head>
 <body>
-<div th:replace="fragments/nav :: body"></div>
+<nav th:replace="~{fragments/nav :: nav}"></nav>
 
 <main class="container my-4">
   <h2 class="mb-1">Weekly Review</h2>
