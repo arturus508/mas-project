@@ -4,9 +4,12 @@ import com.example.healthfitness.model.MealPlan;
 import com.example.healthfitness.service.MealPlanService;
 import com.example.healthfitness.service.MealService;
 import com.example.healthfitness.service.UserService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.example.healthfitness.service.CurrentUserService;
+import com.example.healthfitness.web.form.MealPlanForm;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -16,21 +19,23 @@ public class MealPlanViewController {
     private final MealPlanService mealPlanService;
     private final UserService userService;
     private final MealService mealService;
+    private final CurrentUserService currentUserService;
 
     public MealPlanViewController(MealPlanService mealPlanService,
                                   UserService userService,
-                                  MealService mealService) {
-        this.mealPlanService = mealPlanService;
-        this.userService = userService;
-        this.mealService = mealService;
+                                  MealService mealService,
+                                  CurrentUserService currentUserService) {
+        this.mealPlanService   = mealPlanService;
+        this.userService       = userService;
+        this.mealService       = mealService;
+        this.currentUserService = currentUserService;
     }
 
     
     @GetMapping
     public String listPlans(Model model) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        var user = userService.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found: " + email));
-        model.addAttribute("mealPlans", mealPlanService.getMealPlansByUser(user.getUserId()));
+        Long userId = currentUserService.id();
+        model.addAttribute("mealPlans", mealPlanService.getMealPlansByUser(userId));
         return "meal-plans";
     }
 
@@ -48,16 +53,25 @@ public class MealPlanViewController {
   
     @GetMapping("/add")
     public String addMealPlanPage(Model model) {
-        model.addAttribute("mealPlan", new MealPlan());
+        model.addAttribute("mealPlanForm", new MealPlanForm());
         return "add-meal-plan";
     }
 
-   
     @PostMapping("/add")
-    public String addMealPlan(@ModelAttribute MealPlan mealPlan) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        var user = userService.findByEmail(email).orElseThrow();
-        mealPlan.setUser(user);
+    public String addMealPlan(@Valid @ModelAttribute("mealPlanForm") MealPlanForm form,
+                              BindingResult bindingResult,
+                              Model model) {
+        if (bindingResult.hasErrors()) {
+            return "add-meal-plan";
+        }
+        Long userId = currentUserService.id();
+        MealPlan mealPlan = new MealPlan();
+        mealPlan.setPlanName(form.getPlanName());
+        mealPlan.setDescription(form.getDescription());
+        mealPlan.setDietaryRestriction(form.getDietaryRestriction());
+        mealPlan.setStartDate(form.getStartDate());
+        mealPlan.setEndDate(form.getEndDate());
+        mealPlan.setUser(userService.getUserById(userId));
         mealPlanService.saveMealPlan(mealPlan);
         return "redirect:/meal-plans";
     }
