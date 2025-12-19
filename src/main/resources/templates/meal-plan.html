@@ -17,6 +17,10 @@
 </header>
 
 <div class="content">
+  <!-- Flash messages -->
+  <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+  <div th:if="${errorMessage}" class="alert alert-danger"  th:text="${errorMessage}"></div>
+
   <div class="card">
     <h2 th:text="${mealPlan.planName}">Plan Name</h2>
     <p><strong>Description:</strong> <span th:text="${mealPlan.description}"></span></p>
@@ -48,18 +52,24 @@
       <td th:text="${meal.mealType}">BREAKFAST</td>
       <td th:text="${meal.totalCalories}">0</td>
       <td>
-        <a th:href="@{'/meal-plans/meals/delete/' + ${meal.mealId} + '?mealPlanId=' + ${mealPlan.mealPlanId}}"
-           class="delete-button"
-           onclick="return confirm('Delete this meal?');">Delete</a>
+        <!-- Delete meal form: requires POST to avoid CSRF issues -->
+        <form th:action="@{'/meal-plans/meals/delete/' + ${meal.mealId}}" method="post" style="display:inline;">
+          <input type="hidden" name="mealPlanId" th:value="${mealPlan.mealPlanId}" />
+          <!-- CSRF token -->
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="delete-button" onclick="return confirm('Delete this meal?');">Delete</button>
+        </form>
       </td>
     </tr>
     </tbody>
   </table>
 
   <br/>
+  <form th:action="@{'/meal-plans/delete/' + ${mealPlan.mealPlanId}}" method="post" style="display:inline;">
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    <button type="submit" class="delete-button" onclick="return confirm('Delete this meal plan?');">Delete Meal Plan</button>
+  </form>
   <a th:href="@{/meal-plans}" class="back-button">Back to Meal Plans</a>
 </div>
 </body>
 </html>
-
-

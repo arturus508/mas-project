@@ -1,25 +1,26 @@
 package com.example.healthfitness.controller;
 
+import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.MealPlan;
+import com.example.healthfitness.service.CurrentUserService;
 import com.example.healthfitness.service.MealPlanService;
 import com.example.healthfitness.service.MealService;
 import com.example.healthfitness.service.UserService;
-import com.example.healthfitness.service.CurrentUserService;
 import com.example.healthfitness.web.form.MealPlanForm;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * Web controller for managing meal plans.  This controller exposes pages
- * for listing, adding, editing and deleting meal plans.  It relies on
- * {@link CurrentUserService} to obtain the id of the currently logged‑in
- * user rather than reading from {@code SecurityContextHolder}.  All
- * modifications are performed via the {@link MealPlanService} and
- * relationships to the current user are managed explicitly through
- * {@link UserService}.
+ * Web controller for managing meal plans.  It exposes pages for
+ * listing, viewing details, adding, editing and deleting meal plans.
+ * Actions that modify state return redirects with flash messages to
+ * inform the user of success or failure.  Resource lookups that
+ * return null throw {@link ResourceNotFoundException} so that the
+ * {@link GlobalExceptionHandler} can respond with a 404 page.
  */
 @Controller
 @RequestMapping("/meal-plans")
@@ -31,15 +32,18 @@ public class MealPlanViewController {
     private final CurrentUserService currentUserService;
 
     public MealPlanViewController(MealPlanService mealPlanService,
-                                  UserService userService,
-                                  MealService mealService,
-                                  CurrentUserService currentUserService) {
-        this.mealPlanService   = mealPlanService;
-        this.userService       = userService;
-        this.mealService       = mealService;
+                                   UserService userService,
+                                   MealService mealService,
+                                   CurrentUserService currentUserService) {
+        this.mealPlanService    = mealPlanService;
+        this.userService        = userService;
+        this.mealService        = mealService;
         this.currentUserService = currentUserService;
     }
 
+    /**
+     * List all meal plans belonging to the current user.
+     */
     @GetMapping
     public String listPlans(Model model) {
         Long userId = currentUserService.id();
@@ -47,26 +51,38 @@ public class MealPlanViewController {
         return "meal-plans";
     }
 
+    /**
+     * Show details for a single meal plan.  If the plan does not
+     * exist, a {@link ResourceNotFoundException} is thrown.
+     */
     @GetMapping("/{id}")
     public String details(@PathVariable Long id, Model model) {
         MealPlan mealPlan = mealPlanService.getMealPlanById(id);
         if (mealPlan == null) {
-            throw new RuntimeException("MealPlan not found with id: " + id);
+            throw new ResourceNotFoundException("Meal plan not found with id: " + id);
         }
         model.addAttribute("mealPlan", mealPlan);
         return "meal-plan";
     }
 
+    /**
+     * Display the add meal plan form.
+     */
     @GetMapping("/add")
     public String addMealPlanPage(Model model) {
         model.addAttribute("mealPlanForm", new MealPlanForm());
         return "add-meal-plan";
     }
 
+    /**
+     * Persist a new meal plan.  On validation errors the user is
+     * returned to the form.  On success the user is redirected back
+     * to the list with a success message.
+     */
     @PostMapping("/add")
     public String addMealPlan(@Valid @ModelAttribute("mealPlanForm") MealPlanForm form,
                                BindingResult bindingResult,
-                               Model model) {
+                               RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             return "add-meal-plan";
         }
@@ -79,47 +95,63 @@ public class MealPlanViewController {
         mealPlan.setEndDate(form.getEndDate());
         mealPlan.setUser(userService.getUserById(userId));
         mealPlanService.saveMealPlan(mealPlan);
+        redirectAttributes.addFlashAttribute("successMessage", "Meal plan created successfully");
         return "redirect:/meal-plans";
     }
 
+    /**
+     * Display the edit meal plan form.
+     */
     @GetMapping("/edit/{id}")
     public String editMealPlanPage(@PathVariable Long id, Model model) {
         MealPlan mealPlan = mealPlanService.getMealPlanById(id);
         if (mealPlan == null) {
-            throw new RuntimeException("MealPlan not found with id: " + id);
+            throw new ResourceNotFoundException("Meal plan not found with id: " + id);
         }
         model.addAttribute("mealPlan", mealPlan);
         return "meal-plan-edit";
     }
 
+    /**
+     * Persist updates to an existing meal plan.  On completion the
+     * user is redirected back to the plan detail with a success message.
+     */
     @PostMapping("/edit/{id}")
     public String editMealPlan(@PathVariable Long id,
-                               @ModelAttribute MealPlan updatedMealPlan) {
-        // Associate the updated plan with the current user.  Without
-        // explicitly setting the user here the plan could become
-        // detached from the currently authenticated user.
+                               @ModelAttribute MealPlan updatedMealPlan,
+                               RedirectAttributes redirectAttributes) {
         Long userId = currentUserService.id();
         updatedMealPlan.setUser(userService.getUserById(userId));
         mealPlanService.updateMealPlan(id, updatedMealPlan);
+        redirectAttributes.addFlashAttribute("successMessage", "Meal plan updated successfully");
         return "redirect:/meal-plans/" + id;
     }
 
-    @GetMapping("/delete/{id}")
-    public String deleteMealPlan(@PathVariable Long id) {
+    /**
+     * Delete an entire meal plan.  Redirect back to the list with a
+     * success message.
+     */
+    @PostMapping("/delete/{id}")
+    public String deleteMealPlan(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         mealPlanService.deleteMealPlan(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Meal plan deleted successfully");
         return "redirect:/meal-plans";
     }
 
-    // Legacy: /meal-plans/{id}/meals
-    @GetMapping("/{id}/meals")
-    public String legacyMeals(@PathVariable Long id) {
-        return "redirect:/meal-plans/" + id;
-    }
-
-    @GetMapping("/meals/delete/{mealId}")
+    /**
+     * Remove a single meal from a meal plan.  This endpoint now
+     * requires a POST request to prevent accidental deletions via
+     * bookmarked URLs and to allow Spring Security to enforce CSRF
+     * protection.  The mealPlanId is passed as a parameter to know
+     * where to redirect back to after deletion.  A flash attribute
+     * indicates success.
+     */
+    @PostMapping("/meals/delete/{mealId}")
     public String deleteMealFromPlan(@PathVariable Long mealId,
-                                      @RequestParam("mealPlanId") Long mealPlanId) {
+                                     @RequestParam("mealPlanId") Long mealPlanId,
+                                     RedirectAttributes redirectAttributes) {
         mealService.deleteMeal(mealId);
+        redirectAttributes.addFlashAttribute("successMessage", "Meal deleted successfully");
         return "redirect:/meal-plans/" + mealPlanId;
     }
 }
