@@ -16,6 +16,10 @@
   </nav>
 </header>
 <div class="content">
+  <!-- Flash messages -->
+  <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+  <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
   <!-- Button to add a new meal plan -->
   <a th:href="@{/meal-plans/add}" class="add-button">Add New Meal Plan</a>
 
@@ -27,14 +31,15 @@
     <p th:text="'Start Date: ' + ${mealPlan.startDate}"></p>
     <p th:text="'End Date: ' + ${mealPlan.endDate}"></p>
     <div class="actions">
-      <!-- "Go" button takes you to the Meal Plan Details page (which is at /meal-plans/{id}/meals) -->
-      <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId} + '/meals'}" class="edit-button">Go</a>
-      <!-- "Delete" button removes the meal plan -->
-      <a th:href="@{'/meal-plans/delete/' + ${mealPlan.mealPlanId}}" class="delete-button">Delete</a>
+      <!-- Go to details page for this plan -->
+      <a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId}}" class="edit-button">Go</a>
+      <!-- Delete meal plan via POST to avoid accidental deletion via GET -->
+      <form th:action="@{'/meal-plans/delete/' + ${mealPlan.mealPlanId}}" method="post" style="display:inline;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit" class="delete-button" onclick="return confirm('Delete this meal plan?');">Delete</button>
+      </form>
     </div>
   </div>
 </div>
 </body>
 </html>
-
-

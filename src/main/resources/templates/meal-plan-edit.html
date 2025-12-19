@@ -21,6 +21,9 @@
   <div class="card">
     <form th:action="@{'/meal-plans/edit/' + ${mealPlan.mealPlanId}}"
           method="post" th:object="${mealPlan}">
+      <!-- CSRF token -->
+      <div th:replace="~{fragments/csrf :: csrf}"></div>
+
       <label>Plan Name:</label>
       <input type="text" th:field="*{planName}" required>
 
@@ -42,6 +45,3 @@
 </div>
 </body>
 </html>
-
-
-

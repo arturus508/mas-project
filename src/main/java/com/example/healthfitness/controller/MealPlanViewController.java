@@ -1,6 +1,5 @@
 package com.example.healthfitness.controller;
 
-import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.MealPlan;
 import com.example.healthfitness.service.CurrentUserService;
 import com.example.healthfitness.service.MealPlanService;
@@ -15,12 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
- * Web controller for managing meal plans.  It exposes pages for
+ * Web controller for managing meal plans.  Exposes pages for
  * listing, viewing details, adding, editing and deleting meal plans.
- * Actions that modify state return redirects with flash messages to
- * inform the user of success or failure.  Resource lookups that
- * return null throw {@link ResourceNotFoundException} so that the
- * {@link GlobalExceptionHandler} can respond with a 404 page.
+ * All state‑mutating operations use POST requests to ensure CSRF
+ * protection.  Missing resources are handled by {@link MealPlanService},
+ * which throws {@link com.example.healthfitness.exception.ResourceNotFoundException}
+ * when an entity is not found.  Flash messages convey success or error
+ * status after redirects.
  */
 @Controller
 @RequestMapping("/meal-plans")
@@ -52,21 +52,20 @@ public class MealPlanViewController {
     }
 
     /**
-     * Show details for a single meal plan.  If the plan does not
-     * exist, a {@link ResourceNotFoundException} is thrown.
+     * Show details for a single meal plan.  The service will throw
+     * {@link com.example.healthfitness.exception.ResourceNotFoundException}
+     * if the plan does not exist, which is handled by the global
+     * exception handler.
      */
     @GetMapping("/{id}")
     public String details(@PathVariable Long id, Model model) {
         MealPlan mealPlan = mealPlanService.getMealPlanById(id);
-        if (mealPlan == null) {
-            throw new ResourceNotFoundException("Meal plan not found with id: " + id);
-        }
         model.addAttribute("mealPlan", mealPlan);
         return "meal-plan";
     }
 
     /**
-     * Display the add meal plan form.
+     * Display the form to add a new meal plan.
      */
     @GetMapping("/add")
     public String addMealPlanPage(Model model) {
@@ -75,9 +74,9 @@ public class MealPlanViewController {
     }
 
     /**
-     * Persist a new meal plan.  On validation errors the user is
-     * returned to the form.  On success the user is redirected back
-     * to the list with a success message.
+     * Persist a new meal plan.  On validation errors the user is returned
+     * to the form.  On success the user is redirected back to the list
+     * with a success message.
      */
     @PostMapping("/add")
     public String addMealPlan(@Valid @ModelAttribute("mealPlanForm") MealPlanForm form,
@@ -100,21 +99,19 @@ public class MealPlanViewController {
     }
 
     /**
-     * Display the edit meal plan form.
+     * Display the form to edit an existing meal plan.  The service
+     * will throw if the plan does not exist.
      */
     @GetMapping("/edit/{id}")
     public String editMealPlanPage(@PathVariable Long id, Model model) {
         MealPlan mealPlan = mealPlanService.getMealPlanById(id);
-        if (mealPlan == null) {
-            throw new ResourceNotFoundException("Meal plan not found with id: " + id);
-        }
         model.addAttribute("mealPlan", mealPlan);
         return "meal-plan-edit";
     }
 
     /**
-     * Persist updates to an existing meal plan.  On completion the
-     * user is redirected back to the plan detail with a success message.
+     * Persist updates to an existing meal plan.  On completion the user
+     * is redirected back to the plan detail with a success message.
      */
     @PostMapping("/edit/{id}")
     public String editMealPlan(@PathVariable Long id,
@@ -129,7 +126,7 @@ public class MealPlanViewController {
 
     /**
      * Delete an entire meal plan.  Redirect back to the list with a
-     * success message.
+     * success message.  The service will throw if the plan does not exist.
      */
     @PostMapping("/delete/{id}")
     public String deleteMealPlan(@PathVariable Long id, RedirectAttributes redirectAttributes) {
@@ -139,12 +136,9 @@ public class MealPlanViewController {
     }
 
     /**
-     * Remove a single meal from a meal plan.  This endpoint now
-     * requires a POST request to prevent accidental deletions via
-     * bookmarked URLs and to allow Spring Security to enforce CSRF
-     * protection.  The mealPlanId is passed as a parameter to know
-     * where to redirect back to after deletion.  A flash attribute
-     * indicates success.
+     * Remove a single meal from a meal plan.  Requires POST to avoid
+     * CSRF attacks; after deletion the user is redirected back to the
+     * plan detail.
      */
     @PostMapping("/meals/delete/{mealId}")
     public String deleteMealFromPlan(@PathVariable Long mealId,
