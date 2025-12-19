@@ -2,19 +2,28 @@ package com.example.healthfitness.model;
 
 import jakarta.persistence.*;
 
+/**
+ * Entity representing an exercise in the system.  Each exercise has a
+ * unique name, a muscle group it primarily targets, an intensity
+ * level, and default values for repetitions, rest time and sets.
+ * The {@code unique} constraint on the {@link #exerciseName} field
+ * ensures that duplicate exercises cannot be inserted into the
+ * database.
+ */
 @Entity
 public class Exercise {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long exerciseId;
 
+    @Column(unique = true)
     private String exerciseName;
     private String muscleGroup;
     private String intensityLevel;
 
-    // These fields are in your database schema.
-    // We add default values so that when a new Exercise is created,
-    // these columns are set automatically.
+    // These fields are in your database schema.  We add default values
+    // so that when a new Exercise is created, these columns are set
+    // automatically.
     @Column(nullable = false, columnDefinition = "int default 0")
     private int reps;
 
@@ -75,7 +84,3 @@ public class Exercise {
         this.sets = sets;
     }
 }
-
-
-
-

@@ -14,7 +14,10 @@ import java.util.List;
  * per week the plan is intended to be followed.  Dates are stored as
  * {@link LocalDate} values to allow proper temporal operations and to
  * ensure type safety throughout the application.  Each plan belongs to
- * a user and may contain many workout plan exercises.
+ * a user and may contain many workout plan exercises.  The
+ * {@link #workoutPlanExercises} collection is eagerly fetched to avoid
+ * LazyInitializationExceptions when rendering templates outside of an
+ * open session.
  */
 @Entity
 public class WorkoutPlan {
@@ -39,7 +42,7 @@ public class WorkoutPlan {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference
     private List<WorkoutPlanExercise> workoutPlanExercises = new ArrayList<>();
 

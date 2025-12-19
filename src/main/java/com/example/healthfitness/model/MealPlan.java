@@ -16,7 +16,9 @@ import java.util.List;
  * performed cleanly.  The {@link DateTimeFormat} annotations instruct
  * Spring to bind ISO‑8601 (yyyy‑MM‑dd) formatted strings from web forms
  * into {@link LocalDate} values during data binding.  A meal plan belongs
- * to a single user and may have many meals.
+ * to a single user and may have many meals.  The meals collection is
+ * eagerly fetched to ensure it is available when rendering views without
+ * requiring an open Hibernate session.
  */
 @Entity
 public class MealPlan {
@@ -40,7 +42,13 @@ public class MealPlan {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    /**
+     * The list of meals associated with this plan.  By using
+     * {@link FetchType#EAGER} the collection will be loaded along with
+     * the meal plan, avoiding LazyInitializationException when
+     * rendering Thymeleaf views outside of a transactional context.
+     */
+    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Meal> meals = new ArrayList<>();
 
     // Getters and setters
