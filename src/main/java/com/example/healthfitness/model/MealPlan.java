@@ -2,9 +2,22 @@ package com.example.healthfitness.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity representing a meal plan.  The plan contains a name, optional
+ * description and dietary restriction, as well as a start and end date
+ * for when the plan is active.  Dates are modelled using {@link LocalDate}
+ * rather than {@link String} so that validation and comparisons can be
+ * performed cleanly.  The {@link DateTimeFormat} annotations instruct
+ * Spring to bind ISO‑8601 (yyyy‑MM‑dd) formatted strings from web forms
+ * into {@link LocalDate} values during data binding.  A meal plan belongs
+ * to a single user and may have many meals.
+ */
 @Entity
 public class MealPlan {
 
@@ -13,25 +26,25 @@ public class MealPlan {
     private Long mealPlanId;
 
     private String planName;
-
     private String description;
-
     private String dietaryRestriction;
 
-    private String startDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate startDate;
 
-    private String endDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate endDate;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
     @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Meal> meals = new ArrayList<>();
 
     // Getters and setters
+
     public Long getMealPlanId() {
         return mealPlanId;
     }
@@ -64,19 +77,19 @@ public class MealPlan {
         this.dietaryRestriction = dietaryRestriction;
     }
 
-    public String getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(String startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public String getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(String endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
@@ -96,5 +109,3 @@ public class MealPlan {
         this.meals = meals;
     }
 }
-
-

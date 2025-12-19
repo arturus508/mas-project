@@ -12,6 +12,15 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Web controller for managing meal plans.  This controller exposes pages
+ * for listing, adding, editing and deleting meal plans.  It relies on
+ * {@link CurrentUserService} to obtain the id of the currently logged‑in
+ * user rather than reading from {@code SecurityContextHolder}.  All
+ * modifications are performed via the {@link MealPlanService} and
+ * relationships to the current user are managed explicitly through
+ * {@link UserService}.
+ */
 @Controller
 @RequestMapping("/meal-plans")
 public class MealPlanViewController {
@@ -31,7 +40,6 @@ public class MealPlanViewController {
         this.currentUserService = currentUserService;
     }
 
-    
     @GetMapping
     public String listPlans(Model model) {
         Long userId = currentUserService.id();
@@ -39,7 +47,6 @@ public class MealPlanViewController {
         return "meal-plans";
     }
 
-    
     @GetMapping("/{id}")
     public String details(@PathVariable Long id, Model model) {
         MealPlan mealPlan = mealPlanService.getMealPlanById(id);
@@ -50,7 +57,6 @@ public class MealPlanViewController {
         return "meal-plan";
     }
 
-  
     @GetMapping("/add")
     public String addMealPlanPage(Model model) {
         model.addAttribute("mealPlanForm", new MealPlanForm());
@@ -59,8 +65,8 @@ public class MealPlanViewController {
 
     @PostMapping("/add")
     public String addMealPlan(@Valid @ModelAttribute("mealPlanForm") MealPlanForm form,
-                              BindingResult bindingResult,
-                              Model model) {
+                               BindingResult bindingResult,
+                               Model model) {
         if (bindingResult.hasErrors()) {
             return "add-meal-plan";
         }
@@ -76,7 +82,6 @@ public class MealPlanViewController {
         return "redirect:/meal-plans";
     }
 
-    
     @GetMapping("/edit/{id}")
     public String editMealPlanPage(@PathVariable Long id, Model model) {
         MealPlan mealPlan = mealPlanService.getMealPlanById(id);
@@ -88,15 +93,17 @@ public class MealPlanViewController {
     }
 
     @PostMapping("/edit/{id}")
-    public String editMealPlan(@PathVariable Long id, @ModelAttribute MealPlan updatedMealPlan) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        var user = userService.findByEmail(email).orElseThrow();
-        updatedMealPlan.setUser(user);
+    public String editMealPlan(@PathVariable Long id,
+                               @ModelAttribute MealPlan updatedMealPlan) {
+        // Associate the updated plan with the current user.  Without
+        // explicitly setting the user here the plan could become
+        // detached from the currently authenticated user.
+        Long userId = currentUserService.id();
+        updatedMealPlan.setUser(userService.getUserById(userId));
         mealPlanService.updateMealPlan(id, updatedMealPlan);
-        return "redirect:/meal-plans/" + id; 
+        return "redirect:/meal-plans/" + id;
     }
 
-    
     @GetMapping("/delete/{id}")
     public String deleteMealPlan(@PathVariable Long id) {
         mealPlanService.deleteMealPlan(id);
@@ -109,10 +116,9 @@ public class MealPlanViewController {
         return "redirect:/meal-plans/" + id;
     }
 
-    
     @GetMapping("/meals/delete/{mealId}")
     public String deleteMealFromPlan(@PathVariable Long mealId,
-                                     @RequestParam("mealPlanId") Long mealPlanId) {
+                                      @RequestParam("mealPlanId") Long mealPlanId) {
         mealService.deleteMeal(mealId);
         return "redirect:/meal-plans/" + mealPlanId;
     }

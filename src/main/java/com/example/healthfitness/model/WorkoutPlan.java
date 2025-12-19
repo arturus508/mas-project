@@ -2,11 +2,23 @@ package com.example.healthfitness.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Entity representing a workout plan.  The plan includes metadata such as
+ * name, description, status, start and end dates, and the number of days
+ * per week the plan is intended to be followed.  Dates are stored as
+ * {@link LocalDate} values to allow proper temporal operations and to
+ * ensure type safety throughout the application.  Each plan belongs to
+ * a user and may contain many workout plan exercises.
+ */
 @Entity
 public class WorkoutPlan {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long workoutPlanId;
@@ -14,8 +26,13 @@ public class WorkoutPlan {
     private String planName;
     private String description;
     private String status; // e.g., "active", "completed"
-    private String startDate;
-    private String endDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate startDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate endDate;
+
     private Integer daysPerWeek;
 
     @ManyToOne
@@ -27,6 +44,7 @@ public class WorkoutPlan {
     private List<WorkoutPlanExercise> workoutPlanExercises = new ArrayList<>();
 
     // Getters and setters
+
     public Long getWorkoutPlanId() { return workoutPlanId; }
     public void setWorkoutPlanId(Long workoutPlanId) { this.workoutPlanId = workoutPlanId; }
 
@@ -39,11 +57,11 @@ public class WorkoutPlan {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getStartDate() { return startDate; }
-    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 
-    public String getEndDate() { return endDate; }
-    public void setEndDate(String endDate) { this.endDate = endDate; }
+    public LocalDate getEndDate() { return endDate; }
+    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
 
     public Integer getDaysPerWeek() { return daysPerWeek; }
     public void setDaysPerWeek(Integer daysPerWeek) { this.daysPerWeek = daysPerWeek; }
@@ -64,8 +82,3 @@ public class WorkoutPlan {
         wpe.setWorkoutPlan(null);
     }
 }
-
-
-
-
-
