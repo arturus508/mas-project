@@ -2,7 +2,10 @@ package com.example.healthfitness.service;
 
 import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.MealPlan;
+import com.example.healthfitness.model.User;
 import com.example.healthfitness.repository.MealPlanRepository;
+import com.example.healthfitness.repository.UserRepository;
+import com.example.healthfitness.web.form.MealPlanForm;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,9 +22,12 @@ import java.util.List;
 public class MealPlanService {
 
     private final MealPlanRepository mealPlanRepository;
+    private final UserRepository userRepository;
 
-    public MealPlanService(MealPlanRepository mealPlanRepository) {
+    public MealPlanService(MealPlanRepository mealPlanRepository,
+                           UserRepository userRepository) {
         this.mealPlanRepository = mealPlanRepository;
+        this.userRepository     = userRepository;
     }
 
     /**
@@ -48,10 +54,10 @@ public class MealPlanService {
     }
 
     /**
-     * Update an existing meal plan.  Throws {@link ResourceNotFoundException}
-     * if the plan does not exist.  Only mutable fields are updated; the
-     * associated user and meals remain intact unless overwritten in the
-     * provided object.
+     * Update an existing meal plan from an entity instance.  Throws
+     * {@link ResourceNotFoundException} if the plan does not exist.
+     * Only mutable fields are updated; the associated user and meals
+     * remain intact unless overwritten in the provided object.
      */
     public MealPlan updateMealPlan(Long id, MealPlan updatedMealPlan) {
         MealPlan existingMealPlan = mealPlanRepository.findById(id)
@@ -61,9 +67,34 @@ public class MealPlanService {
         existingMealPlan.setDietaryRestriction(updatedMealPlan.getDietaryRestriction());
         existingMealPlan.setStartDate(updatedMealPlan.getStartDate());
         existingMealPlan.setEndDate(updatedMealPlan.getEndDate());
-        // update user in case it changed (should be current user)
         existingMealPlan.setUser(updatedMealPlan.getUser());
         return mealPlanRepository.save(existingMealPlan);
+    }
+
+    /**
+     * Update an existing meal plan using a {@link MealPlanForm}.  The user
+     * performing the update must be provided so that ownership can be
+     * reassigned if necessary.  Only the form fields are applied; meals
+     * and other associations remain unchanged.
+     *
+     * @param id   the id of the plan to update
+     * @param form the form containing new values
+     * @param userId   the id of the user performing the update
+     * @return the updated meal plan
+     */
+    public MealPlan updateMealPlan(Long id, MealPlanForm form, Long userId) {
+        MealPlan existing = mealPlanRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Meal plan not found with id: " + id));
+        existing.setPlanName(form.getPlanName());
+        existing.setDescription(form.getDescription());
+        existing.setDietaryRestriction(form.getDietaryRestriction());
+        existing.setStartDate(form.getStartDate());
+        existing.setEndDate(form.getEndDate());
+        // assign the current user to ensure ownership is correct
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        existing.setUser(user);
+        return mealPlanRepository.save(existing);
     }
 
     /**
@@ -74,7 +105,6 @@ public class MealPlanService {
      * {@link jakarta.persistence.CascadeType#ORPHAN_REMOVAL}.
      */
     public void deleteMealPlan(Long id) {
-        // verify existence before delete to provide consistent error handling
         MealPlan plan = mealPlanRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal plan not found with id: " + id));
         mealPlanRepository.delete(plan);

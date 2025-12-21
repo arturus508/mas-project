@@ -1,6 +1,7 @@
 package com.example.healthfitness.service;
 
 import com.example.healthfitness.model.*;
+import com.example.healthfitness.model.Unit;
 import com.example.healthfitness.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,14 +56,15 @@ public class MealMacroService {
         int kcal=0, p=0, f=0, c=0;
         for (var it : m.getItems()) {
             var fi = it.getFoodItem();
-            // interpretacja ilości zależnie od enum Unit
+            // Use the Unit enum to determine how to interpret quantity.
             if (fi.getUnit() == Unit.G) {
                 double k = it.getQuantity() / 100.0;
-                kcal += Math.round(fi.getKcal100()    * k);
-                p    += Math.round(fi.getProtein100() * k);
-                f    += Math.round(fi.getFat100()     * k);
-                c    += Math.round(fi.getCarbs100()   * k);
+                kcal += Math.round( fi.getKcal100()    * k );
+                p    += Math.round( fi.getProtein100() * k );
+                f    += Math.round( fi.getFat100()     * k );
+                c    += Math.round( fi.getCarbs100()   * k );
             } else {
+                // Assume quantity is number of pieces.
                 kcal += fi.getKcal100()    * it.getQuantity();
                 p    += fi.getProtein100() * it.getQuantity();
                 f    += fi.getFat100()     * it.getQuantity();

@@ -100,26 +100,41 @@ public class MealPlanViewController {
 
     /**
      * Display the form to edit an existing meal plan.  The service
-     * will throw if the plan does not exist.
+     * will throw if the plan does not exist.  The returned view binds
+     * to a {@link MealPlanForm} rather than directly to the entity.
      */
     @GetMapping("/edit/{id}")
     public String editMealPlanPage(@PathVariable Long id, Model model) {
         MealPlan mealPlan = mealPlanService.getMealPlanById(id);
-        model.addAttribute("mealPlan", mealPlan);
+        MealPlanForm form = new MealPlanForm();
+        form.setPlanName(mealPlan.getPlanName());
+        form.setDescription(mealPlan.getDescription());
+        form.setDietaryRestriction(mealPlan.getDietaryRestriction());
+        form.setStartDate(mealPlan.getStartDate());
+        form.setEndDate(mealPlan.getEndDate());
+        model.addAttribute("mealPlanForm", form);
+        model.addAttribute("mealPlanId", id);
         return "meal-plan-edit";
     }
 
     /**
-     * Persist updates to an existing meal plan.  On completion the user
+     * Persist updates to an existing meal plan.  On validation error the
+     * user is returned to the same page.  On completion the user
      * is redirected back to the plan detail with a success message.
      */
     @PostMapping("/edit/{id}")
     public String editMealPlan(@PathVariable Long id,
-                               @ModelAttribute MealPlan updatedMealPlan,
-                               RedirectAttributes redirectAttributes) {
+                               @Valid @ModelAttribute("mealPlanForm") MealPlanForm form,
+                               BindingResult bindingResult,
+                               RedirectAttributes redirectAttributes,
+                               Model model) {
+        if (bindingResult.hasErrors()) {
+            // ensure the plan id is in the model for the form action
+            model.addAttribute("mealPlanId", id);
+            return "meal-plan-edit";
+        }
         Long userId = currentUserService.id();
-        updatedMealPlan.setUser(userService.getUserById(userId));
-        mealPlanService.updateMealPlan(id, updatedMealPlan);
+        mealPlanService.updateMealPlan(id, form, userId);
         redirectAttributes.addFlashAttribute("successMessage", "Meal plan updated successfully");
         return "redirect:/meal-plans/" + id;
     }
@@ -142,8 +157,8 @@ public class MealPlanViewController {
      */
     @PostMapping("/meals/delete/{mealId}")
     public String deleteMealFromPlan(@PathVariable Long mealId,
-                                     @RequestParam("mealPlanId") Long mealPlanId,
-                                     RedirectAttributes redirectAttributes) {
+                                      @RequestParam("mealPlanId") Long mealPlanId,
+                                      RedirectAttributes redirectAttributes) {
         mealService.deleteMeal(mealId);
         redirectAttributes.addFlashAttribute("successMessage", "Meal deleted successfully");
         return "redirect:/meal-plans/" + mealPlanId;

@@ -22,15 +22,15 @@
     <div th:replace="~{fragments/csrf :: csrf}"></div>
 
     <label for="planName">Plan Name:</label>
-    <input type="text" id="planName" th:field="*{planName}" placeholder="Enter plan name"/>
+    <input type="text" id="planName" th:field="*{planName}" placeholder="Enter plan name" />
     <div th:if="${#fields.hasErrors('planName')}" th:errors="*{planName}" class="error"></div>
 
     <label for="description">Description:</label>
-    <input type="text" id="description" th:field="*{description}" placeholder="Enter description"/>
+    <input type="text" id="description" th:field="*{description}" placeholder="Enter description" />
     <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></div>
 
     <label for="dietaryRestriction">Dietary Restriction:</label>
-    <input type="text" id="dietaryRestriction" th:field="*{dietaryRestriction}" placeholder="Enter dietary restriction"/>
+    <input type="text" id="dietaryRestriction" th:field="*{dietaryRestriction}" placeholder="Enter dietary restriction" />
     <div th:if="${#fields.hasErrors('dietaryRestriction')}" th:errors="*{dietaryRestriction}" class="error"></div>
 
     <label for="startDate">Start Date:</label>

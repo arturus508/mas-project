@@ -12,32 +12,37 @@
     <ul>
       <li><a th:href="@{/dashboard}">Dashboard</a></li>
       <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
-      <li><a th:href="@{'/meal-plans/' + ${mealPlan.mealPlanId}}">Back to Details</a></li>
+      <li><a th:href="@{'/meal-plans/' + ${mealPlanId}}">Back to Details</a></li>
     </ul>
   </nav>
 </header>
 
 <div class="content">
   <div class="card">
-    <form th:action="@{'/meal-plans/edit/' + ${mealPlan.mealPlanId}}"
-          method="post" th:object="${mealPlan}">
+    <form th:action="@{'/meal-plans/edit/' + ${mealPlanId}}"
+          method="post" th:object="${mealPlanForm}">
       <!-- CSRF token -->
       <div th:replace="~{fragments/csrf :: csrf}"></div>
 
       <label>Plan Name:</label>
       <input type="text" th:field="*{planName}" required>
+      <div th:if="${#fields.hasErrors('planName')}" th:errors="*{planName}" class="error"></div>
 
       <label>Description:</label>
-      <input type="text" th:field="*{description}" required>
+      <input type="text" th:field="*{description}">
+      <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></div>
 
       <label>Dietary Restriction:</label>
-      <input type="text" th:field="*{dietaryRestriction}" required>
+      <input type="text" th:field="*{dietaryRestriction}">
+      <div th:if="${#fields.hasErrors('dietaryRestriction')}" th:errors="*{dietaryRestriction}" class="error"></div>
 
       <label>Start Date:</label>
       <input type="date" th:field="*{startDate}" required>
+      <div th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error"></div>
 
       <label>End Date:</label>
       <input type="date" th:field="*{endDate}" required>
+      <div th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}" class="error"></div>
 
       <button type="submit" class="btn">Save Changes</button>
     </form>

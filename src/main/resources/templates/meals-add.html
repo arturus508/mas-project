@@ -18,36 +18,37 @@
 
 <div class="content">
   <div class="card">
-    <form action="/meals/add" method="post">
-      <!-- CSRF (jeśli masz fragment, można go użyć bez parametrów) -->
+    <form th:action="@{/meals/add}" th:object="${mealForm}" method="post">
+      <!-- CSRF token -->
       <div th:replace="~{fragments/csrf :: csrf}"></div>
-
-      <!-- Hidden: mealPlanId (bierzemy z modelu lub z query-param) -->
-      <input type="hidden" name="mealPlanId"
-             th:value="${mealPlanId} ?: ${param.mealPlanId}"/>
+      <!-- Hidden mealPlanId so the meal can be attached if provided -->
+      <input type="hidden" th:field="*{mealPlanId}" />
 
       <label for="date">Date</label>
-      <input id="date" name="date" type="date"
-             th:value="${date} ?: ${#temporals.format(#temporals.createNow(),'yyyy-MM-dd')}" />
+      <input id="date" type="date" th:field="*{date}" required />
+      <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="error"></div>
 
       <label for="type">Type</label>
-      <select id="type" name="type">
-        <!-- iterujemy po enumie bez zależności od kontrolera -->
+      <select id="type" th:field="*{type}">
         <option th:each="t : ${T(com.example.healthfitness.model.MealType).values()}"
                 th:value="${t}" th:text="${t}">BREAKFAST</option>
       </select>
 
       <label for="kcal">Calories</label>
-      <input id="kcal" name="kcal" type="number" min="0" step="1" value="0"/>
+      <input id="kcal" type="number" min="0" step="1" th:field="*{kcal}" />
+      <div th:if="${#fields.hasErrors('kcal')}" th:errors="*{kcal}" class="error"></div>
 
       <label for="protein">Protein (g)</label>
-      <input id="protein" name="protein" type="number" min="0" step="1" value="0"/>
+      <input id="protein" type="number" min="0" step="1" th:field="*{protein}" />
+      <div th:if="${#fields.hasErrors('protein')}" th:errors="*{protein}" class="error"></div>
 
       <label for="fat">Fat (g)</label>
-      <input id="fat" name="fat" type="number" min="0" step="1" value="0"/>
+      <input id="fat" type="number" min="0" step="1" th:field="*{fat}" />
+      <div th:if="${#fields.hasErrors('fat')}" th:errors="*{fat}" class="error"></div>
 
       <label for="carbs">Carbs (g)</label>
-      <input id="carbs" name="carbs" type="number" min="0" step="1" value="0"/>
+      <input id="carbs" type="number" min="0" step="1" th:field="*{carbs}" />
+      <div th:if="${#fields.hasErrors('carbs')}" th:errors="*{carbs}" class="error"></div>
 
       <div class="actions">
         <button type="submit" class="btn">Save</button>

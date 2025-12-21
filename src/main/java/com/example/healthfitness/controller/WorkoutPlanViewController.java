@@ -7,12 +7,9 @@ import com.example.healthfitness.model.WorkoutPlanExercise;
 import com.example.healthfitness.service.ExerciseService;
 import com.example.healthfitness.service.UserService;
 import com.example.healthfitness.service.WorkoutPlanService;
-import com.example.healthfitness.service.CurrentUserService;
-import com.example.healthfitness.web.form.WorkoutPlanForm;
-import jakarta.validation.Valid;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -22,13 +19,11 @@ public class WorkoutPlanViewController {
     private final WorkoutPlanService workoutPlanService;
     private final ExerciseService exerciseService;
     private final UserService userService;
-    private final CurrentUserService currentUserService;
 
-    public WorkoutPlanViewController(WorkoutPlanService workoutPlanService, ExerciseService exerciseService, UserService userService, CurrentUserService currentUserService) {
+    public WorkoutPlanViewController(WorkoutPlanService workoutPlanService, ExerciseService exerciseService, UserService userService) {
         this.workoutPlanService = workoutPlanService;
-        this.exerciseService    = exerciseService;
-        this.userService        = userService;
-        this.currentUserService = currentUserService;
+        this.exerciseService = exerciseService;
+        this.userService = userService;
     }
 
     // --------------------- Workout Plan CRUD ---------------------
@@ -36,35 +31,28 @@ public class WorkoutPlanViewController {
     // List workout plans for the logged-in user.
     @GetMapping
     public String showWorkoutPlans(Model model) {
-        Long userId = currentUserService.id();
-        model.addAttribute("workoutPlans", workoutPlanService.getWorkoutPlansByUser(userId));
-        return "workout-plans";
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+        model.addAttribute("workoutPlans", workoutPlanService.getWorkoutPlansByUser(user.getUserId()));
+        return "workout-plans"; // corresponds to workout-plans.html
     }
 
     // Display the Add Workout Plan page.
     @GetMapping("/add")
     public String addWorkoutPlanPage(Model model) {
-        model.addAttribute("workoutPlanForm", new WorkoutPlanForm());
-        return "add-workout-plan";
+        model.addAttribute("workoutPlan", new WorkoutPlan());
+        return "add-workout-plan"; // corresponds to add-workout-plan.html
     }
 
     // Process the Add Workout Plan form submission.
     @PostMapping("/add")
-    public String addWorkoutPlan(@Valid @ModelAttribute("workoutPlanForm") WorkoutPlanForm form,
-                                 BindingResult bindingResult,
-                                 Model model) {
-        if (bindingResult.hasErrors()) {
-            return "add-workout-plan";
-        }
-        Long userId = currentUserService.id();
-        WorkoutPlan plan = new WorkoutPlan();
-        plan.setPlanName(form.getPlanName());
-        plan.setDescription(form.getDescription());
-        plan.setStartDate(form.getStartDate());
-        plan.setEndDate(form.getEndDate());
-        plan.setDaysPerWeek(form.getDaysPerWeek());
-        plan.setUser(userService.getUserById(userId));
-        workoutPlanService.saveWorkoutPlan(plan);
+    public String addWorkoutPlan(@ModelAttribute WorkoutPlan workoutPlan) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
+        workoutPlan.setUser(user);
+        workoutPlanService.saveWorkoutPlan(workoutPlan);
         return "redirect:/workout-plans";
     }
 

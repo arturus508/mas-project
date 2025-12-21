@@ -28,7 +28,7 @@ public class BodyStatsService {
         return bodyStatsRepository.save(bodyStats);
     }
     public List<BodyStats> getBodyStatsByUser(Long userId) {
-        
+        // Fetch body stats directly from repository to avoid LazyInitializationException. Fetching via user.getBodyStats() would require an active Hibernate session.
         return bodyStatsRepository.findByUserUserIdOrderByDateRecordedDesc(userId);
     }
 
