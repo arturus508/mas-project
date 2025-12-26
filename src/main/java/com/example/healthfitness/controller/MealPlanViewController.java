@@ -59,7 +59,8 @@ public class MealPlanViewController {
      */
     @GetMapping("/{id}")
     public String details(@PathVariable Long id, Model model) {
-        MealPlan mealPlan = mealPlanService.getMealPlanById(id);
+        Long userId = currentUserService.id();
+        MealPlan mealPlan = mealPlanService.getMealPlanByIdForUser(userId, id);
         model.addAttribute("mealPlan", mealPlan);
         return "meal-plan";
     }
@@ -105,7 +106,8 @@ public class MealPlanViewController {
      */
     @GetMapping("/edit/{id}")
     public String editMealPlanPage(@PathVariable Long id, Model model) {
-        MealPlan mealPlan = mealPlanService.getMealPlanById(id);
+        Long userId = currentUserService.id();
+        MealPlan mealPlan = mealPlanService.getMealPlanByIdForUser(userId, id);
         MealPlanForm form = new MealPlanForm();
         form.setPlanName(mealPlan.getPlanName());
         form.setDescription(mealPlan.getDescription());
@@ -145,7 +147,8 @@ public class MealPlanViewController {
      */
     @PostMapping("/delete/{id}")
     public String deleteMealPlan(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        mealPlanService.deleteMealPlan(id);
+        Long userId = currentUserService.id();
+        mealPlanService.deleteMealPlanForUser(userId, id);
         redirectAttributes.addFlashAttribute("successMessage", "Meal plan deleted successfully");
         return "redirect:/meal-plans";
     }
@@ -159,7 +162,8 @@ public class MealPlanViewController {
     public String deleteMealFromPlan(@PathVariable Long mealId,
                                       @RequestParam("mealPlanId") Long mealPlanId,
                                       RedirectAttributes redirectAttributes) {
-        mealService.deleteMeal(mealId);
+        Long userId = currentUserService.id();
+        mealService.deleteMeal(userId, mealId);
         redirectAttributes.addFlashAttribute("successMessage", "Meal deleted successfully");
         return "redirect:/meal-plans/" + mealPlanId;
     }

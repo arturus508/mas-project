@@ -1,59 +1,70 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Workout Plan Details</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-    <h1>Workout Plan Details</h1>
-    <nav>
-        <ul>
-            <li><a th:href="@{/dashboard}">Dashboard</a></li>
-            <li><a th:href="@{/workout-plans}">Workout Plans</a></li>
-        </ul>
-    </nav>
-</header>
-<div class="content">
-    <div class="card">
-        <h2 th:text="${workoutPlan.planName}">Plan Name</h2>
-        <p><strong>Description:</strong> <span th:text="${workoutPlan.description}"></span></p>
-        <p><strong>Status:</strong> <span th:text="${workoutPlan.status}"></span></p>
-        <p><strong>Start Date:</strong> <span th:text="${workoutPlan.startDate}"></span></p>
-        <p><strong>End Date:</strong> <span th:text="${workoutPlan.endDate}"></span></p>
-        <p><strong>Days per Week:</strong> <span th:text="${workoutPlan.daysPerWeek}"></span></p>
-        <a th:href="@{'/workout-plans/edit/' + ${workoutPlan.workoutPlanId}}" class="edit-button">Edit Plan</a>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Workout Plan Details')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="mb-0">Workout Plan Details</h1>
+        <a th:href="@{/workout-plans}" class="btn btn-outline-secondary">Back</a>
     </div>
 
-    <h3>Exercises in this Plan</h3>
-    <a th:href="@{'/workout-plans/' + ${workoutPlan.workoutPlanId} + '/exercises/add'}" class="add-button">Add Exercise</a>
-    <br/><br/>
-    <table>
-        <thead>
-        <tr>
-            <th>Exercise Name</th>
-            <th>Sets</th>
-            <th>Reps</th>
-            <th>Rest Time (sec)</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="wpe : ${exercises}">
-            <td th:text="${wpe.exercise != null ? wpe.exercise.exerciseName : 'N/A'}"></td>
-            <td th:text="${wpe.sets}"></td>
-            <td th:text="${wpe.reps}"></td>
-            <td th:text="${wpe.restTime}"></td>
-            <td>
-                <a th:href="@{'/workout-plans/' + ${workoutPlan.workoutPlanId} + '/exercises/delete/' + ${wpe.wpExerciseId}}" class="delete-button">Delete</a>
-                <!-- Optionally, add an Edit link if you later implement editing for workout plan exercises -->
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <br/>
-    <a th:href="@{/workout-plans}" class="back-button">Back to Workout Plans</a>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="h5 mb-3" th:text="${workoutPlan.planName}">Plan Name</h2>
+            <p class="mb-1"><strong>Description:</strong> <span th:text="${workoutPlan.description}"></span></p>
+            <p class="mb-1"><strong>Status:</strong> <span th:text="${workoutPlan.status}"></span></p>
+            <p class="mb-1"><strong>Start Date:</strong> <span th:text="${workoutPlan.startDate}"></span></p>
+            <p class="mb-1"><strong>End Date:</strong> <span th:text="${workoutPlan.endDate}"></span></p>
+            <p class="mb-0"><strong>Days per Week:</strong> <span th:text="${workoutPlan.daysPerWeek}"></span></p>
+        </div>
+        <div class="card-footer">
+            <a th:href="@{'/workout-plans/edit/' + ${workoutPlan.workoutPlanId}}" class="btn btn-outline-primary">Edit Plan</a>
+        </div>
+    </div>
+
+    <h3 class="mb-3">Days in this Plan</h3>
+
+    <div class="row g-3">
+        <div class="col-lg-4" th:each="day : ${planDays}">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <span th:text="${day.name}">Day 1</span>
+                    <form th:action="@{'/workout-plans/days/' + ${day.planDayId} + '/add-to-today'}" method="post">
+                        <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <button type="submit" class="btn btn-sm btn-success">Add to Today</button>
+                    </form>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(day.exercises)}">
+                        <li class="list-group-item d-flex justify-content-between align-items-center"
+                            th:each="ex : ${day.exercises}">
+                            <div>
+                                <div class="fw-semibold" th:text="${ex.exercise.exerciseName}">Exercise</div>
+                                <div class="text-muted small">
+                                    <span th:text="${ex.setsPlanned}">2</span> sets
+                                    <span th:if="${ex.targetReps != null}">· <span th:text="${ex.targetReps}"></span> reps</span>
+                                    <span th:if="${ex.restTime != null}">· rest <span th:text="${ex.restTime}"></span>s</span>
+                                </div>
+                            </div>
+                            <form th:action="@{'/workout-plans/' + ${workoutPlan.workoutPlanId} + '/days/' + ${day.planDayId} + '/exercises/delete/' + ${ex.planDayExerciseId}}" method="post">
+                                <div th:replace="~{fragments/csrf :: csrf}"></div>
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </li>
+                    </ul>
+                    <div th:if="${#lists.isEmpty(day.exercises)}" class="text-muted small">
+                        No exercises yet.
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a th:href="@{'/workout-plans/' + ${workoutPlan.workoutPlanId} + '/days/' + ${day.planDayId} + '/exercises/add'}"
+                       class="btn btn-sm btn-outline-primary">Add Exercise</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

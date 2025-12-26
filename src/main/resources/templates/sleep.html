@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head th:replace="~{fragments/head :: headNoArg}"></head>
+<head th:replace="~{fragments/head :: head('Sleep')}"></head>
 <body class="bg-light">
 
 <nav th:replace="~{fragments/nav :: nav}"></nav>
@@ -13,23 +13,36 @@
       <div class="card h-100">
         <div class="card-header">Log last night</div>
         <div class="card-body">
-          <form th:action="@{/mind/sleep}" method="post" class="row g-2">
-            <div th:replace="fragments/csrf :: csrf"></div>
+          <form th:action="@{/mind/sleep/add}" th:object="${sleepForm}" method="post" class="row g-2">
+            <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <div class="col-12" th:if="${#fields.hasErrors('*')}">
+              <div class="alert alert-danger py-2">
+                <div th:each="err : ${#fields.errors('*')}" th:text="${err}">Invalid input</div>
+              </div>
+            </div>
             <div class="col-6">
-              <label class="form-label">Date</label>
-              <input type="date" name="date" class="form-control" th:value="${#temporals.format(#temporals.createNow(),'yyyy-MM-dd')}">
+              <label class="form-label" for="date">Date</label>
+              <input id="date" type="date" th:field="*{date}" class="form-control">
+              <div class="text-danger small" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
             </div>
             <div class="col-3">
-              <label class="form-label">Hours</label>
-              <input type="number" name="hours" class="form-control" min="0" max="24" step="1" value="7">
+              <label class="form-label" for="hours">Hours</label>
+              <input id="hours" type="number" th:field="*{hours}" class="form-control" min="0" max="24" step="1">
+              <div class="text-danger small" th:if="${#fields.hasErrors('hours')}" th:errors="*{hours}"></div>
             </div>
             <div class="col-3">
-              <label class="form-label">Minutes</label>
-              <input type="number" name="minutes" class="form-control" min="0" max="59" step="1" value="30">
+              <label class="form-label" for="minutes">Minutes</label>
+              <input id="minutes" type="number" th:field="*{minutes}" class="form-control" min="0" max="59" step="1">
+              <div class="text-danger small" th:if="${#fields.hasErrors('minutes')}" th:errors="*{minutes}"></div>
             </div>
             <div class="col-12">
-              <label class="form-label">Quality (1–5)</label>
-              <input type="number" name="quality" class="form-control" min="1" max="5" step="1" value="3">
+              <label class="form-label" for="quality">Quality (1-5)</label>
+              <input id="quality" type="number" th:field="*{quality}" class="form-control" min="1" max="5" step="1">
+              <div class="text-danger small" th:if="${#fields.hasErrors('quality')}" th:errors="*{quality}"></div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="note">Note (optional)</label>
+              <textarea id="note" th:field="*{note}" class="form-control" rows="2"></textarea>
             </div>
             <div class="col-12">
               <button class="btn btn-primary">Save</button>
@@ -65,8 +78,8 @@
                   <span class="badge text-bg-secondary" th:text="${e.quality}">3</span>
                 </td>
                 <td class="text-end">
-                  <form th:action="@{|/mind/sleep/${e.id}/delete|}" method="post" th:object="${e}">
-                    <div th:replace="fragments/csrf :: csrf"></div>
+                  <form th:action="@{|/mind/sleep/${e.id}/delete|}" method="post">
+                    <div th:replace="~{fragments/csrf :: csrf}"></div>
                     <button class="btn btn-outline-danger btn-sm">Delete</button>
                   </form>
                 </td>
@@ -79,10 +92,15 @@
           </div>
         </div>
         <div class="card-footer">
-          <small class="text-muted">Tip: aim for 7–9 hours; consistency matters.</small>
+          <small class="text-muted">Tip: aim for 7-9 hours; consistency matters.</small>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="mt-3 d-flex gap-2">
+    <a href="/mind/dreams" class="btn btn-outline-secondary">Go to Dreams</a>
+    <a href="/dashboard" class="btn btn-outline-secondary">Back to Home</a>
   </div>
 </main>
 

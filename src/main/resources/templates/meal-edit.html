@@ -13,15 +13,18 @@
     <form th:action="@{'/meal-plans/' + ${mealPlanId} + '/meals/edit/' + ${meal.mealId}}" method="post" th:object="${meal}">
         <label for="mealName">Meal Name:</label>
         <input type="text" id="mealName" th:field="*{mealName}" placeholder="Enter meal name" required>
+        <small>Short name to identify this meal.</small>
 
         <label for="date">Date:</label>
         <input type="date" id="date" th:field="*{date}" required>
 
         <label for="time">Time:</label>
-        <input type="time" id="time" th:field="*{time}" required>
+        <input type="time" id="time" th:field="*{time}" required placeholder="e.g., 08:30">
+        <small>Optional; use local time.</small>
 
         <label for="totalCalories">Total Calories:</label>
-        <input type="number" id="totalCalories" th:field="*{totalCalories}" required>
+        <input type="number" id="totalCalories" th:field="*{totalCalories}" required placeholder="e.g., 650">
+        <small>Use a rough estimate if unsure.</small>
 
         <button type="submit">Update Meal</button>
     </form>

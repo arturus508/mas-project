@@ -1,5 +1,6 @@
 package com.example.healthfitness.service;
 
+import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.Exercise;
 import com.example.healthfitness.repository.ExerciseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,13 @@ public class ExerciseService {
 
     public Exercise getExerciseById(Long id) {
         return exerciseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Exercise not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Exercise not found with id: " + id));
     }
 
     public void deleteExercise(Long id) {
-        exerciseRepository.deleteById(id);
+        Exercise exercise = exerciseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Exercise not found with id: " + id));
+        exerciseRepository.delete(exercise);
     }
 }
 

@@ -3,7 +3,6 @@ package com.example.healthfitness.controller;
 import com.example.healthfitness.model.*;
 import com.example.healthfitness.repository.FoodItemRepository;
 import com.example.healthfitness.service.MealMacroService;
-import com.example.healthfitness.service.UserService;
 import com.example.healthfitness.service.CurrentUserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -21,28 +20,29 @@ import java.util.*;
  * {@link DateTimeFormat} for type safety.
  */
 @Controller
-@RequestMapping("/meal-plans/day")
+@RequestMapping("/meals")
 public class MealDayViewController {
 
     private final MealMacroService mealMacroService;
     private final FoodItemRepository foodItemRepository;
-    private final UserService userService;
     private final CurrentUserService currentUserService;
 
     public MealDayViewController(MealMacroService mealMacroService,
                                  FoodItemRepository foodItemRepository,
-                                 UserService userService,
                                  CurrentUserService currentUserService) {
         this.mealMacroService = mealMacroService;
         this.foodItemRepository = foodItemRepository;
-        this.userService = userService;
         this.currentUserService = currentUserService;
+    }
+
+    @GetMapping("/today")
+    public String today() {
+        return "redirect:/meals?date=" + LocalDate.now();
     }
 
     @GetMapping
     public String day(@RequestParam(value = "date", required = false)
                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                      @RequestParam(value = "q", required = false) String q,
                       Model model) {
         Long userId = currentUserService.id();
         var d = date != null ? date : LocalDate.now();
@@ -60,45 +60,86 @@ public class MealDayViewController {
         model.addAttribute("totD", mealMacroService.totalsForMeal(dinner.getMealId()));
         model.addAttribute("totS", mealMacroService.totalsForMeal(snack.getMealId()));
         model.addAttribute("totDay", mealMacroService.totalsForDay(userId, d));
+        model.addAttribute("itemsB", mealMacroService.getItems(userId, breakfast.getMealId()));
+        model.addAttribute("itemsL", mealMacroService.getItems(userId, lunch.getMealId()));
+        model.addAttribute("itemsD", mealMacroService.getItems(userId, dinner.getMealId()));
+        model.addAttribute("itemsS", mealMacroService.getItems(userId, snack.getMealId()));
+        return "meals-day";
+    }
+
+    @GetMapping("/{date}/{segment}")
+    public String segment(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                          @PathVariable String segment,
+                          @RequestParam(value = "q", required = false) String q,
+                          Model model) {
+        Long userId = currentUserService.id();
+        MealType type = mealTypeFromSegment(segment);
+        Meal meal = mealMacroService.getOrCreateMeal(userId, date, type);
+        model.addAttribute("date", date);
+        model.addAttribute("segment", segment);
+        model.addAttribute("meal", meal);
+        model.addAttribute("items", mealMacroService.getItems(userId, meal.getMealId()));
+        model.addAttribute("totals", mealMacroService.totalsForMeal(meal.getMealId()));
         List<FoodItem> foods = q != null && !q.isBlank()
                 ? foodItemRepository.findTop20ByNameContainingIgnoreCaseOrderByNameAsc(q)
                 : foodItemRepository.findTop20ByNameContainingIgnoreCaseOrderByNameAsc("");
         model.addAttribute("foods", foods);
         model.addAttribute("q", q);
-        return "meals-day";
+        return "meal-details";
     }
 
-    @PostMapping("/{mealId}/add-item")
-    public String addItem(@PathVariable Long mealId,
-                          @RequestParam Long foodItemId,
-                          @RequestParam Integer quantity,
-                          @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        mealMacroService.addItem(mealId, foodItemId, quantity);
-        return "redirect:/meal-plans/day?date=" + date;
+    @PostMapping("/{date}/{segment}/items/add-food")
+    public String addFoodItem(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                              @PathVariable String segment,
+                              @RequestParam Long foodItemId,
+                              @RequestParam Integer quantity) {
+        Long userId = currentUserService.id();
+        MealType type = mealTypeFromSegment(segment);
+        Meal meal = mealMacroService.getOrCreateMeal(userId, date, type);
+        mealMacroService.addItem(userId, meal.getMealId(), foodItemId, quantity);
+        return "redirect:/meals/" + date + "/" + segment;
     }
 
-    @PostMapping("/remove-item/{itemId}")
-    public String removeItem(@PathVariable Long itemId,
-                             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        mealMacroService.removeItem(itemId);
-        return "redirect:/meal-plans/day?date=" + date;
+    @PostMapping("/{date}/{segment}/items/add-custom")
+    public String addCustomItem(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                @PathVariable String segment,
+                                @RequestParam String name,
+                                @RequestParam Integer kcal,
+                                @RequestParam Integer protein,
+                                @RequestParam Integer fat,
+                                @RequestParam Integer carbs,
+                                @RequestParam(required = false) Integer quantity) {
+        Long userId = currentUserService.id();
+        MealType type = mealTypeFromSegment(segment);
+        Meal meal = mealMacroService.getOrCreateMeal(userId, date, type);
+        mealMacroService.addCustomItem(userId, meal.getMealId(), name, kcal, protein, fat, carbs, quantity);
+        return "redirect:/meals/" + date + "/" + segment;
     }
 
-    @PostMapping("/{mealId}/quick")
-    public String quick(@PathVariable Long mealId,
-                        @RequestParam Integer kcal,
-                        @RequestParam Integer protein,
-                        @RequestParam Integer fat,
-                        @RequestParam Integer carbs,
-                        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        mealMacroService.setManual(mealId, kcal, protein, fat, carbs);
-        return "redirect:/meal-plans/day?date=" + date;
+    @PostMapping("/{date}/{segment}/items/{itemId}/delete")
+    public String removeItem(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                             @PathVariable String segment,
+                             @PathVariable Long itemId) {
+        Long userId = currentUserService.id();
+        mealMacroService.removeItem(userId, itemId);
+        return "redirect:/meals/" + date + "/" + segment;
     }
 
     @PostMapping("/copy-yesterday")
     public String copyYesterday(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         Long userId = currentUserService.id();
         mealMacroService.copyDay(userId, date.minusDays(1), date);
-        return "redirect:/meal-plans/day?date=" + date;
+        return "redirect:/meals?date=" + date;
+    }
+
+    private MealType mealTypeFromSegment(String segment) {
+        if (segment == null) {
+            throw new IllegalArgumentException("Segment is required");
+        }
+        String key = segment.trim().toUpperCase(Locale.ROOT);
+        if (key.endsWith("S")) {
+            key = key.substring(0, key.length() - 1);
+        }
+        return MealType.valueOf(key);
     }
 }

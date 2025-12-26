@@ -48,7 +48,7 @@ public class MealPlan {
      * the meal plan, avoiding LazyInitializationException when
      * rendering Thymeleaf views outside of a transactional context.
      */
-    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "mealPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Meal> meals = new ArrayList<>();
 
     // Getters and setters

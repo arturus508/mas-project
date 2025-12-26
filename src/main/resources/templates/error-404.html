@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Page Not Found</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-    <h1>404 - Not Found</h1>
-</header>
-<div class="content">
-    <p th:text="${message}">The requested resource could not be found.</p>
-    <a th:href="@{/}" class="back-button">Go to Home</a>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('404 Not Found')}"></head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="alert alert-warning">
+        <div class="fw-semibold mb-2">404 - Not Found</div>
+        <div th:text="${message}">The requested resource could not be found.</div>
+    </div>
+    <a th:href="@{/}" class="btn btn-outline-secondary">Back to home</a>
 </div>
 </body>
 </html>

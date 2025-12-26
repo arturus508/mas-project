@@ -1,18 +1,39 @@
-version: '3.8'
-
 services:
   mysql:
     image: mysql:8.0
     container_name: mysql-db
     environment:
-      MYSQL_ROOT_PASSWORD: example_password # Root password for MySQL
-      MYSQL_DATABASE: example_db # Name of the default database
-      MYSQL_USER: example_user # Non-root MySQL user
-      MYSQL_PASSWORD: user_password # Password for the non-root user
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-example_password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-healthfitness}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-app_password}
     ports:
-      - "3307:3306" # Expose MySQL on port 3306
+      - "${MYSQL_PORT:-3307}:3306"
     volumes:
-      - mysql-data:/var/lib/mysql # Persistent storage for MySQL data
+      - mysql-data:/var/lib/mysql
+    networks:
+      - mysql-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-example_password}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-healthfitness}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-app_password}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
       - mysql-network
 

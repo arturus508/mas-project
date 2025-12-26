@@ -287,3 +287,20 @@ table th {
 .back-button:hover {
     background-color: #45a049;
 }
+
+/* Improve contrast on light pages using Bootstrap */
+body.bg-light {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+body.bg-light label,
+body.bg-light .form-label {
+    color: #212529;
+}
+
+body.bg-light .form-text,
+body.bg-light small,
+body.bg-light .text-muted {
+    color: #6c757d;
+}

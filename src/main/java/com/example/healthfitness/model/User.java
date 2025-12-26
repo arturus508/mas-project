@@ -2,7 +2,6 @@ package com.example.healthfitness.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,10 +56,6 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public boolean checkPassword(String rawPassword) {
-        return new BCryptPasswordEncoder().matches(rawPassword, this.password);
-    }
-
     public List<WorkoutPlan> getWorkoutPlans() { return workoutPlans; }
     public void setWorkoutPlans(List<WorkoutPlan> workoutPlans) { this.workoutPlans = workoutPlans; }
 
@@ -72,7 +67,6 @@ public class User {
 
     // removed getters/setters for payments and membership
 }
-
 
 
 

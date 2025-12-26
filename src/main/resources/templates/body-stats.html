@@ -1,72 +1,100 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Body Stats</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
-  <style>
-    /* Additional styling for the body-stats view if needed */
-    .body-stats-list {
-      list-style-type: none;
-      padding: 0;
-      margin-top: 20px;
-    }
-    .body-stats-item {
-      background: #444;
-      padding: 10px;
-      margin: 10px auto;
-      border-radius: 5px;
-      text-align: center;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-    }
-    .body-stats-item span {
-      margin: 0 5px;
-    }
-    .delete-button {
-      padding: 5px 10px;
-      background-color: transparent;
-      border: 1px solid #4CAF50;
-      color: #4CAF50;
-      border-radius: 3px;
-      text-decoration: none;
-      transition: background-color 0.3s ease;
-    }
-    .delete-button:hover {
-      background-color: #4CAF50;
-      color: white;
-    }
-  </style>
-</head>
-<body>
-<header>Body Stats</header>
-<div class="content">
-  <form th:action="@{/body-stats/add}" method="post">
-    <input type="date" name="dateRecorded" required>
-    <input type="number" step="0.1" name="weight" placeholder="Weight (kg)" required>
-    <input type="number" step="0.1" name="bodyFatPercent" placeholder="Body Fat (%)" required>
-    <button type="submit">Add Stats</button>
-  </form>
+<head th:replace="~{fragments/head :: head('Body Stats')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
 
-  <ul class="body-stats-list">
-    <li th:each="stat : ${bodyStats}" class="body-stats-item">
-      <span>Date: <span th:text="${stat.dateRecorded}"></span></span> -
-      <span>Weight: <span th:text="${stat.weight}"></span> kg</span> -
-      <span>Body Fat: <span th:text="${stat.bodyFatPercent}"></span> %</span>
-      <a th:href="@{'/body-stats/delete/' + ${stat.bodyStatsId}}" class="delete-button">Delete</a>
-    </li>
-  </ul>
-  <br/>
-  <a th:href="@{/dashboard}" class="back-button">Back to Dashboard</a>
+<div class="container py-4">
+    <h1 class="mb-4">Body Stats</h1>
+
+    <form th:action="@{/body-stats/add}" th:object="${bodyStatsForm}" method="post" class="row g-3">
+        <div th:replace="~{fragments/csrf :: csrf}"></div>
+
+        <div class="col-md-4">
+            <label class="form-label" for="dateRecorded">Date</label>
+            <input id="dateRecorded" class="form-control" type="date" th:field="*{dateRecorded}" required>
+            <div class="form-text">Pick the day of this measurement.</div>
+            <div class="text-danger small" th:if="${#fields.hasErrors('dateRecorded')}" th:errors="*{dateRecorded}"></div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label" for="weight">Weight (kg)</label>
+            <input id="weight" class="form-control" type="number" step="0.1" th:field="*{weight}" placeholder="e.g., 78.5" required>
+            <div class="form-text">Use the same scale for consistency.</div>
+            <div class="text-danger small" th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}"></div>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label" for="bodyFatPercent">Body Fat (%)</label>
+            <input id="bodyFatPercent" class="form-control" type="number" step="0.1" th:field="*{bodyFatPercent}" placeholder="e.g., 18.2" required>
+            <div class="form-text">Optional if you do not track body fat.</div>
+            <div class="text-danger small" th:if="${#fields.hasErrors('bodyFatPercent')}" th:errors="*{bodyFatPercent}"></div>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Add Stats</button>
+            <a th:href="@{/dashboard}" class="btn btn-outline-secondary">Back</a>
+        </div>
+    </form>
+
+    <div class="mt-4">
+        <div class="card mb-3" th:if="${!#lists.isEmpty(bodyStats)}">
+            <div class="card-header">Weight trend</div>
+            <div class="card-body">
+                <canvas id="weightChart" height="120"></canvas>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(bodyStats)}" class="alert alert-light border">
+            <div class="fw-semibold">No body stats yet</div>
+            <div class="text-muted small">Add your first measurement to start tracking progress.</div>
+        </div>
+        <ul class="list-group" th:if="${!#lists.isEmpty(bodyStats)}">
+            <li th:each="stat : ${bodyStats}" class="list-group-item d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="me-3">Date: <strong th:text="${stat.dateRecorded}"></strong></span>
+                    <span class="me-3">Weight: <strong th:text="${stat.weight}"></strong> kg</span>
+                    <span>Body Fat: <strong th:text="${stat.bodyFatPercent}"></strong> %</span>
+                </div>
+                <form th:action="@{'/body-stats/delete/' + ${stat.bodyStatsId}}" method="post" class="d-inline">
+                    <div th:replace="~{fragments/csrf :: csrf}"></div>
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                </form>
+            </li>
+        </ul>
+    </div>
 </div>
+<script th:inline="javascript">
+/*<![CDATA[*/
+  const weightLabels = /*[[${statsDates}]]*/ [];
+  const weightData = /*[[${statsWeights}]]*/ [];
+  const chartEl = document.getElementById('weightChart');
+  if (chartEl && weightLabels.length > 0) {
+    new Chart(chartEl, {
+      type: 'line',
+      data: {
+        labels: weightLabels,
+        datasets: [{
+          label: 'Weight (kg)',
+          data: weightData,
+          borderColor: '#4CAF50',
+          backgroundColor: 'rgba(76, 175, 80, 0.15)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { title: { display: true, text: 'kg' } }
+        }
+      }
+    });
+  }
+/*]]>*/
+</script>
 </body>
 </html>
-
-
-
-
-
-
-
-

@@ -1,5 +1,6 @@
 package com.example.healthfitness.service;
 
+import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.Ingredient;
 import com.example.healthfitness.repository.IngredientRepository;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,19 @@ public class IngredientService {
         return ingredientRepository.findAll();
     }
 
+    public List<Ingredient> getIngredientsByMealId(Long mealId) {
+        return ingredientRepository.findByMeal_MealId(mealId);
+    }
+
     public Ingredient getIngredientById(Long id) {
         return ingredientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ingredient not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found with id: " + id));
     }
 
     public void deleteIngredient(Long id) {
-        ingredientRepository.deleteById(id);
+        Ingredient ingredient = ingredientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found with id: " + id));
+        ingredientRepository.delete(ingredient);
     }
 
     public Ingredient findByName(String name) {

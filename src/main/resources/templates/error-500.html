@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Error</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-    <h1>Something went wrong</h1>
-</header>
-<div class="content">
-    <p th:text="${message}">An unexpected error occurred.</p>
-    <a th:href="@{/}" class="back-button">Go to Home</a>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Server Error')}"></head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="alert alert-danger">
+        <div class="fw-semibold mb-2">Something went wrong</div>
+        <div th:text="${message}">An unexpected error occurred.</div>
+    </div>
+    <a th:href="@{/}" class="btn btn-outline-secondary">Back to home</a>
 </div>
 </body>
 </html>

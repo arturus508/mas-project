@@ -1,8 +1,8 @@
 package com.example.healthfitness.controller;
 
 import com.example.healthfitness.model.WorkoutPlanExercise;
+import com.example.healthfitness.service.CurrentUserService;
 import com.example.healthfitness.service.WorkoutPlanExerciseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,16 +11,24 @@ import java.util.List;
 @RequestMapping("/workoutplanexercises")
 public class WorkoutPlanExerciseController {
 
-    @Autowired
-    private WorkoutPlanExerciseService workoutPlanExerciseService;
+    private final WorkoutPlanExerciseService workoutPlanExerciseService;
+    private final CurrentUserService currentUserService;
+
+    public WorkoutPlanExerciseController(WorkoutPlanExerciseService workoutPlanExerciseService,
+                                         CurrentUserService currentUserService) {
+        this.workoutPlanExerciseService = workoutPlanExerciseService;
+        this.currentUserService = currentUserService;
+    }
 
     @GetMapping
     public List<WorkoutPlanExercise> getAllWorkoutPlanExercises() {
-        return workoutPlanExerciseService.getAllWorkoutPlanExercises();
+        Long userId = currentUserService.id();
+        return workoutPlanExerciseService.getWorkoutPlanExercisesForUser(userId);
     }
 
     @PostMapping
     public WorkoutPlanExercise createWorkoutPlanExercise(@RequestBody WorkoutPlanExercise workoutPlanExercise) {
-        return workoutPlanExerciseService.saveWorkoutPlanExercise(workoutPlanExercise);
+        Long userId = currentUserService.id();
+        return workoutPlanExerciseService.saveWorkoutPlanExercise(userId, workoutPlanExercise);
     }
 }

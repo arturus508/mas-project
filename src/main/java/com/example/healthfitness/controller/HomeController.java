@@ -9,17 +9,11 @@ public class HomeController {
 
     @GetMapping({"/", "/index"})
     public String index(Model model) {
-        // Landing / login page (jeśli masz index.html)
-        model.addAttribute("pageTitle", "Welcome");
-        return "index";
+        return "redirect:/today";
     }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        // Prosty dashboard bez Guides; później dołożymy tu podsumowanie snu itd.
-        model.addAttribute("pageTitle", "Dashboard");
-        return "dashboard";
+        return "redirect:/today";
     }
 }
-
-

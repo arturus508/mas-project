@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Profile')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container py-4">
+    <h1 class="mb-4">Profile</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="text-muted small">Name</div>
+                    <div class="fw-semibold" th:text="${user.name}">Name</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="text-muted small">Email</div>
+                    <div class="fw-semibold" th:text="${user.email}">Email</div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <a th:href="@{/dashboard}" class="btn btn-outline-secondary">Back to Dashboard</a>
+            <a th:href="@{/settings}" class="btn btn-outline-primary">Settings</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

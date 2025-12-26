@@ -1,9 +1,8 @@
 package com.example.healthfitness.controller;
 
 import com.example.healthfitness.model.Meal;
-import com.example.healthfitness.service.MealService;
-import com.example.healthfitness.service.UserService;
 import com.example.healthfitness.service.CurrentUserService;
+import com.example.healthfitness.service.MealService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,20 +20,18 @@ import java.util.List;
 public class MealController {
 
     private final MealService mealService;
-    private final UserService userService;
     private final CurrentUserService currentUserService;
 
     public MealController(MealService mealService,
-                          UserService userService,
                           CurrentUserService currentUserService) {
         this.mealService = mealService;
-        this.userService = userService;
         this.currentUserService = currentUserService;
     }
 
     @GetMapping("/meal-plan/{mealPlanId}")
     public List<Meal> getMealsForMealPlan(@PathVariable Long mealPlanId) {
-        return mealService.getMealsByMealPlan(mealPlanId);
+        Long userId = currentUserService.id();
+        return mealService.getMealsByMealPlan(userId, mealPlanId);
     }
 
     @PostMapping("/meal-plan/{mealPlanId}/add")
@@ -45,6 +42,7 @@ public class MealController {
 
     @DeleteMapping("/delete/{mealId}")
     public void deleteMeal(@PathVariable Long mealId) {
-        mealService.deleteMeal(mealId);
+        Long userId = currentUserService.id();
+        mealService.deleteMeal(userId, mealId);
     }
 }

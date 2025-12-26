@@ -1,37 +1,48 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Workout Plans</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-    <h1>Workout Plans</h1>
-    <nav>
-        <ul>
-            <li><a th:href="@{/dashboard}">Dashboard</a></li>
-            <li><a th:href="@{/workout-plans}">Workout Plans</a></li>
-        </ul>
-    </nav>
-</header>
-<div class="content">
-    <a th:href="@{/workout-plans/add}" class="add-button">Add New Workout Plan</a>
-    <div th:each="plan : ${workoutPlans}" class="card">
-        <h3 th:text="${plan.planName}"></h3>
-        <p th:text="${plan.description}"></p>
-        <p>Days Per Week: <span th:text="${plan.daysPerWeek}"></span></p>
-        <div class="actions">
-            <a th:href="@{'/workout-plans/edit/' + ${plan.workoutPlanId}}" class="edit-button">Edit</a>
-            <a th:href="@{'/workout-plans/delete/' + ${plan.workoutPlanId}}" class="delete-button">Delete</a>
-            <a th:href="@{'/workout-plans/' + ${plan.workoutPlanId} + '/exercises'}" class="edit-button">Go</a>
-        </div>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Workout Plans')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="mb-0">Workout Plans</h1>
+        <a th:href="@{/workout-plans/add}" class="btn btn-primary">Add Workout Plan</a>
+    </div>
+
+    <div class="table-responsive" th:if="${!#lists.isEmpty(workoutPlans)}">
+        <table class="table table-striped align-middle">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Days/Week</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="plan : ${workoutPlans}">
+                <td th:text="${plan.planName}"></td>
+                <td th:text="${plan.startDate}"></td>
+                <td th:text="${plan.endDate}"></td>
+                <td th:text="${plan.daysPerWeek}"></td>
+                <td>
+                    <a class="btn btn-outline-secondary btn-sm" th:href="@{'/workout-plans/' + ${plan.workoutPlanId} + '/exercises'}">Details</a>
+                    <a class="btn btn-outline-primary btn-sm" th:href="@{'/workout-plans/edit/' + ${plan.workoutPlanId}}">Edit</a>
+                    <form th:action="@{'/workout-plans/delete/' + ${plan.workoutPlanId}}" method="post" class="d-inline">
+                        <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="alert alert-light border" th:if="${#lists.isEmpty(workoutPlans)}">
+        <div class="fw-semibold">No workout plans yet</div>
+        <div class="text-muted small">Create your first plan to start tracking workouts.</div>
     </div>
 </div>
 </body>
 </html>
-
-
-
-
-

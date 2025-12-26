@@ -1,49 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Add Meal Plan</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-  <h1>Add Meal Plan</h1>
-  <nav>
-    <ul>
-      <li><a th:href="@{/dashboard}">Dashboard</a></li>
-      <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
-    </ul>
-  </nav>
-</header>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Add Meal Plan')}"></head>
+<body class="bg-light">
 
-<div class="content">
-  <form th:action="@{/meal-plans/add}" th:object="${mealPlanForm}" method="post">
-    <!-- CSRF token -->
+<nav th:replace="~{fragments/nav :: nav}"></nav>
+
+<main class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h2 class="m-0">Add Meal Plan</h2>
+    <a th:href="@{/meal-plans}" class="btn btn-outline-secondary">Back to Meal Plans</a>
+  </div>
+
+  <form th:action="@{/meal-plans/add}" th:object="${mealPlanForm}" method="post" class="row g-3">
     <div th:replace="~{fragments/csrf :: csrf}"></div>
 
-    <label for="planName">Plan Name:</label>
-    <input type="text" id="planName" th:field="*{planName}" placeholder="Enter plan name" />
-    <div th:if="${#fields.hasErrors('planName')}" th:errors="*{planName}" class="error"></div>
+    <div class="col-12">
+      <label class="form-label" for="planName">Plan Name</label>
+      <input type="text" id="planName" class="form-control" th:field="*{planName}" placeholder="e.g., Cutting Week 1">
+      <div class="form-text">Give this plan a short name.</div>
+      <div class="text-danger small" th:if="${#fields.hasErrors('planName')}" th:errors="*{planName}"></div>
+    </div>
 
-    <label for="description">Description:</label>
-    <input type="text" id="description" th:field="*{description}" placeholder="Enter description" />
-    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></div>
+    <div class="col-12">
+      <label class="form-label" for="description">Description</label>
+      <input type="text" id="description" class="form-control" th:field="*{description}" placeholder="Short note about this plan">
+      <div class="form-text">Optional notes about goals or macros.</div>
+      <div class="text-danger small" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+    </div>
 
-    <label for="dietaryRestriction">Dietary Restriction:</label>
-    <input type="text" id="dietaryRestriction" th:field="*{dietaryRestriction}" placeholder="Enter dietary restriction" />
-    <div th:if="${#fields.hasErrors('dietaryRestriction')}" th:errors="*{dietaryRestriction}" class="error"></div>
+    <div class="col-12">
+      <label class="form-label" for="dietaryRestriction">Dietary Restriction</label>
+      <input type="text" id="dietaryRestriction" class="form-control" th:field="*{dietaryRestriction}" placeholder="e.g., low carb, gluten-free">
+      <div class="form-text">Optional; leave blank if none.</div>
+      <div class="text-danger small" th:if="${#fields.hasErrors('dietaryRestriction')}" th:errors="*{dietaryRestriction}"></div>
+    </div>
 
-    <label for="startDate">Start Date:</label>
-    <input type="date" id="startDate" th:field="*{startDate}" />
-    <div th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error"></div>
+    <div class="col-md-6">
+      <label class="form-label" for="startDate">Start Date</label>
+      <input type="date" id="startDate" class="form-control" th:field="*{startDate}">
+      <div class="text-danger small" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
+    </div>
 
-    <label for="endDate">End Date:</label>
-    <input type="date" id="endDate" th:field="*{endDate}" />
-    <div th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}" class="error"></div>
+    <div class="col-md-6">
+      <label class="form-label" for="endDate">End Date</label>
+      <input type="date" id="endDate" class="form-control" th:field="*{endDate}">
+      <div class="text-danger small" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></div>
+    </div>
 
-    <button type="submit" class="btn">Add Meal Plan</button>
-    <a th:href="@{/meal-plans}" class="btn btn-secondary">Cancel</a>
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Add Meal Plan</button>
+      <a th:href="@{/meal-plans}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
   </form>
-</div>
+</main>
+
 </body>
 </html>

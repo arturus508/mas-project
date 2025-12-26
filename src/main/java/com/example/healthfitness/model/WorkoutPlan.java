@@ -1,5 +1,6 @@
 package com.example.healthfitness.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,9 +16,8 @@ import java.util.List;
  * {@link LocalDate} values to allow proper temporal operations and to
  * ensure type safety throughout the application.  Each plan belongs to
  * a user and may contain many workout plan exercises.  The
- * {@link #workoutPlanExercises} collection is eagerly fetched to avoid
- * LazyInitializationExceptions when rendering templates outside of an
- * open session.
+ * {@link #workoutPlanExercises} collection is loaded lazily and the
+ * service layer uses targeted fetches when templates need exercises.
  */
 @Entity
 public class WorkoutPlan {
@@ -40,11 +40,16 @@ public class WorkoutPlan {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<WorkoutPlanExercise> workoutPlanExercises = new ArrayList<>();
+
+    @OneToMany(mappedBy = "workoutPlan", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference(value = "planDays")
+    private List<WorkoutPlanDay> planDays = new ArrayList<>();
 
     // Getters and setters
 
@@ -74,6 +79,9 @@ public class WorkoutPlan {
 
     public List<WorkoutPlanExercise> getWorkoutPlanExercises() { return workoutPlanExercises; }
     public void setWorkoutPlanExercises(List<WorkoutPlanExercise> workoutPlanExercises) { this.workoutPlanExercises = workoutPlanExercises; }
+
+    public List<WorkoutPlanDay> getPlanDays() { return planDays; }
+    public void setPlanDays(List<WorkoutPlanDay> planDays) { this.planDays = planDays; }
 
     public void addWorkoutPlanExercise(WorkoutPlanExercise wpe) {
         workoutPlanExercises.add(wpe);

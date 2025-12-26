@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Meal Details')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="mb-1 text-capitalize" th:text="${segment}">Breakfast</h1>
+            <div class="text-muted small">
+                <span th:text="${date}">2025-08-20</span>
+            </div>
+        </div>
+        <a th:href="@{'/meals?date=' + ${date}}" class="btn btn-outline-secondary">Back to Meals</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body d-flex flex-wrap gap-2">
+            <span class="badge text-bg-primary" th:text="${totals.kcal} + ' kcal'">0 kcal</span>
+            <span class="badge text-bg-secondary" th:text="${totals.protein} + ' P'">0 P</span>
+            <span class="badge text-bg-secondary" th:text="${totals.fat} + ' F'">0 F</span>
+            <span class="badge text-bg-secondary" th:text="${totals.carbs} + ' C'">0 C</span>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">Items</div>
+        <div class="card-body" th:if="${#lists.isEmpty(items)}">
+            <div class="text-muted">No items yet. Add your first item below.</div>
+        </div>
+        <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(items)}">
+            <li class="list-group-item d-flex align-items-center justify-content-between" th:each="item : ${items}">
+                <div>
+                    <div class="fw-semibold" th:text="${item.foodItem != null ? item.foodItem.name : item.name}">Item</div>
+                    <div class="text-muted small">
+                        <span th:if="${item.quantity != null}">Qty: <span th:text="${item.quantity}"></span></span>
+                    </div>
+                </div>
+                <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/' + ${item.id} + '/delete'}" method="post">
+                    <div th:replace="~{fragments/csrf :: csrf}"></div>
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="card h-100">
+                <div class="card-header">Add food from database</div>
+                <div class="card-body">
+                    <form class="row g-2 mb-3" method="get" th:action="@{'/meals/' + ${date} + '/' + ${segment}}">
+                        <div class="col-8">
+                            <input type="text" class="form-control" name="q" placeholder="Search food" th:value="${q}">
+                        </div>
+                        <div class="col-4">
+                            <button class="btn btn-outline-primary w-100">Search</button>
+                        </div>
+                    </form>
+
+                    <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/add-food'}" method="post" class="row g-2">
+                        <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <div class="col-12 col-md-7">
+                            <select class="form-select" name="foodItemId" required>
+                                <option value="" disabled selected>Select food</option>
+                                <option th:each="f : ${foods}" th:value="${f.id}" th:text="${f.name}">Food</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <input type="number" class="form-control" name="quantity" min="1" value="100">
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <button class="btn btn-success w-100">Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card h-100">
+                <div class="card-header">Add custom item</div>
+                <div class="card-body">
+                    <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/add-custom'}" method="post" class="row g-2">
+                        <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <div class="col-12">
+                            <input type="text" class="form-control" name="name" placeholder="Item name" required>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" class="form-control" name="kcal" placeholder="kcal" required>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" class="form-control" name="protein" placeholder="protein" required>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" class="form-control" name="fat" placeholder="fat" required>
+                        </div>
+                        <div class="col-6">
+                            <input type="number" class="form-control" name="carbs" placeholder="carbs" required>
+                        </div>
+                        <div class="col-12">
+                            <input type="number" class="form-control" name="quantity" placeholder="quantity (optional)">
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100">Add custom</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

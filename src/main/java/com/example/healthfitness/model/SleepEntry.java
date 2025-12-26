@@ -52,4 +52,20 @@ public class SleepEntry {
 
     public String getNote() { return note; }
     public void setNote(String note) { this.note = note; }
+
+    @Transient
+    public long getDurationMinutes() {
+        if (sleepStart == null || sleepEnd == null) return 0;
+        LocalDateTime end = sleepEnd;
+        if (end.isBefore(sleepStart)) end = end.plusDays(1);
+        return Duration.between(sleepStart, end).toMinutes();
+    }
+
+    @Transient
+    public String getDurationText() {
+        long minutes = getDurationMinutes();
+        long h = minutes / 60;
+        long m = minutes % 60;
+        return h + "h " + m + "m";
+    }
 }

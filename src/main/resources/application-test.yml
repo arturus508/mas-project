@@ -6,11 +6,24 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+        globally_quoted_identifiers: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
   flyway:
     enabled: true
     locations: classpath:db/migration
+    placeholders:
+      exercise_insert_alias: ""
+      exercise_name_upsert: "VALUES(exercise_name)"
+      exercise_muscle_group_upsert: "VALUES(muscle_group)"
+      exercise_intensity_level_upsert: "VALUES(intensity_level)"
+      food_insert_alias: ""
+      food_name_upsert: "VALUES(name)"
+      food_unit_upsert: "VALUES(unit)"
+      food_kcal100_upsert: "VALUES(kcal100)"
+      food_protein100_upsert: "VALUES(protein100)"
+      food_fat100_upsert: "VALUES(fat100)"
+      food_carbs100_upsert: "VALUES(carbs100)"
   sql:
     init:
       mode: never

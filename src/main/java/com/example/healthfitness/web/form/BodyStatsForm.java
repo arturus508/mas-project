@@ -1,33 +1,61 @@
 package com.example.healthfitness.web.form;
 
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 
 /**
- * Form backing object for recording body statistics.  Using BigDecimal
- * for numeric fields provides better precision and integrates well
- * with validation annotations.  After binding and validation the
- * numeric values can be converted to doubles for storage.
+ * Form backing bean for creating or editing body statistics.  This DTO
+ * decouples the web layer from the persistence model and allows
+ * validation rules to be applied on user input prior to mapping into
+ * the {@link com.example.healthfitness.model.BodyStats} entity.
  */
 public class BodyStatsForm {
 
+    /**
+     * The date the body measurements were recorded.  A value is
+     * required and bound using ISO‑8601 format.  See
+     * {@link DateTimeFormat#iso()} for details.
+     */
     @NotNull
-    private LocalDate date;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dateRecorded;
 
-    @NotNull
-    @DecimalMin(value = "1.0", inclusive = false)
-    private BigDecimal weightKg;
+    /** The weight in kilograms.  Must be non‑negative. */
+    @Min(value = 0, message = "Weight cannot be negative")
+    private Double weight;
 
-    private BigDecimal bodyFatPercent;
+    /**
+     * The body fat percentage.  Must be non‑negative.  Depending on
+     * your domain this could be constrained to 0–100 but here we
+     * simply require a non‑negative value.
+     */
+    @Min(value = 0, message = "Body fat percentage cannot be negative")
+    private Double bodyFatPercent;
 
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+    public LocalDate getDateRecorded() {
+        return dateRecorded;
+    }
 
-    public BigDecimal getWeightKg() { return weightKg; }
-    public void setWeightKg(BigDecimal weightKg) { this.weightKg = weightKg; }
+    public void setDateRecorded(LocalDate dateRecorded) {
+        this.dateRecorded = dateRecorded;
+    }
 
-    public BigDecimal getBodyFatPercent() { return bodyFatPercent; }
-    public void setBodyFatPercent(BigDecimal bodyFatPercent) { this.bodyFatPercent = bodyFatPercent; }
+    public Double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Double weight) {
+        this.weight = weight;
+    }
+
+    public Double getBodyFatPercent() {
+        return bodyFatPercent;
+    }
+
+    public void setBodyFatPercent(Double bodyFatPercent) {
+        this.bodyFatPercent = bodyFatPercent;
+    }
 }

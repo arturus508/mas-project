@@ -1,5 +1,6 @@
 package com.example.healthfitness.service;
 
+import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.*;
 import com.example.healthfitness.repository.WeeklyGoalRepository;
 import com.example.healthfitness.repository.UserRepository;
@@ -16,13 +17,15 @@ public class WeeklyGoalService {
     @Autowired private UserRepository userRepository;
 
     public List<WeeklyGoal> listForUser(Long userId){
-        var user = userRepository.findById(userId).orElseThrow();
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         return weeklyGoalRepository.findByUserOrderByWeekStartDesc(user);
     }
 
     public WeeklyGoal add(Long userId , String title , WeeklyGoalType type ,
                           LocalDate weekStart , LocalDate weekEnd , Integer targetValue){
-        var user = userRepository.findById(userId).orElseThrow();
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         var g = new WeeklyGoal();
         g.setUser(user); g.setTitle(title); g.setType(type);
         g.setWeekStart(weekStart); g.setWeekEnd(weekEnd);
@@ -34,7 +37,8 @@ public class WeeklyGoalService {
     public WeeklyGoal update(Long id , String title , WeeklyGoalType type ,
                              LocalDate weekStart , LocalDate weekEnd , Integer targetValue ,
                              Integer currentValue , Boolean completed){
-        var g = weeklyGoalRepository.findById(id).orElseThrow();
+        var g = weeklyGoalRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Weekly goal not found with id: " + id));
         if (title != null) g.setTitle(title);
         if (type  != null) g.setType(type);
         if (weekStart != null) g.setWeekStart(weekStart);
@@ -48,16 +52,22 @@ public class WeeklyGoalService {
         return weeklyGoalRepository.save(g);
     }
 
-    public void delete(Long id){ weeklyGoalRepository.deleteById(id); }
+    public void delete(Long id){
+        WeeklyGoal goal = weeklyGoalRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Weekly goal not found with id: " + id));
+        weeklyGoalRepository.delete(goal);
+    }
 
     public void increment(Long id , int by){
-        var g = weeklyGoalRepository.findById(id).orElseThrow();
+        var g = weeklyGoalRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Weekly goal not found with id: " + id));
         g.setCurrentValue( Math.max(0, g.getCurrentValue() + by) );
         weeklyGoalRepository.save(g);
     }
 
     public void toggleComplete(Long id){
-        var g = weeklyGoalRepository.findById(id).orElseThrow();
+        var g = weeklyGoalRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Weekly goal not found with id: " + id));
         var nd = !g.isCompleted();
         g.setCompleted(nd);
         g.setCompletedDate(nd ? LocalDate.now() : null);
@@ -66,7 +76,8 @@ public class WeeklyGoalService {
 
     // auto weekly sumary
     public void finalizeFinishedWeeks(Long userId){
-        var user = userRepository.findById(userId).orElseThrow();
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         var now = LocalDate.now();
         var list = weeklyGoalRepository.findByUserOrderByWeekStartDesc(user);
         for (var g : list){

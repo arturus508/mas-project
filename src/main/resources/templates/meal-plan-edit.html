@@ -1,52 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Edit Meal Plan</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-  <h1>Edit Meal Plan</h1>
-  <nav>
-    <ul>
-      <li><a th:href="@{/dashboard}">Dashboard</a></li>
-      <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
-      <li><a th:href="@{'/meal-plans/' + ${mealPlanId}}">Back to Details</a></li>
-    </ul>
-  </nav>
-</header>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Edit Meal Plan')}"></head>
+<body class="bg-light">
 
-<div class="content">
-  <div class="card">
-    <form th:action="@{'/meal-plans/edit/' + ${mealPlanId}}"
-          method="post" th:object="${mealPlanForm}">
-      <!-- CSRF token -->
-      <div th:replace="~{fragments/csrf :: csrf}"></div>
+<nav th:replace="~{fragments/nav :: nav}"></nav>
 
-      <label>Plan Name:</label>
-      <input type="text" th:field="*{planName}" required>
-      <div th:if="${#fields.hasErrors('planName')}" th:errors="*{planName}" class="error"></div>
-
-      <label>Description:</label>
-      <input type="text" th:field="*{description}">
-      <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error"></div>
-
-      <label>Dietary Restriction:</label>
-      <input type="text" th:field="*{dietaryRestriction}">
-      <div th:if="${#fields.hasErrors('dietaryRestriction')}" th:errors="*{dietaryRestriction}" class="error"></div>
-
-      <label>Start Date:</label>
-      <input type="date" th:field="*{startDate}" required>
-      <div th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}" class="error"></div>
-
-      <label>End Date:</label>
-      <input type="date" th:field="*{endDate}" required>
-      <div th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}" class="error"></div>
-
-      <button type="submit" class="btn">Save Changes</button>
-    </form>
+<main class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h2 class="m-0">Edit Meal Plan</h2>
+    <a th:href="@{'/meal-plans/' + ${mealPlanId}}" class="btn btn-outline-secondary">Back to Details</a>
   </div>
-</div>
+
+  <form th:action="@{'/meal-plans/edit/' + ${mealPlanId}}" method="post" th:object="${mealPlanForm}" class="row g-3">
+    <div th:replace="~{fragments/csrf :: csrf}"></div>
+
+    <div class="col-12">
+      <label class="form-label">Plan Name</label>
+      <input type="text" class="form-control" th:field="*{planName}" placeholder="e.g., Cutting Week 1" required>
+      <div class="form-text">Give this plan a short name.</div>
+      <div class="text-danger small" th:if="${#fields.hasErrors('planName')}" th:errors="*{planName}"></div>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Description</label>
+      <input type="text" class="form-control" th:field="*{description}" placeholder="Short note about this plan">
+      <div class="form-text">Optional notes about goals or macros.</div>
+      <div class="text-danger small" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label">Dietary Restriction</label>
+      <input type="text" class="form-control" th:field="*{dietaryRestriction}" placeholder="e.g., low carb, gluten-free">
+      <div class="form-text">Optional; leave blank if none.</div>
+      <div class="text-danger small" th:if="${#fields.hasErrors('dietaryRestriction')}" th:errors="*{dietaryRestriction}"></div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">Start Date</label>
+      <input type="date" class="form-control" th:field="*{startDate}" required>
+      <div class="text-danger small" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label">End Date</label>
+      <input type="date" class="form-control" th:field="*{endDate}" required>
+      <div class="text-danger small" th:if="${#fields.hasErrors('endDate')}" th:errors="*{endDate}"></div>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a th:href="@{'/meal-plans/' + ${mealPlanId}}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</main>
+
 </body>
 </html>

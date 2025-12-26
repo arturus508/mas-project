@@ -25,7 +25,7 @@ public class IngredientViewController {
     public String listIngredientsForMeal(@PathVariable Long mealId, Model model) {
         Meal meal = mealService.getMealById(mealId);
         model.addAttribute("meal", meal);
-        model.addAttribute("ingredients", meal.getIngredients());
+        model.addAttribute("ingredients", ingredientService.getIngredientsByMealId(mealId));
         model.addAttribute("mealId", mealId);
         return "ingredient-list";  // Thymeleaf template
     }
@@ -44,22 +44,19 @@ public class IngredientViewController {
         Meal meal = mealService.getMealById(mealId);
         // Set the Meal on the Ingredient
         ingredient.setMeal(meal);
-        // Add the new Ingredient to the Meal’s list
-        meal.getIngredients().add(ingredient);
-        // Save the updated Meal (which cascades the new Ingredient)
-        mealService.updateMeal(meal);
+        ingredientService.saveIngredient(ingredient);
         return "redirect:/meals/" + mealId + "/ingredients";
     }
 
     // Remove an Ingredient from the Meal
     @GetMapping("/{mealId}/ingredients/delete/{ingredientId}")
     public String removeIngredient(@PathVariable Long mealId, @PathVariable Long ingredientId) {
-        Meal meal = mealService.getMealById(mealId);
-        meal.getIngredients().removeIf(ing -> ing.getIngredientId().equals(ingredientId));
-        mealService.updateMeal(meal);
+        ingredientService.deleteIngredient(ingredientId);
         return "redirect:/meals/" + mealId + "/ingredients";
     }
 }
+
+
 
 
 

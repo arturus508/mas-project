@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.core.env.Environment;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -27,16 +29,18 @@ import java.io.IOException;
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+    private final Environment environment;
 
-    public SecurityConfig(UserDetailsService uds) {
+    public SecurityConfig(UserDetailsService uds, Environment environment) {
         this.userDetailsService = uds;
+        this.environment = environment;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/css/**","/js/**","/img/**","/login","/register").permitAll()
+                .requestMatchers("/css/**","/js/**","/img/**","/login","/register","/error","/favicon.ico").permitAll()
                 .requestMatchers(HttpMethod.GET, "/meal-plans/**", "/meals/**").authenticated()
                 .requestMatchers(HttpMethod.POST, "/meals/**").authenticated()
                 .anyRequest().authenticated()
@@ -56,11 +60,18 @@ public class SecurityConfig {
                 .contentTypeOptions(Customizer.withDefaults())
                 .frameOptions(f -> f.deny())
                 .referrerPolicy(r -> r.policy(ReferrerPolicy.SAME_ORIGIN))
-                .xssProtection(Customizer.withDefaults())
-                .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true))
+                .addHeaderWriter(new StaticHeadersWriter(
+                    "Permissions-Policy", "geolocation=(), microphone=(), camera=()"))
             )
             .addFilterAfter(cspHeaderFilter(), HeaderWriterFilter.class)
             .authenticationProvider(authProvider()); 
+
+        boolean isProd = java.util.Arrays.asList(environment.getActiveProfiles()).contains("prod");
+        if (isProd) {
+            http.headers(h -> h.httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).preload(true)));
+        } else {
+            http.headers(h -> h.httpStrictTransportSecurity(hsts -> hsts.disable()));
+        }
 
         return http.build();
     }
@@ -76,8 +87,6 @@ public class SecurityConfig {
                     "script-src 'self' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm; " +
                     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.jsdelivr.net/npm; " +
                     "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'");
-                res.setHeader("X-Content-Type-Options", "nosniff");
-                res.setHeader("X-Frame-Options", "DENY");
                 chain.doFilter(req, res);
             }
         };

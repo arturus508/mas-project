@@ -71,6 +71,6 @@ public class MealViewController {
             return "redirect:/meal-plans/" + mealPlanId;
         }
         LocalDate date = mealForm.getDate() != null ? mealForm.getDate() : LocalDate.now();
-        return "redirect:/meal-plans/day?date=" + date;
+        return "redirect:/meals?date=" + date;
     }
 }

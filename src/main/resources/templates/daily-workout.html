@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Today Workout')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="mb-1">Today Workout</h1>
+            <div class="text-muted small" th:text="${dailyWorkout.date}">Date</div>
+        </div>
+        <a th:href="@{/workout-plans}" class="btn btn-outline-secondary">Back to Plans</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <span th:text="${dailyWorkout != null ? dailyWorkout.title : 'No workout yet'}">Workout</span>
+        </div>
+        <div class="card-body">
+            <div th:if="${dailyWorkout == null}" class="text-muted">
+                No workout logged for today yet. Add one from a plan day.
+            </div>
+            <div th:if="${dailyWorkout != null && #lists.isEmpty(sets)}" class="text-muted">
+                No sets added yet. Use the form below to add one.
+            </div>
+            <div class="list-group" th:if="${dailyWorkout != null && !#lists.isEmpty(sets)}">
+                <div class="list-group-item d-flex align-items-center justify-content-between"
+                     th:each="set : ${sets}">
+                    <div>
+                        <div class="fw-semibold" th:text="${set.exercise != null ? set.exercise.exerciseName : 'Exercise'}">Exercise</div>
+                        <div class="text-muted small">Set <span th:text="${set.setNumber}">1</span></div>
+                    </div>
+                    <form th:action="@{'/workouts/sets/' + ${set.dailyWorkoutSetId} + '/reps'}" method="post" class="d-flex align-items-center gap-2">
+                        <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <input class="form-control form-control-sm" type="number" min="0" name="repsDone"
+                               th:value="${set.repsDone}" placeholder="reps">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                    </form>
+                    <form th:action="@{'/workouts/sets/' + ${set.dailyWorkoutSetId} + '/delete'}" method="post">
+                        <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" th:if="${dailyWorkout != null}">
+        <div class="card-header">Add set</div>
+        <div class="card-body">
+            <form th:action="@{'/workouts/' + ${dailyWorkout.dailyWorkoutId} + '/sets/add'}" method="post" class="row g-3">
+                <div th:replace="~{fragments/csrf :: csrf}"></div>
+                <div class="col-md-8">
+                    <label class="form-label" for="exerciseId">Exercise</label>
+                    <select id="exerciseId" name="exerciseId" class="form-select" required>
+                        <option value="" disabled selected>Select exercise</option>
+                        <option th:each="ex : ${globalExercises}" th:value="${ex.exerciseId}" th:text="${ex.exerciseName}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">Add set</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -11,12 +11,18 @@ public class LegacyRoutesController {
     @GetMapping({"/meals/save", "/meals/new"})
     public String legacyMealsGet() {
         String today = LocalDate.now().toString();
-        return "redirect:/meal-plans/day?date=" + today;
+        return "redirect:/meals?date=" + today;
     }
 
     @PostMapping("/meals/save")
     public String legacyMealsPost() {
         String today = LocalDate.now().toString();
-        return "redirect:/meal-plans/day?date=" + today;
+        return "redirect:/meals?date=" + today;
+    }
+
+    @GetMapping("/meal-plans/day")
+    public String legacyMealPlansDay(@RequestParam(value = "date", required = false) String date) {
+        String target = date == null || date.isBlank() ? LocalDate.now().toString() : date;
+        return "redirect:/meals?date=" + target;
     }
 }

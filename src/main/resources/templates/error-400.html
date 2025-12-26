@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Bad Request')}"></head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="alert alert-warning">
+        <div class="fw-semibold mb-2">Bad request</div>
+        <div th:text="${message}">The request could not be processed.</div>
+    </div>
+    <a th:href="@{/}" class="btn btn-outline-secondary">Back to home</a>
+</div>
+</body>
+</html>

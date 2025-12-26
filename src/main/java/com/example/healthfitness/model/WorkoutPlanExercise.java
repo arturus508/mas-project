@@ -1,5 +1,6 @@
 package com.example.healthfitness.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,10 +11,11 @@ public class WorkoutPlanExercise {
 
     private int sets;
     private int reps;
-    private int restTime;
+    private Integer restTime;
 
     @ManyToOne
     @JoinColumn(name = "workout_plan_id")
+    @JsonBackReference
     private WorkoutPlan workoutPlan;
 
     @ManyToOne
@@ -30,8 +32,8 @@ public class WorkoutPlanExercise {
     public int getReps() { return reps; }
     public void setReps(int reps) { this.reps = reps; }
 
-    public int getRestTime() { return restTime; }
-    public void setRestTime(int restTime) { this.restTime = restTime; }
+    public Integer getRestTime() { return restTime; }
+    public void setRestTime(Integer restTime) { this.restTime = restTime; }
 
     public WorkoutPlan getWorkoutPlan() { return workoutPlan; }
     public void setWorkoutPlan(WorkoutPlan workoutPlan) { this.workoutPlan = workoutPlan; }

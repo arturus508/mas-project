@@ -13,19 +13,23 @@
     <form th:action="@{'/workout-plans/' + ${workoutPlanId} + '/exercises/edit/' + ${workoutPlanExercise.wpExerciseId}}" method="post" th:object="${workoutPlanExercise}">
         <div class="form-group">
             <label for="exerciseId">Exercise ID:</label>
-            <input type="number" id="exerciseId" th:field="*{exercise.exerciseId}" required>
+            <input type="number" id="exerciseId" th:field="*{exercise.exerciseId}" placeholder="Exercise ID" required>
+            <small>Use the ID from the exercise list.</small>
         </div>
         <div class="form-group">
             <label for="sets">Sets:</label>
-            <input type="number" id="sets" th:field="*{sets}" required>
+            <input type="number" id="sets" th:field="*{sets}" placeholder="e.g., 3" required>
+            <small>How many sets for this exercise.</small>
         </div>
         <div class="form-group">
             <label for="reps">Reps:</label>
-            <input type="number" id="reps" th:field="*{reps}" required>
+            <input type="number" id="reps" th:field="*{reps}" placeholder="e.g., 10" required>
+            <small>How many reps per set.</small>
         </div>
         <div class="form-group">
             <label for="restTime">Rest Time (sec):</label>
-            <input type="number" id="restTime" th:field="*{restTime}" required>
+            <input type="number" id="restTime" th:field="*{restTime}" placeholder="e.g., 60">
+            <small>Optional. Leave blank if not tracking rest time.</small>
         </div>
         <button type="submit" class="btn">Update Exercise</button>
     </form>

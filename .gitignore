@@ -1,4 +1,5 @@
 HELP.md
+*.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -31,6 +32,6 @@ build/
 
 ### VS Code ###
 .vscode/
-".idea/" 
-"target/" 
-"*.iml" 
+.env
+ARCHITECTURE.md
+FLYWAY_PLAN.md

@@ -1,61 +1,70 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Add meal</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-  <h1>Add meal</h1>
-  <nav>
-    <ul>
-      <li><a th:href="@{/dashboard}">Dashboard</a></li>
-      <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
-    </ul>
-  </nav>
-</header>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Add Meal')}"></head>
+<body class="bg-light">
 
-<div class="content">
-  <div class="card">
-    <form th:action="@{/meals/add}" th:object="${mealForm}" method="post">
-      <!-- CSRF token -->
-      <div th:replace="~{fragments/csrf :: csrf}"></div>
-      <!-- Hidden mealPlanId so the meal can be attached if provided -->
-      <input type="hidden" th:field="*{mealPlanId}" />
+<nav th:replace="~{fragments/nav :: nav}"></nav>
 
-      <label for="date">Date</label>
-      <input id="date" type="date" th:field="*{date}" required />
-      <div th:if="${#fields.hasErrors('date')}" th:errors="*{date}" class="error"></div>
+<main class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h2 class="m-0">Add Meal</h2>
+    <a th:href="@{/meal-plans}" class="btn btn-outline-secondary">Back to Meal Plans</a>
+  </div>
 
-      <label for="type">Type</label>
-      <select id="type" th:field="*{type}">
+  <form th:action="@{/meals/add}" th:object="${mealForm}" method="post" class="row g-3">
+    <div th:replace="~{fragments/csrf :: csrf}"></div>
+    <input type="hidden" th:field="*{mealPlanId}">
+
+    <div class="col-md-6">
+      <label class="form-label" for="date">Date</label>
+      <input id="date" type="date" class="form-control" th:field="*{date}" required>
+      <div class="form-text">Day this meal was eaten.</div>
+      <div class="text-danger small" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label" for="type">Type</label>
+      <select id="type" class="form-select" th:field="*{type}">
         <option th:each="t : ${T(com.example.healthfitness.model.MealType).values()}"
                 th:value="${t}" th:text="${t}">BREAKFAST</option>
       </select>
+      <div class="form-text">Pick breakfast, lunch, dinner, or snack.</div>
+    </div>
 
-      <label for="kcal">Calories</label>
-      <input id="kcal" type="number" min="0" step="1" th:field="*{kcal}" />
-      <div th:if="${#fields.hasErrors('kcal')}" th:errors="*{kcal}" class="error"></div>
+    <div class="col-12">
+      <div class="form-text">Optional quick macros override (use when you do not add items).</div>
+    </div>
 
-      <label for="protein">Protein (g)</label>
-      <input id="protein" type="number" min="0" step="1" th:field="*{protein}" />
-      <div th:if="${#fields.hasErrors('protein')}" th:errors="*{protein}" class="error"></div>
+    <div class="col-6 col-md-3">
+      <label class="form-label" for="kcal">Calories</label>
+      <input id="kcal" type="number" min="0" step="1" class="form-control" th:field="*{kcal}" placeholder="e.g., 650">
+      <div class="text-danger small" th:if="${#fields.hasErrors('kcal')}" th:errors="*{kcal}"></div>
+    </div>
 
-      <label for="fat">Fat (g)</label>
-      <input id="fat" type="number" min="0" step="1" th:field="*{fat}" />
-      <div th:if="${#fields.hasErrors('fat')}" th:errors="*{fat}" class="error"></div>
+    <div class="col-6 col-md-3">
+      <label class="form-label" for="protein">Protein (g)</label>
+      <input id="protein" type="number" min="0" step="1" class="form-control" th:field="*{protein}" placeholder="e.g., 35">
+      <div class="text-danger small" th:if="${#fields.hasErrors('protein')}" th:errors="*{protein}"></div>
+    </div>
 
-      <label for="carbs">Carbs (g)</label>
-      <input id="carbs" type="number" min="0" step="1" th:field="*{carbs}" />
-      <div th:if="${#fields.hasErrors('carbs')}" th:errors="*{carbs}" class="error"></div>
+    <div class="col-6 col-md-3">
+      <label class="form-label" for="fat">Fat (g)</label>
+      <input id="fat" type="number" min="0" step="1" class="form-control" th:field="*{fat}" placeholder="e.g., 20">
+      <div class="text-danger small" th:if="${#fields.hasErrors('fat')}" th:errors="*{fat}"></div>
+    </div>
 
-      <div class="actions">
-        <button type="submit" class="btn">Save</button>
-        <a th:href="@{/meal-plans}" class="btn btn-secondary">Cancel</a>
-      </div>
-    </form>
-  </div>
-</div>
+    <div class="col-6 col-md-3">
+      <label class="form-label" for="carbs">Carbs (g)</label>
+      <input id="carbs" type="number" min="0" step="1" class="form-control" th:field="*{carbs}" placeholder="e.g., 70">
+      <div class="text-danger small" th:if="${#fields.hasErrors('carbs')}" th:errors="*{carbs}"></div>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a th:href="@{/meal-plans}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</main>
+
 </body>
 </html>

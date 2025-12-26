@@ -1,13 +1,13 @@
 package com.example.healthfitness.controller;
 
-import com.example.healthfitness.model.User;
+import com.example.healthfitness.exception.ConflictException;
 import com.example.healthfitness.service.UserService;
-import jakarta.servlet.http.HttpSession;
+import com.example.healthfitness.web.form.UserRegistrationForm;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @Controller
 public class AuthController {
@@ -20,24 +20,37 @@ public class AuthController {
 
     // Show the registration form (GET /register)
     @GetMapping("/register")
-    public String showRegisterForm() {
+    public String showRegisterForm(Model model) {
+        model.addAttribute("registerForm", new UserRegistrationForm());
         return "register"; // register.html in templates
     }
 
     // Handle form submission for registration (POST /register)
     @PostMapping("/register")
-    public String register(@RequestParam String name,
-                           @RequestParam String email,
-                           @RequestParam String password,
+    public String register(@Valid @ModelAttribute("registerForm") UserRegistrationForm form,
+                           BindingResult bindingResult,
                            Model model) {
-        Optional<User> existingUser = userService.findByEmail(email);
-        if (existingUser.isPresent()) {
-            // If user with this email already exists, show error
-            model.addAttribute("error", "User already exists!");
+        if (bindingResult.hasErrors()) {
             return "register";
         }
 
-        userService.registerUser(name, email, password);
+        String email = form.getEmail() != null ? form.getEmail().trim().toLowerCase() : null;
+        form.setEmail(email);
+        if (email == null || email.isBlank()) {
+            bindingResult.rejectValue("email", "email.invalid", "Email is required");
+            return "register";
+        }
+        if (userService.findByEmail(email).isPresent()) {
+            bindingResult.rejectValue("email", "email.duplicate", "Email already exists");
+            return "register";
+        }
+
+        try {
+            userService.registerUser(form.getName(), email, form.getPassword());
+        } catch (ConflictException ex) {
+            bindingResult.rejectValue("email", "email.duplicate", "Email already exists");
+            return "register";
+        }
         // After success, redirect to /login with a flag
         return "redirect:/login?registered=true";
     }

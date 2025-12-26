@@ -1,64 +1,106 @@
 package com.example.healthfitness.controller;
 
-import com.example.healthfitness.model.BodyStats;
-import com.example.healthfitness.model.User;
 import com.example.healthfitness.service.BodyStatsService;
+import com.example.healthfitness.service.CurrentUserService;
 import com.example.healthfitness.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.example.healthfitness.web.form.BodyStatsForm;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * MVC controller for recording and viewing body statistics.  This
+ * implementation follows a strict Controller → Service → Repository
+ * layering: it performs request mapping, validation and DTO
+ * binding, delegates domain logic to the service layer and
+ * prepares the model for the view.  It does not directly access
+ * persistence or contain business logic.
+ */
 @Controller
+@RequestMapping("/body-stats")
 public class BodyStatsViewController {
 
-    @Autowired
-    private BodyStatsService bodyStatsService;
+    private final BodyStatsService bodyStatsService;
+    private final CurrentUserService currentUserService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public BodyStatsViewController(BodyStatsService bodyStatsService,
+                                   CurrentUserService currentUserService,
+                                   UserService userService) {
+        this.bodyStatsService    = bodyStatsService;
+        this.currentUserService  = currentUserService;
+        this.userService         = userService;
+    }
 
-    @GetMapping("/body-stats")
+    /**
+     * List the body statistics for the currently logged in user and
+     * present an empty form for adding a new entry.  The controller
+     * does not resolve the user from the security context directly;
+     * instead it uses {@link CurrentUserService} to obtain the id of
+     * the authenticated user.
+     */
+    @GetMapping
     public String showBodyStats(Model model) {
-        // Get current user from Security Context
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        User user = userService.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found: " + email));
-
-        // Retrieve that user's body stats and add to model.
-        model.addAttribute("bodyStats", bodyStatsService.getBodyStatsByUser(user.getUserId()));
-        model.addAttribute("user", user);
-        return "body-stats"; // corresponds to body-stats.html
+        Long userId = currentUserService.id();
+        List<com.example.healthfitness.model.BodyStats> stats = bodyStatsService.getBodyStatsByUser(userId);
+        addChartData(model, stats);
+        model.addAttribute("bodyStats", stats);
+        model.addAttribute("bodyStatsForm", new BodyStatsForm());
+        return "body-stats";
     }
 
-    @PostMapping("/body-stats/add")
-    public String addBodyStats(
-            @RequestParam("dateRecorded")
-            @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
-            java.time.LocalDate dateRecorded,
-            @RequestParam("weight") double weight,
-            @RequestParam("bodyFatPercent") double bodyFatPercent) {
-        // Get current user
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email       = auth.getName();
-        User user          = userService.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found: " + email));
-
-        // Build BodyStats using the LocalDate constructor and associate with user
-        BodyStats stats = new BodyStats(dateRecorded, weight, bodyFatPercent);
-        bodyStatsService.addBodyStatsToUser(user.getUserId(), stats);
+    /**
+     * Process submission of a body stats form.  Validation errors
+     * cause the list page to be re-rendered with existing stats and
+     * field error messages.  On success the stats are recorded via
+     * the service layer and the user is redirected back to the list.
+     */
+    @PostMapping("/add")
+    public String addBodyStats(@Valid @ModelAttribute("bodyStatsForm") BodyStatsForm form,
+                               BindingResult bindingResult,
+                               Model model) {
+        if (bindingResult.hasErrors()) {
+            // Re-display existing stats when validation fails
+            Long userId = currentUserService.id();
+            List<com.example.healthfitness.model.BodyStats> stats = bodyStatsService.getBodyStatsByUser(userId);
+            addChartData(model, stats);
+            model.addAttribute("bodyStats", stats);
+            return "body-stats";
+        }
+        Long userId = currentUserService.id();
+        bodyStatsService.addBodyStatsToUser(userId, form);
         return "redirect:/body-stats";
     }
 
-    // New: Delete a specific body stat.
-    @GetMapping("/body-stats/delete/{id}")
+    /**
+     * Delete a body stats entry for the current user.  Although HTTP
+     * DELETE would be more semantically appropriate, Thymeleaf forms
+     * often post back via POST with a hidden `_method` field.  This
+     * simple mapping assumes the delete link or form uses POST.
+     */
+    @PostMapping("/delete/{id}")
     public String deleteBodyStats(@PathVariable("id") Long id) {
-        bodyStatsService.deleteBodyStats(id);
+        Long userId = currentUserService.id();
+        bodyStatsService.deleteBodyStats(userId, id);
         return "redirect:/body-stats";
+    }
+
+    private void addChartData(Model model, List<com.example.healthfitness.model.BodyStats> stats) {
+        List<com.example.healthfitness.model.BodyStats> sorted = new ArrayList<>(stats);
+        sorted.sort(Comparator.comparing(com.example.healthfitness.model.BodyStats::getDateRecorded));
+        List<String> dates = new ArrayList<>();
+        List<Double> weights = new ArrayList<>();
+        for (com.example.healthfitness.model.BodyStats s : sorted) {
+            dates.add(s.getDateRecorded() == null ? "" : s.getDateRecorded().toString());
+            weights.add(s.getWeight());
+        }
+        model.addAttribute("statsDates", dates);
+        model.addAttribute("statsWeights", weights);
     }
 }
-
-

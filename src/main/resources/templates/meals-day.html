@@ -1,75 +1,140 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head}"></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Meals Day')}"></head>
 <body class="bg-light">
 
-<div th:replace="~{fragments/nav :: body}"></div>
+<nav th:replace="~{fragments/nav :: nav}"></nav>
 
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="mb-0">
-      Meals
-      <small class="text-muted" th:text="${#ctx.containsVariable('date') ? date : ''}"></small>
-    </h2>
-    <a th:href="@{/meal-plans}" class="btn btn-outline-secondary btn-sm">Back</a>
+<main class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+      <h2 class="mb-0">Meals Today</h2>
+      <div class="text-muted" th:text="${date}">2025-08-20</div>
+    </div>
+    <div class="d-flex gap-2">
+      <a th:href="@{/meal-plans}" class="btn btn-outline-secondary">Meal Library</a>
+      <a th:href="@{/dashboard}" class="btn btn-outline-secondary">Back to Home</a>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body d-flex flex-wrap gap-3 align-items-center">
+      <div class="fw-semibold">Daily totals:</div>
+      <div class="badge text-bg-primary" th:text="${totDay.kcal} + ' kcal'">0 kcal</div>
+      <div class="badge text-bg-secondary" th:text="${totDay.protein} + ' P'">0 P</div>
+      <div class="badge text-bg-secondary" th:text="${totDay.fat} + ' F'">0 F</div>
+      <div class="badge text-bg-secondary" th:text="${totDay.carbs} + ' C'">0 C</div>
+      <form class="ms-auto" th:action="@{/meals/copy-yesterday}" method="post">
+        <div th:replace="~{fragments/csrf :: csrf}"></div>
+        <input type="hidden" name="date" th:value="${date}">
+        <button class="btn btn-outline-primary btn-sm">Copy yesterday</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <form class="d-flex flex-wrap gap-2" method="get" th:action="@{/meals}">
+        <input type="date" class="form-control" name="date" th:value="${date}">
+        <button class="btn btn-outline-primary">Go</button>
+      </form>
+    </div>
   </div>
 
   <div class="row g-3">
-
     <div class="col-12 col-lg-6">
       <div class="card h-100">
-        <div class="card-header">Breakfast</div>
-        <div class="card-body">
-          <div th:if="${#ctx.containsVariable('breakfast')}" class="text-muted">
-            <div>ID: <span th:text="${breakfast.mealId}">-</span></div>
-            <div th:if="${breakfast.kcalManual != null}">Kcal: <span th:text="${breakfast.kcalManual}">0</span></div>
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <span>Breakfast</span>
+          <a th:href="@{'/meals/' + ${date} + '/breakfast'}" class="btn btn-sm btn-outline-primary">Open</a>
+        </div>
+        <div class="card-body" th:with="meal=${breakfast}, totals=${totB}, items=${itemsB}">
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge text-bg-primary" th:text="${totals.kcal} + ' kcal'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.protein} + ' P'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.fat} + ' F'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.carbs} + ' C'">0</span>
           </div>
-          <div th:if="${!#ctx.containsVariable('breakfast')}" class="text-muted">No entry</div>
+          <div th:if="${#lists.isEmpty(items)}" class="text-muted small">No items yet.</div>
+          <ul class="list-unstyled small mb-0" th:if="${!#lists.isEmpty(items)}">
+            <li th:each="item, itemStat : ${items}" th:if="${itemStat.index < 3}">
+              <span th:text="${item.foodItem != null ? item.foodItem.name : item.name}">Item</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
 
     <div class="col-12 col-lg-6">
       <div class="card h-100">
-        <div class="card-header">Lunch</div>
-        <div class="card-body">
-          <div th:if="${#ctx.containsVariable('lunch')}" class="text-muted">
-            <div>ID: <span th:text="${lunch.mealId}">-</span></div>
-            <div th:if="${lunch.kcalManual != null}">Kcal: <span th:text="${lunch.kcalManual}">0</span></div>
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <span>Lunch</span>
+          <a th:href="@{'/meals/' + ${date} + '/lunch'}" class="btn btn-sm btn-outline-primary">Open</a>
+        </div>
+        <div class="card-body" th:with="meal=${lunch}, totals=${totL}, items=${itemsL}">
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge text-bg-primary" th:text="${totals.kcal} + ' kcal'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.protein} + ' P'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.fat} + ' F'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.carbs} + ' C'">0</span>
           </div>
-          <div th:if="${!#ctx.containsVariable('lunch')}" class="text-muted">No entry</div>
+          <div th:if="${#lists.isEmpty(items)}" class="text-muted small">No items yet.</div>
+          <ul class="list-unstyled small mb-0" th:if="${!#lists.isEmpty(items)}">
+            <li th:each="item, itemStat : ${items}" th:if="${itemStat.index < 3}">
+              <span th:text="${item.foodItem != null ? item.foodItem.name : item.name}">Item</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
 
     <div class="col-12 col-lg-6">
       <div class="card h-100">
-        <div class="card-header">Dinner</div>
-        <div class="card-body">
-          <div th:if="${#ctx.containsVariable('dinner')}" class="text-muted">
-            <div>ID: <span th:text="${dinner.mealId}">-</span></div>
-            <div th:if="${dinner.kcalManual != null}">Kcal: <span th:text="${dinner.kcalManual}">0</span></div>
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <span>Dinner</span>
+          <a th:href="@{'/meals/' + ${date} + '/dinner'}" class="btn btn-sm btn-outline-primary">Open</a>
+        </div>
+        <div class="card-body" th:with="meal=${dinner}, totals=${totD}, items=${itemsD}">
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge text-bg-primary" th:text="${totals.kcal} + ' kcal'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.protein} + ' P'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.fat} + ' F'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.carbs} + ' C'">0</span>
           </div>
-          <div th:if="${!#ctx.containsVariable('dinner')}" class="text-muted">No entry</div>
+          <div th:if="${#lists.isEmpty(items)}" class="text-muted small">No items yet.</div>
+          <ul class="list-unstyled small mb-0" th:if="${!#lists.isEmpty(items)}">
+            <li th:each="item, itemStat : ${items}" th:if="${itemStat.index < 3}">
+              <span th:text="${item.foodItem != null ? item.foodItem.name : item.name}">Item</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
 
     <div class="col-12 col-lg-6">
       <div class="card h-100">
-        <div class="card-header">Snack</div>
-        <div class="card-body">
-          <div th:if="${#ctx.containsVariable('snack')}" class="text-muted">
-            <div>ID: <span th:text="${snack.mealId}">-</span></div>
-            <div th:if="${snack.kcalManual != null}">Kcal: <span th:text="${snack.kcalManual}">0</span></div>
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <span>Snacks</span>
+          <a th:href="@{'/meals/' + ${date} + '/snack'}" class="btn btn-sm btn-outline-primary">Open</a>
+        </div>
+        <div class="card-body" th:with="meal=${snack}, totals=${totS}, items=${itemsS}">
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge text-bg-primary" th:text="${totals.kcal} + ' kcal'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.protein} + ' P'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.fat} + ' F'">0</span>
+            <span class="badge text-bg-secondary" th:text="${totals.carbs} + ' C'">0</span>
           </div>
-          <div th:if="${!#ctx.containsVariable('snack')}" class="text-muted">No entry</div>
+          <div th:if="${#lists.isEmpty(items)}" class="text-muted small">No items yet.</div>
+          <ul class="list-unstyled small mb-0" th:if="${!#lists.isEmpty(items)}">
+            <li th:each="item, itemStat : ${items}" th:if="${itemStat.index < 3}">
+              <span th:text="${item.foodItem != null ? item.foodItem.name : item.name}">Item</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
-
   </div>
-</div>
+</main>
 
 </body>
 </html>

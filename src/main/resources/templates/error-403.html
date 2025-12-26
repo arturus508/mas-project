@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Forbidden')}"></head>
+<body class="bg-light">
+<div class="container py-5">
+    <div class="alert alert-danger">
+        <div class="fw-semibold mb-2">Access denied</div>
+        <div th:text="${message}">You do not have permission to access this resource.</div>
+    </div>
+    <a th:href="@{/}" class="btn btn-outline-secondary">Back to home</a>
+</div>
+</body>
+</html>

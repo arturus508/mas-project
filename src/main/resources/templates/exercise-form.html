@@ -11,18 +11,21 @@
 </header>
 <div class="content">
     <form th:action="@{/exercises/add}" method="post" th:object="${exercise}">
-        <div th:replace="fragments/csrf :: csrf"></div>
+        <div th:replace="~{fragments/csrf :: csrf}"></div>
         <div class="form-group">
             <label for="exerciseName">Exercise Name:</label>
             <input type="text" id="exerciseName" th:field="*{exerciseName}" placeholder="Enter exercise name" required>
+            <small>Use a clear, common name.</small>
         </div>
         <div class="form-group">
             <label for="muscleGroup">Muscle Group:</label>
             <input type="text" id="muscleGroup" th:field="*{muscleGroup}" placeholder="Enter muscle group" required>
+            <small>Example: Chest, Back, Legs.</small>
         </div>
         <div class="form-group">
             <label for="intensityLevel">Intensity Level:</label>
             <input type="text" id="intensityLevel" th:field="*{intensityLevel}" placeholder="Enter intensity level" required>
+            <small>Example: Low, Medium, High.</small>
         </div>
         <button type="submit" class="btn">Create Exercise</button>
     </form>
@@ -31,6 +34,7 @@
 </div>
 </body>
 </html>
+
 
 
 

@@ -1,6 +1,7 @@
 package com.example.healthfitness.repository;
 
 import com.example.healthfitness.model.WorkoutPlanExercise;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,12 @@ public interface WorkoutPlanExerciseRepository extends JpaRepository<WorkoutPlan
      * @return list of exercises belonging to the specified workout plan
      */
     java.util.List<WorkoutPlanExercise> findByWorkoutPlan_WorkoutPlanId(Long workoutPlanId);
+
+    java.util.List<WorkoutPlanExercise> findByWorkoutPlan_User_UserId(Long userId);
+
+    @EntityGraph(attributePaths = "exercise")
+    java.util.List<WorkoutPlanExercise> findWithExerciseByWorkoutPlan_WorkoutPlanId(Long workoutPlanId);
+
+    @EntityGraph(attributePaths = "exercise")
+    java.util.List<WorkoutPlanExercise> findWithExerciseByWorkoutPlan_User_UserId(Long userId);
 }

@@ -21,7 +21,7 @@ public class BodyStats {
 
     private double weight;
     private double bodyFatPercent;
-    private double BMI;
+    private Double BMI;
 
     @ManyToOne
     @JsonBackReference
@@ -55,8 +55,8 @@ public class BodyStats {
     public double getBodyFatPercent() { return bodyFatPercent; }
     public void setBodyFatPercent(double bodyFatPercent) { this.bodyFatPercent = bodyFatPercent; }
 
-    public double getBMI() { return BMI; }
-    public void setBMI(double BMI) { this.BMI = BMI; }
+    public Double getBMI() { return BMI; }
+    public void setBMI(Double BMI) { this.BMI = BMI; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

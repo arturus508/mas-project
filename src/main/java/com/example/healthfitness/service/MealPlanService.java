@@ -1,5 +1,6 @@
 package com.example.healthfitness.service;
 
+import com.example.healthfitness.exception.ForbiddenException;
 import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.MealPlan;
 import com.example.healthfitness.model.User;
@@ -34,7 +35,9 @@ public class MealPlanService {
      * Return all meal plans for the given user id.
      */
     public List<MealPlan> getMealPlansByUser(Long userId) {
-        return mealPlanRepository.findByUser_UserId(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        return mealPlanRepository.findWithMealsByUser_UserId(userId);
     }
 
     /**
@@ -42,7 +45,12 @@ public class MealPlanService {
      * if no plan exists with the given id.
      */
     public MealPlan getMealPlanById(Long id) {
-        return mealPlanRepository.findById(id)
+        return mealPlanRepository.findWithMealsByMealPlanId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Meal plan not found with id: " + id));
+    }
+
+    public MealPlan getMealPlanByIdForUser(Long userId, Long id) {
+        return mealPlanRepository.findWithMealsByMealPlanIdAndUser_UserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal plan not found with id: " + id));
     }
 
@@ -50,6 +58,13 @@ public class MealPlanService {
      * Persist a new meal plan.  The plan must already have its user set.
      */
     public MealPlan saveMealPlan(MealPlan mealPlan) {
+        return mealPlanRepository.save(mealPlan);
+    }
+
+    public MealPlan saveMealPlanForUser(Long userId, MealPlan mealPlan) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        mealPlan.setUser(user);
         return mealPlanRepository.save(mealPlan);
     }
 
@@ -71,6 +86,20 @@ public class MealPlanService {
         return mealPlanRepository.save(existingMealPlan);
     }
 
+    public MealPlan updateMealPlanForUser(Long userId, Long id, MealPlan updatedMealPlan) {
+        MealPlan existingMealPlan = mealPlanRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Meal plan not found with id: " + id));
+        if (!existingMealPlan.getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Meal plan does not belong to current user");
+        }
+        existingMealPlan.setPlanName(updatedMealPlan.getPlanName());
+        existingMealPlan.setDescription(updatedMealPlan.getDescription());
+        existingMealPlan.setDietaryRestriction(updatedMealPlan.getDietaryRestriction());
+        existingMealPlan.setStartDate(updatedMealPlan.getStartDate());
+        existingMealPlan.setEndDate(updatedMealPlan.getEndDate());
+        return mealPlanRepository.save(existingMealPlan);
+    }
+
     /**
      * Update an existing meal plan using a {@link MealPlanForm}.  The user
      * performing the update must be provided so that ownership can be
@@ -85,6 +114,9 @@ public class MealPlanService {
     public MealPlan updateMealPlan(Long id, MealPlanForm form, Long userId) {
         MealPlan existing = mealPlanRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal plan not found with id: " + id));
+        if (!existing.getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Meal plan does not belong to current user");
+        }
         existing.setPlanName(form.getPlanName());
         existing.setDescription(form.getDescription());
         existing.setDietaryRestriction(form.getDietaryRestriction());
@@ -107,6 +139,15 @@ public class MealPlanService {
     public void deleteMealPlan(Long id) {
         MealPlan plan = mealPlanRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal plan not found with id: " + id));
+        mealPlanRepository.delete(plan);
+    }
+
+    public void deleteMealPlanForUser(Long userId, Long id) {
+        MealPlan plan = mealPlanRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Meal plan not found with id: " + id));
+        if (!plan.getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Meal plan does not belong to current user");
+        }
         mealPlanRepository.delete(plan);
     }
 }

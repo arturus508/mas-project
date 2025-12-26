@@ -1,5 +1,6 @@
 package com.example.healthfitness.service;
 
+import com.example.healthfitness.exception.ForbiddenException;
 import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.Meal;
 import com.example.healthfitness.model.MealPlan;
@@ -45,6 +46,15 @@ public class MealService {
         return mealRepository.findByMealPlan_MealPlanId(mealPlanId);
     }
 
+    public List<Meal> getMealsByMealPlan(Long userId, Long mealPlanId) {
+        MealPlan mealPlan = mealPlanRepository.findById(mealPlanId)
+                .orElseThrow(() -> new ResourceNotFoundException("MealPlan not found with id: " + mealPlanId));
+        if (!mealPlan.getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Meal plan does not belong to current user");
+        }
+        return mealRepository.findByMealPlan_MealPlanId(mealPlanId);
+    }
+
     /**
      * Look up a meal by id.  Throws {@link ResourceNotFoundException}
      * when the meal cannot be found.
@@ -65,10 +75,11 @@ public class MealService {
                 .orElseThrow(() -> new ResourceNotFoundException("MealPlan not found"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!mealPlan.getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Meal plan does not belong to current user");
+        }
         meal.setMealPlan(mealPlan);
         meal.setUser(user);
-        // maintain bidirectional relationship
-        mealPlan.getMeals().add(meal);
         return mealRepository.save(meal);
     }
 
@@ -107,9 +118,10 @@ public class MealService {
             MealPlan mealPlan = mealPlanRepository.findById(mealPlanId)
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "MealPlan not found with id: " + mealPlanId));
+            if (!mealPlan.getUser().getUserId().equals(userId)) {
+                throw new ForbiddenException("Meal plan does not belong to current user");
+            }
             meal.setMealPlan(mealPlan);
-            // maintain bidirectional collection to support orphanRemoval
-            mealPlan.getMeals().add(meal);
         }
         return mealRepository.save(meal);
     }
@@ -131,11 +143,15 @@ public class MealService {
         Meal meal = mealRepository.findById(mealId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Meal not found with id: " + mealId));
-        MealPlan mealPlan = meal.getMealPlan();
-        if (mealPlan != null) {
-            mealPlan.getMeals().remove(meal);
-            // save the plan to update the association
-            mealPlanRepository.save(mealPlan);
+        mealRepository.delete(meal);
+    }
+
+    public void deleteMeal(Long userId, Long mealId) {
+        Meal meal = mealRepository.findById(mealId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Meal not found with id: " + mealId));
+        if (!meal.getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Meal does not belong to current user");
         }
         mealRepository.delete(meal);
     }
