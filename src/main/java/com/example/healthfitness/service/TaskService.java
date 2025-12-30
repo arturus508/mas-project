@@ -24,6 +24,12 @@ public class TaskService {
         return taskRepository.findByUserAndDateOrderByIdAsc(u , date);
     }
 
+    public List<Task> listTopForDate(Long userId, LocalDate date) {
+        var u = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        return taskRepository.findByUserAndDateAndTopTrueOrderByIdAsc(u, date);
+    }
+
     public Task create(Long userId, FlowTaskForm form){
         var u = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -33,6 +39,8 @@ public class TaskService {
         t.setTitle(form.getTitle());
         t.setNotes(form.getNotes());
         t.setDueDate(form.getDueDate());
+        String pr = form.getPriority();
+        t.setPriority(pr == null || pr.isBlank() ? "MEDIUM" : pr.toUpperCase());
         return taskRepository.save(t);
     }
 
@@ -46,6 +54,24 @@ public class TaskService {
         t.setDone(nd);
         t.setCompletedDate(nd ? LocalDate.now() : null);
         taskRepository.save(t);
+    }
+
+    public boolean toggleTop(Long userId, Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+        if (!task.getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Task does not belong to current user");
+        }
+        boolean next = !task.isTop();
+        if (next) {
+            long count = taskRepository.findByUserAndDateAndTopTrueOrderByIdAsc(task.getUser(), task.getDate()).size();
+            if (count >= 3) {
+                return false;
+            }
+        }
+        task.setTop(next);
+        taskRepository.save(task);
+        return true;
     }
 
     public void delete(Long userId, Long id){

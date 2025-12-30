@@ -12,6 +12,7 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByUserAndDateOrderByIdAsc(User user, LocalDate date);
     List<Task> findByUserAndDateBetweenOrderByDateAsc(User user, LocalDate start, LocalDate end);
+    List<Task> findByUserAndDateAndTopTrueOrderByIdAsc(User user, LocalDate date);
 
     @Query("""
            select count(t) from Task t

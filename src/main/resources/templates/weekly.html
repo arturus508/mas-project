@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Weekly Overview')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div>
+            <h1 class="mb-1">Weekly Overview</h1>
+            <div class="text-muted small" th:text="${vm.weekStart} + ' - ' + ${vm.weekEnd}">2025-01-01 - 2025-01-07</div>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-outline-secondary btn-sm"
+               th:href="@{/week/{date}(date=${vm.weekStart.minusDays(7)})}">Prev</a>
+            <a class="btn btn-outline-secondary btn-sm"
+               th:href="@{/week}">This Week</a>
+            <a class="btn btn-outline-secondary btn-sm"
+               th:href="@{/week/{date}(date=${vm.weekStart.plusDays(7)})}">Next</a>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Nutrition (avg per day)</div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge text-bg-primary" th:text="${vm.avgKcal} + ' kcal'">0 kcal</span>
+                        <span class="badge text-bg-secondary" th:text="${vm.avgProtein} + ' P'">0 P</span>
+                        <span class="badge text-bg-secondary" th:text="${vm.avgFat} + ' F'">0 F</span>
+                        <span class="badge text-bg-secondary" th:text="${vm.avgCarbs} + ' C'">0 C</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Sleep (avg)</div>
+                <div class="card-body" th:with="mins=${vm.avgSleepMinutes}">
+                    <div th:if="${mins != null}">
+                        <div class="fw-semibold">
+                            <span th:text="${mins / 60}">0</span>h
+                            <span th:text="${mins % 60}">0</span>m
+                        </div>
+                        <div class="text-muted small" th:if="${vm.avgSleepQuality != null}">
+                            Quality: <span th:text="${vm.avgSleepQuality}">0</span>
+                        </div>
+                    </div>
+                    <div class="text-muted small" th:if="${mins == null}">
+                        No sleep entries this week.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Workouts</div>
+                <div class="card-body">
+                    <div class="fw-semibold">
+                        <span th:text="${vm.workoutsCount}">0</span> sessions
+                    </div>
+                    <div class="text-muted small mb-2">Sets per muscle group</div>
+                    <ul class="list-unstyled small mb-0" th:if="${vm.muscleGroupCounts != null && !vm.muscleGroupCounts.isEmpty()}">
+                        <li th:each="entry : ${vm.muscleGroupCounts}">
+                            <span th:text="${entry.key}">Group</span>:
+                            <span th:text="${entry.value}">0</span>
+                        </li>
+                    </ul>
+                    <div class="text-muted small" th:if="${vm.muscleGroupCounts == null || vm.muscleGroupCounts.isEmpty()}">
+                        No workout sets logged.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Tasks & Habits</div>
+                <div class="card-body">
+                    <div class="fw-semibold mb-2">
+                        Tasks done:
+                        <span th:text="${vm.tasksDone}">0</span> /
+                        <span th:text="${vm.tasksTotal}">0</span>
+                    </div>
+                    <div class="fw-semibold">
+                        Habits:
+                        <span th:text="${vm.habitsDone}">0</span> /
+                        <span th:text="${vm.habitsPossible}">0</span>
+                        (<span th:text="${vm.habitsPossible > 0 ? (vm.habitsDone * 100 / vm.habitsPossible) : 0}">0</span>%)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Review (avg)</div>
+                <div class="card-body">
+                    <div class="text-muted small mb-2">
+                        Entries: <span th:text="${vm.reviewsCount}">0</span>
+                    </div>
+                    <div class="fw-semibold" th:if="${vm.avgMood != null}">
+                        Mood: <span th:text="${vm.avgMood}">0</span>/5
+                    </div>
+                    <div class="fw-semibold" th:if="${vm.avgEnergy != null}">
+                        Energy: <span th:text="${vm.avgEnergy}">0</span>/5
+                    </div>
+                    <div class="text-muted small" th:if="${vm.avgMood == null && vm.avgEnergy == null}">
+                        No reviews yet.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

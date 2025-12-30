@@ -81,7 +81,7 @@ class MealDayViewControllerTest {
                         .param("foodItemId", "5")
                         .param("quantity", "100"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/meals/" + date + "/breakfast"));
+                .andExpect(view().name("redirect:/meals/" + date + "/breakfast?saved=1"));
 
         verify(mealMacroService).addItem(1L, 1L, 5L, 100);
     }
@@ -94,7 +94,7 @@ class MealDayViewControllerTest {
         mockMvc.perform(post("/meals/copy-yesterday")
                         .param("date", date.toString()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/meals?date=" + date));
+                .andExpect(view().name("redirect:/meals?date=" + date + "&copied=1"));
 
         verify(mealMacroService).copyDay(1L, date.minusDays(1), date);
     }

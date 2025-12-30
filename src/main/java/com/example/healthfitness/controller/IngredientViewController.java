@@ -49,7 +49,7 @@ public class IngredientViewController {
     }
 
     // Remove an Ingredient from the Meal
-    @GetMapping("/{mealId}/ingredients/delete/{ingredientId}")
+    @PostMapping("/{mealId}/ingredients/delete/{ingredientId}")
     public String removeIngredient(@PathVariable Long mealId, @PathVariable Long ingredientId) {
         ingredientService.deleteIngredient(ingredientId);
         return "redirect:/meals/" + mealId + "/ingredients";

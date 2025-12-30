@@ -22,6 +22,7 @@ public class TodayViewService {
     private final SleepService sleepService;
     private final HabitService habitService;
     private final HabitLogService habitLogService;
+    private final DailyReviewService dailyReviewService;
 
     public TodayViewService(UserRepository userRepository,
                             TaskRepository taskRepository,
@@ -29,7 +30,8 @@ public class TodayViewService {
                             DailyWorkoutService dailyWorkoutService,
                             SleepService sleepService,
                             HabitService habitService,
-                            HabitLogService habitLogService) {
+                            HabitLogService habitLogService,
+                            DailyReviewService dailyReviewService) {
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.mealMacroService = mealMacroService;
@@ -37,6 +39,7 @@ public class TodayViewService {
         this.sleepService = sleepService;
         this.habitService = habitService;
         this.habitLogService = habitLogService;
+        this.dailyReviewService = dailyReviewService;
     }
 
     public TodayViewModel build(Long userId, LocalDate date) {
@@ -72,28 +75,53 @@ public class TodayViewService {
         List<Task> tasks = taskRepository.findByUserAndDateOrderByIdAsc(user, d);
         vm.setTasksTotal(tasks.size());
         vm.setTasksDone((int) tasks.stream().filter(Task::isDone).count());
-        vm.setTopTasks(tasks.stream()
+
+        List<Task> top = taskRepository.findByUserAndDateAndTopTrueOrderByIdAsc(user, d);
+        List<Task> source = top.isEmpty() ? tasks : top;
+        vm.setTopTasks(source.stream()
                 .limit(3)
                 .map(t -> new TodayTaskItem(t.getId(), t.getTitle(), t.isDone()))
                 .toList());
 
-        List<Habit> habits = habitService.findByUser(user);
+        List<Habit> habits = habitService.findActiveByUser(user);
         vm.setHabitsTotal(habits.size());
         var doneMap = habitLogService.mapForDate(user, d);
+        LocalDate weekStart = d.with(java.time.DayOfWeek.MONDAY);
+        LocalDate weekEnd = weekStart.plusDays(6);
+        List<HabitLog> weekLogs = habitLogService.listForDateRange(user, weekStart, weekEnd);
+        java.util.Map<Long, Long> weekCounts = weekLogs.stream()
+                .collect(java.util.stream.Collectors.groupingBy(l -> l.getHabit().getId(), java.util.stream.Collectors.counting()));
+
         int doneHabits = 0;
+        java.util.List<TodayHabitItem> items = new java.util.ArrayList<>();
         for (Habit h : habits) {
-            if (Boolean.TRUE.equals(doneMap.get(h.getId()))) {
-                doneHabits++;
+            String cadence = h.getCadence() == null ? "DAILY" : h.getCadence().toUpperCase();
+            if ("WEEKLY".equals(cadence)) {
+                int target = h.getTargetPerWeek() != null ? h.getTargetPerWeek() : 1;
+                int done = weekCounts.getOrDefault(h.getId(), 0L).intValue();
+                boolean complete = done >= target;
+                if (complete) {
+                    doneHabits++;
+                }
+                items.add(new TodayHabitItem(h.getId(), h.getName(), complete, cadence, done, target));
+            } else {
+                boolean done = Boolean.TRUE.equals(doneMap.get(h.getId()));
+                if (done) {
+                    doneHabits++;
+                }
+                items.add(new TodayHabitItem(h.getId(), h.getName(), done, cadence, null, null));
             }
         }
+        vm.setHabits(items);
         vm.setHabitsDone(doneHabits);
-        vm.setHabits(habits.stream()
-                .map(h -> new TodayHabitItem(
-                        h.getId(),
-                        h.getName(),
-                        Boolean.TRUE.equals(doneMap.get(h.getId()))
-                ))
-                .toList());
+
+        dailyReviewService.findForDate(userId, d).ifPresent(review -> {
+            vm.setReviewPresent(true);
+            vm.setReviewMood(review.getMood());
+            vm.setReviewEnergy(review.getEnergy());
+            vm.setReviewNote(review.getNote());
+            vm.setReviewResetDone(review.isResetDone());
+        });
 
         return vm;
     }

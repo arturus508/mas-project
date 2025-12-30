@@ -35,6 +35,25 @@ public class HabitStatsService {
         Map<Long,Integer> res = new HashMap<>();
 
         for (Habit h : habits){
+            String cadence = h.getCadence() == null ? "DAILY" : h.getCadence().toUpperCase();
+            if ("WEEKLY".equals(cadence)) {
+                int target = h.getTargetPerWeek() != null ? h.getTargetPerWeek() : 1;
+                int weeks = Math.max(1, lookback / 7);
+                int streak = 0;
+                for (int i = 0; i < weeks; i++) {
+                    LocalDate weekStart = ref.with(java.time.DayOfWeek.MONDAY).minusWeeks(i);
+                    LocalDate weekEnd = weekStart.plusDays(6);
+                    long done = habitLogService.countDoneForHabitBetween(h, weekStart, weekEnd);
+                    if (done >= target) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+                res.put(h.getId(), streak);
+                continue;
+            }
+
             int streak = 0; boolean started = false;
             for (int i = days.size()-1 ; i >= 0 ; i--){
                 LocalDate d = days.get(i);

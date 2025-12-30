@@ -54,23 +54,65 @@ public class DreamViewController {
     @PostMapping("/add")
     public String add(@Valid @ModelAttribute("dreamForm") DreamForm form,
                       BindingResult bindingResult,
+                      @RequestParam(value = "from", required = false)
+                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                      @RequestParam(value = "to", required = false)
+                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+                      @RequestParam(value = "tag", required = false) String tag,
                       Model model) {
         Long userId = currentUserService.id();
         if (bindingResult.hasErrors()) {
             model.addAttribute("dreams", dreamService.listAll(userId));
-            model.addAttribute("from", null);
-            model.addAttribute("to", null);
-            model.addAttribute("tag", null);
+            model.addAttribute("from", from);
+            model.addAttribute("to", to);
+            model.addAttribute("tag", tag);
             return "dreams";
         }
         dreamService.create(userId, form);
-        return "redirect:/mind/dreams";
+        String redirect = "redirect:/mind/dreams";
+        if (from != null || to != null || (tag != null && !tag.isBlank())) {
+            redirect += "?";
+            boolean first = true;
+            if (from != null) {
+                redirect += "from=" + from;
+                first = false;
+            }
+            if (to != null) {
+                redirect += (first ? "" : "&") + "to=" + to;
+                first = false;
+            }
+            if (tag != null && !tag.isBlank()) {
+                redirect += (first ? "" : "&") + "tag=" + tag;
+            }
+        }
+        return redirect;
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Long id,
+                         @RequestParam(value = "from", required = false)
+                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                         @RequestParam(value = "to", required = false)
+                         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+                         @RequestParam(value = "tag", required = false) String tag) {
         Long userId = currentUserService.id();
         dreamService.delete(userId, id);
-        return "redirect:/mind/dreams";
+        String redirect = "redirect:/mind/dreams";
+        if (from != null || to != null || (tag != null && !tag.isBlank())) {
+            redirect += "?";
+            boolean first = true;
+            if (from != null) {
+                redirect += "from=" + from;
+                first = false;
+            }
+            if (to != null) {
+                redirect += (first ? "" : "&") + "to=" + to;
+                first = false;
+            }
+            if (tag != null && !tag.isBlank()) {
+                redirect += (first ? "" : "&") + "tag=" + tag;
+            }
+        }
+        return redirect;
     }
 }

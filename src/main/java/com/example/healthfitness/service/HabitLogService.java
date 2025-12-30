@@ -30,6 +30,18 @@ public class HabitLogService {
         return map;
     }
 
+    public List<HabitLog> listForDateRange(User user, LocalDate from, LocalDate to) {
+        LocalDate start = from == null ? LocalDate.now() : from;
+        LocalDate end = to == null ? start : to;
+        return habitLogRepository.findByUserAndDateBetweenOrderByDateAsc(user, start, end);
+    }
+
+    public long countDoneForHabitBetween(Habit habit, LocalDate from, LocalDate to) {
+        LocalDate start = from == null ? LocalDate.now() : from;
+        LocalDate end = to == null ? start : to;
+        return habitLogRepository.countByHabitAndDateBetween(habit, start, end);
+    }
+
     @Transactional
     public void toggle(User user , Habit habit , LocalDate date) {
         LocalDate d = date == null ? LocalDate.now() : date;

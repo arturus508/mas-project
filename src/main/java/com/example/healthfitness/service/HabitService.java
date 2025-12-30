@@ -19,9 +19,17 @@ public class HabitService {
         return habitRepository.findByUserOrderByIdAsc(u);
     }
 
+    public List<Habit> findActiveByUser(User u) {
+        return habitRepository.findByUserAndActiveTrueOrderByIdAsc(u);
+    }
+
     public Habit save(Habit h){
         if (h.getCadence() == null || h.getCadence().isBlank()) h.setCadence("DAILY");
         if (h.getTargetPerDay() == null || h.getTargetPerDay() < 1) h.setTargetPerDay(1);
+        if (h.getTargetPerWeek() != null && h.getTargetPerWeek() < 1) h.setTargetPerWeek(1);
+        if ("WEEKLY".equalsIgnoreCase(h.getCadence()) && h.getTargetPerWeek() == null) {
+            h.setTargetPerWeek(1);
+        }
         return habitRepository.save(h);
     }
 

@@ -14,5 +14,7 @@ public interface HabitLogRepository extends JpaRepository<HabitLog, Long> {
 
     List<HabitLog> findByHabitOrderByDateDesc(Habit habit);
 
+    long countByHabitAndDateBetween(Habit habit, LocalDate from, LocalDate to);
+
     void deleteByHabit(Habit habit);
 }

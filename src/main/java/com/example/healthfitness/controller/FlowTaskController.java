@@ -35,13 +35,16 @@ public class FlowTaskController {
     @GetMapping
     public String list(@RequestParam(value = "date", required = false)
                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                       @RequestParam(value = "topLimit", required = false) String topLimit,
                        Model model) {
         var d = (date != null) ? date : LocalDate.now();
         Long userId = currentUserService.id();
         model.addAttribute("date", d);
         model.addAttribute("tasks", taskService.listForDate(userId, d));
+        model.addAttribute("topLimitReached", topLimit != null);
         FlowTaskForm form = new FlowTaskForm();
         form.setDate(d);
+        form.setPriority("MEDIUM");
         model.addAttribute("taskForm", form);
         return "tasks";
     }
@@ -67,6 +70,18 @@ public class FlowTaskController {
         Long userId = currentUserService.id();
         taskService.toggle(userId, id);
         return "redirect:/flow/tasks?date=" + date;
+    }
+
+    @PostMapping("/top/{id}")
+    public String toggleTop(@PathVariable Long id,
+                            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        Long userId = currentUserService.id();
+        boolean changed = taskService.toggleTop(userId, id);
+        String redirect = "redirect:/flow/tasks?date=" + date;
+        if (!changed) {
+            redirect += "&topLimit=1";
+        }
+        return redirect;
     }
 
     @PostMapping("/delete/{id}")

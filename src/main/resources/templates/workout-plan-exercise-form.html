@@ -40,7 +40,7 @@
     </form>
     <br/>
     <!-- Link to create a new Exercise in the global list -->
-    <a th:href="@{/exercises/add}" class="add-button">Create New Exercise</a>
+    <a th:href="@{/exercises/add(returnTo=${'/workout-plans/' + workoutPlanId + '/exercises'})}" class="add-button">Create New Exercise</a>
     <br/><br/>
     <a th:href="@{'/workout-plans/' + ${workoutPlanId} + '/exercises'}" class="back-button">Back to Plan Details</a>
 </div>

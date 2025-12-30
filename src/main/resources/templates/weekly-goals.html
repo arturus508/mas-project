@@ -5,7 +5,10 @@
 <nav th:replace="~{fragments/nav :: nav}"></nav>
 
 <main class="container my-4">
-  <h2 class="mb-1">Weekly Review</h2>
+  <div class="d-flex align-items-center justify-content-between">
+    <h2 class="mb-1">Weekly Review</h2>
+    <a href="/today" class="btn btn-outline-secondary btn-sm">Back to Today</a>
+  </div>
   <p class="text-muted">Week:
     <span th:text="${weekStart}">2025-08-11</span> — <span th:text="${weekEnd}">2025-08-17</span>
   </p>

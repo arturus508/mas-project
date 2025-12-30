@@ -46,15 +46,25 @@ public class FlowHabitController {
         LocalDate ref = (date == null) ? LocalDate.now() : date;
 
         List<Habit> habits = habitService.findByUser(u);
+        List<Habit> activeHabits = new ArrayList<>();
+        List<Habit> archivedHabits = new ArrayList<>();
+        for (Habit h : habits) {
+            if (h.isActive()) {
+                activeHabits.add(h);
+            } else {
+                archivedHabits.add(h);
+            }
+        }
         Map<Long,Boolean> today = new HashMap<>( habitLogService.mapForDate(u , ref) );
-        for (Habit h : habits) today.putIfAbsent(h.getId() , false);
+        for (Habit h : activeHabits) today.putIfAbsent(h.getId() , false);
 
         var days    = habitStatsService.windowDays(ref , HEATMAP_DAYS);
         var byDate  = habitStatsService.mapsForDates(u , days);
-        var heat    = habitStatsService.heatForDays(habits , days , byDate);
-        var streaks = habitStatsService.streaks(u , habits , ref , HEATMAP_DAYS);
+        var heat    = habitStatsService.heatForDays(activeHabits , days , byDate);
+        var streaks = habitStatsService.streaks(u , activeHabits , ref , HEATMAP_DAYS);
 
-        model.addAttribute("habits" , habits);
+        model.addAttribute("habits" , activeHabits);
+        model.addAttribute("archivedHabits", archivedHabits);
         model.addAttribute("today" , today);
         model.addAttribute("date" , ref.toString());
         model.addAttribute("windowDays" , days);
@@ -66,6 +76,8 @@ public class FlowHabitController {
     @PostMapping
     public String create(@RequestParam String name ,
                          @RequestParam(required = false , defaultValue = "1") Integer targetPerDay ,
+                         @RequestParam(required = false) Integer targetPerWeek,
+                         @RequestParam(required = false) String cadence,
                          @RequestParam(required = false)
                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date){
         Long userId = currentUserService.id();
@@ -73,6 +85,8 @@ public class FlowHabitController {
 
         Habit h = new Habit();
         h.setName(name); h.setTargetPerDay(targetPerDay == null ? 1 : targetPerDay);
+        h.setTargetPerWeek(targetPerWeek);
+        h.setCadence(cadence);
         h.setActive(true); h.setUser(u);
         habitService.save(h);
 
@@ -101,6 +115,30 @@ public class FlowHabitController {
         Long userId = currentUserService.id();
         Habit h = habitService.getForUserOrThrow(userId, habitId);
         habitLogService.deleteAllForHabit(h); habitService.delete(h);
+        LocalDate d = (date == null) ? LocalDate.now() : date;
+        return "redirect:/flow/habits?date=" + d;
+    }
+
+    @PostMapping("/{habitId}/archive")
+    public String archive(@PathVariable Long habitId,
+                          @RequestParam(required = false)
+                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        Long userId = currentUserService.id();
+        Habit h = habitService.getForUserOrThrow(userId, habitId);
+        h.setActive(false);
+        habitService.save(h);
+        LocalDate d = (date == null) ? LocalDate.now() : date;
+        return "redirect:/flow/habits?date=" + d;
+    }
+
+    @PostMapping("/{habitId}/restore")
+    public String restore(@PathVariable Long habitId,
+                          @RequestParam(required = false)
+                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        Long userId = currentUserService.id();
+        Habit h = habitService.getForUserOrThrow(userId, habitId);
+        h.setActive(true);
+        habitService.save(h);
         LocalDate d = (date == null) ? LocalDate.now() : date;
         return "redirect:/flow/habits?date=" + d;
     }

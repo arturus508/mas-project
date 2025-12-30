@@ -5,12 +5,23 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 
 <div class="container py-4">
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
         <div>
-            <h1 class="mb-1">Today Workout</h1>
-            <div class="text-muted small" th:text="${dailyWorkout.date}">Date</div>
+            <h1 class="mb-1">Workout</h1>
+            <div class="text-muted small" th:text="${viewDate}">Date</div>
         </div>
-        <a th:href="@{/workout-plans}" class="btn btn-outline-secondary">Back to Plans</a>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="btn-group">
+                <a class="btn btn-outline-secondary btn-sm"
+                   th:href="@{/workouts/{date}(date=${viewDate.minusDays(1)})}">Yesterday</a>
+                <a class="btn btn-outline-secondary btn-sm"
+                   th:href="@{/workouts/today}">Today</a>
+                <a class="btn btn-outline-secondary btn-sm"
+                   th:href="@{/workouts/{date}(date=${viewDate.plusDays(1)})}">Tomorrow</a>
+            </div>
+            <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
+            <a th:href="@{/workout-plans}" class="btn btn-outline-secondary">Back to Plans</a>
+        </div>
     </div>
 
     <div class="card mb-4">
@@ -33,12 +44,14 @@
                     </div>
                     <form th:action="@{'/workouts/sets/' + ${set.dailyWorkoutSetId} + '/reps'}" method="post" class="d-flex align-items-center gap-2">
                         <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <input type="hidden" name="date" th:value="${viewDate}">
                         <input class="form-control form-control-sm" type="number" min="0" name="repsDone"
                                th:value="${set.repsDone}" placeholder="reps">
                         <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
                     </form>
                     <form th:action="@{'/workouts/sets/' + ${set.dailyWorkoutSetId} + '/delete'}" method="post">
                         <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <input type="hidden" name="date" th:value="${viewDate}">
                         <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
                     </form>
                 </div>
@@ -51,6 +64,7 @@
         <div class="card-body">
             <form th:action="@{'/workouts/' + ${dailyWorkout.dailyWorkoutId} + '/sets/add'}" method="post" class="row g-3">
                 <div th:replace="~{fragments/csrf :: csrf}"></div>
+                <input type="hidden" name="date" th:value="${viewDate}">
                 <div class="col-md-8">
                     <label class="form-label" for="exerciseId">Exercise</label>
                     <select id="exerciseId" name="exerciseId" class="form-select" required>

@@ -69,8 +69,10 @@ public class MealPlanViewController {
      * Display the form to add a new meal plan.
      */
     @GetMapping("/add")
-    public String addMealPlanPage(Model model) {
+    public String addMealPlanPage(@RequestParam(value = "returnTo", required = false) String returnTo,
+                                  Model model) {
         model.addAttribute("mealPlanForm", new MealPlanForm());
+        model.addAttribute("returnTo", sanitizeReturnTo(returnTo));
         return "add-meal-plan";
     }
 
@@ -82,7 +84,8 @@ public class MealPlanViewController {
     @PostMapping("/add")
     public String addMealPlan(@Valid @ModelAttribute("mealPlanForm") MealPlanForm form,
                                BindingResult bindingResult,
-                               RedirectAttributes redirectAttributes) {
+                               RedirectAttributes redirectAttributes,
+                               @RequestParam(value = "returnTo", required = false) String returnTo) {
         if (bindingResult.hasErrors()) {
             return "add-meal-plan";
         }
@@ -96,6 +99,10 @@ public class MealPlanViewController {
         mealPlan.setUser(userService.getUserById(userId));
         mealPlanService.saveMealPlan(mealPlan);
         redirectAttributes.addFlashAttribute("successMessage", "Meal plan created successfully");
+        String safeReturn = sanitizeReturnTo(returnTo);
+        if (safeReturn != null) {
+            return "redirect:" + safeReturn;
+        }
         return "redirect:/meal-plans";
     }
 
@@ -105,7 +112,9 @@ public class MealPlanViewController {
      * to a {@link MealPlanForm} rather than directly to the entity.
      */
     @GetMapping("/edit/{id}")
-    public String editMealPlanPage(@PathVariable Long id, Model model) {
+    public String editMealPlanPage(@PathVariable Long id,
+                                   @RequestParam(value = "returnTo", required = false) String returnTo,
+                                   Model model) {
         Long userId = currentUserService.id();
         MealPlan mealPlan = mealPlanService.getMealPlanByIdForUser(userId, id);
         MealPlanForm form = new MealPlanForm();
@@ -116,6 +125,7 @@ public class MealPlanViewController {
         form.setEndDate(mealPlan.getEndDate());
         model.addAttribute("mealPlanForm", form);
         model.addAttribute("mealPlanId", id);
+        model.addAttribute("returnTo", sanitizeReturnTo(returnTo));
         return "meal-plan-edit";
     }
 
@@ -129,15 +139,21 @@ public class MealPlanViewController {
                                @Valid @ModelAttribute("mealPlanForm") MealPlanForm form,
                                BindingResult bindingResult,
                                RedirectAttributes redirectAttributes,
-                               Model model) {
+                               Model model,
+                               @RequestParam(value = "returnTo", required = false) String returnTo) {
         if (bindingResult.hasErrors()) {
             // ensure the plan id is in the model for the form action
             model.addAttribute("mealPlanId", id);
+            model.addAttribute("returnTo", sanitizeReturnTo(returnTo));
             return "meal-plan-edit";
         }
         Long userId = currentUserService.id();
         mealPlanService.updateMealPlan(id, form, userId);
         redirectAttributes.addFlashAttribute("successMessage", "Meal plan updated successfully");
+        String safeReturn = sanitizeReturnTo(returnTo);
+        if (safeReturn != null) {
+            return "redirect:" + safeReturn;
+        }
         return "redirect:/meal-plans/" + id;
     }
 
@@ -166,5 +182,16 @@ public class MealPlanViewController {
         mealService.deleteMeal(userId, mealId);
         redirectAttributes.addFlashAttribute("successMessage", "Meal deleted successfully");
         return "redirect:/meal-plans/" + mealPlanId;
+    }
+
+    private String sanitizeReturnTo(String returnTo) {
+        if (returnTo == null || returnTo.isBlank()) {
+            return null;
+        }
+        String trimmed = returnTo.trim();
+        if (!trimmed.startsWith("/") || trimmed.startsWith("//")) {
+            return null;
+        }
+        return trimmed;
     }
 }

@@ -67,7 +67,7 @@ public class MealMacroService {
     }
 
     public void removeItem(Long userId, Long itemId) {
-        MealItem item = mealItemRepository.findById(itemId)
+        MealItem item = mealItemRepository.findWithMealById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Meal item not found with id: " + itemId));
         if (!item.getMeal().getUser().getUserId().equals(userId)) {
             throw new ForbiddenException("Meal item does not belong to current user");

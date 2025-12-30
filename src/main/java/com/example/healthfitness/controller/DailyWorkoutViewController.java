@@ -38,6 +38,7 @@ public class DailyWorkoutViewController {
         Long userId = currentUserService.id();
         DailyWorkout workout = dailyWorkoutService.findForDate(userId, date);
         model.addAttribute("dailyWorkout", workout);
+        model.addAttribute("viewDate", date);
         if (workout != null) {
             List<DailyWorkoutSet> sets = dailyWorkoutService.getSets(userId, workout.getDailyWorkoutId());
             model.addAttribute("sets", sets);
@@ -48,24 +49,27 @@ public class DailyWorkoutViewController {
 
     @PostMapping("/{dailyWorkoutId}/sets/add")
     public String addSet(@PathVariable Long dailyWorkoutId,
-                         @RequestParam Long exerciseId) {
+                         @RequestParam Long exerciseId,
+                         @RequestParam(required = false) LocalDate date) {
         Long userId = currentUserService.id();
         dailyWorkoutService.addSet(userId, dailyWorkoutId, exerciseId);
-        return "redirect:/workouts/today";
+        return date == null ? "redirect:/workouts/today" : "redirect:/workouts/" + date;
     }
 
     @PostMapping("/sets/{setId}/reps")
     public String updateReps(@PathVariable Long setId,
-                             @RequestParam(required = false) Integer repsDone) {
+                             @RequestParam(required = false) Integer repsDone,
+                             @RequestParam(required = false) LocalDate date) {
         Long userId = currentUserService.id();
         dailyWorkoutService.updateReps(userId, setId, repsDone);
-        return "redirect:/workouts/today";
+        return date == null ? "redirect:/workouts/today" : "redirect:/workouts/" + date;
     }
 
     @PostMapping("/sets/{setId}/delete")
-    public String deleteSet(@PathVariable Long setId) {
+    public String deleteSet(@PathVariable Long setId,
+                            @RequestParam(required = false) LocalDate date) {
         Long userId = currentUserService.id();
         dailyWorkoutService.deleteSet(userId, setId);
-        return "redirect:/workouts/today";
+        return date == null ? "redirect:/workouts/today" : "redirect:/workouts/" + date;
     }
 }

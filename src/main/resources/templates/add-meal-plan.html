@@ -13,6 +13,7 @@
 
   <form th:action="@{/meal-plans/add}" th:object="${mealPlanForm}" method="post" class="row g-3">
     <div th:replace="~{fragments/csrf :: csrf}"></div>
+    <input type="hidden" name="returnTo" th:value="${returnTo}">
 
     <div class="col-12">
       <label class="form-label" for="planName">Plan Name</label>
@@ -49,7 +50,8 @@
 
     <div class="col-12 d-flex gap-2">
       <button type="submit" class="btn btn-primary">Add Meal Plan</button>
-      <a th:href="@{/meal-plans}" class="btn btn-outline-secondary">Cancel</a>
+      <a th:if="${returnTo != null}" th:href="${returnTo}" class="btn btn-outline-secondary">Cancel</a>
+      <a th:if="${returnTo == null}" th:href="@{/meal-plans}" class="btn btn-outline-secondary">Cancel</a>
     </div>
   </form>
 </main>

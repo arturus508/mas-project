@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Today')}"></head>
 <body>
@@ -10,11 +10,16 @@
       <h1 class="h3 mb-1">Today</h1>
       <div class="text-muted" th:text="${#temporals.format(vm.date, 'yyyy-MM-dd')}">2025-01-01</div>
     </div>
-    <div class="btn-group">
-      <a class="btn btn-outline-secondary btn-sm"
-         th:href="@{/today/{date}(date=${vm.date.minusDays(1)})}">Prev</a>
-      <a class="btn btn-outline-secondary btn-sm"
-         th:href="@{/today/{date}(date=${vm.date.plusDays(1)})}">Next</a>
+    <div class="d-flex gap-2 align-items-center">
+      <a class="btn btn-outline-primary btn-sm" th:href="@{/week}">Weekly Overview</a>
+      <div class="btn-group">
+        <a class="btn btn-outline-secondary btn-sm"
+           th:href="@{/today/{date}(date=${vm.date.minusDays(1)})}">Yesterday</a>
+        <a class="btn btn-outline-secondary btn-sm"
+           th:href="@{/today}">Today</a>
+        <a class="btn btn-outline-secondary btn-sm"
+           th:href="@{/today/{date}(date=${vm.date.plusDays(1)})}">Tomorrow</a>
+      </div>
     </div>
   </div>
 
@@ -64,6 +69,8 @@
                 <input class="form-check-input" type="checkbox" th:checked="${h.done}" onchange="this.form.submit()">
               </form>
               <span th:text="${h.name}" th:classappend="${h.done} ? 'text-decoration-line-through text-muted' : ''">Habit</span>
+              <span class="text-muted small" th:if="${h.progressTarget != null}"
+                    th:text="'(week ' + h.progressDone + '/' + h.progressTarget + ')'">(week 0/0)</span>
             </div>
           </div>
         </div>
@@ -105,8 +112,8 @@
             <div>
               <div class="fw-semibold">Workout</div>
               <div class="text-muted small" th:if="${vm.workoutTitle != null}"
-                   th:text="${vm.workoutTitle + ' • ' + vm.workoutSetsDone + '/' + vm.workoutSetsTotal + ' sets'}">
-                Workout • 0/0 sets
+                   th:text="${vm.workoutTitle + '  -  ' + vm.workoutSetsDone + '/' + vm.workoutSetsTotal + ' sets'}">
+                Workout  -  0/0 sets
               </div>
               <div class="text-muted small" th:if="${vm.workoutTitle == null}">
                 No workout logged today
@@ -119,8 +126,8 @@
             <div>
               <div class="fw-semibold">Sleep (Last Night)</div>
               <div class="text-muted small" th:if="${vm.sleepHours != null}"
-                   th:text="${vm.sleepHours + 'h ' + vm.sleepMinutes + 'm • quality ' + vm.sleepQuality}">
-                0h 0m • quality 0
+                   th:text="${vm.sleepHours + 'h ' + vm.sleepMinutes + 'm  -  quality ' + vm.sleepQuality}">
+                0h 0m  -  quality 0
               </div>
               <div class="text-muted small" th:if="${vm.sleepHours == null}">
                 No sleep logged for last night
@@ -146,7 +153,33 @@
       <div class="card h-100">
         <div class="card-header">Review</div>
         <div class="card-body">
-          <p class="text-muted mb-0">Daily review is coming next (mood, energy, short note).</p>
+          <div class="text-muted small mb-3" th:if="${vm.reviewPresent}">
+            Saved for this day.
+          </div>
+          <form th:action="@{/today/{date}/review(date=${vm.date})}" method="post" th:object="${dailyReviewForm}" class="row g-2">
+            <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <div class="col-6">
+              <label class="form-label" for="reviewMood">Mood (1-5)</label>
+              <input id="reviewMood" type="number" min="1" max="5" class="form-control" th:field="*{mood}">
+              <div class="text-danger small" th:if="${#fields.hasErrors('mood')}" th:errors="*{mood}"></div>
+            </div>
+            <div class="col-6">
+              <label class="form-label" for="reviewEnergy">Energy (1-5)</label>
+              <input id="reviewEnergy" type="number" min="1" max="5" class="form-control" th:field="*{energy}">
+              <div class="text-danger small" th:if="${#fields.hasErrors('energy')}" th:errors="*{energy}"></div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="reviewNote">Note</label>
+              <textarea id="reviewNote" class="form-control" rows="3" th:field="*{note}" placeholder="Short note (optional)"></textarea>
+            </div>
+            <div class="col-12 d-flex align-items-center gap-2">
+              <input id="reviewReset" class="form-check-input" type="checkbox" th:field="*{resetDone}">
+              <label class="form-check-label" for="reviewReset">Reset done</label>
+            </div>
+            <div class="col-12">
+              <button class="btn btn-outline-primary">Save review</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

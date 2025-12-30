@@ -97,7 +97,7 @@ public class MealDayViewController {
         MealType type = mealTypeFromSegment(segment);
         Meal meal = mealMacroService.getOrCreateMeal(userId, date, type);
         mealMacroService.addItem(userId, meal.getMealId(), foodItemId, quantity);
-        return "redirect:/meals/" + date + "/" + segment;
+        return "redirect:/meals/" + date + "/" + segment + "?saved=1";
     }
 
     @PostMapping("/{date}/{segment}/items/add-custom")
@@ -113,7 +113,7 @@ public class MealDayViewController {
         MealType type = mealTypeFromSegment(segment);
         Meal meal = mealMacroService.getOrCreateMeal(userId, date, type);
         mealMacroService.addCustomItem(userId, meal.getMealId(), name, kcal, protein, fat, carbs, quantity);
-        return "redirect:/meals/" + date + "/" + segment;
+        return "redirect:/meals/" + date + "/" + segment + "?saved=1";
     }
 
     @PostMapping("/{date}/{segment}/items/{itemId}/delete")
@@ -122,14 +122,14 @@ public class MealDayViewController {
                              @PathVariable Long itemId) {
         Long userId = currentUserService.id();
         mealMacroService.removeItem(userId, itemId);
-        return "redirect:/meals/" + date + "/" + segment;
+        return "redirect:/meals/" + date + "/" + segment + "?removed=1";
     }
 
     @PostMapping("/copy-yesterday")
     public String copyYesterday(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         Long userId = currentUserService.id();
         mealMacroService.copyDay(userId, date.minusDays(1), date);
-        return "redirect:/meals?date=" + date;
+        return "redirect:/meals?date=" + date + "&copied=1";
     }
 
     private MealType mealTypeFromSegment(String segment) {

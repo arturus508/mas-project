@@ -38,7 +38,7 @@ public class DailyWorkoutService {
             return existing;
         }
 
-        WorkoutPlanDay planDay = workoutPlanDayRepository.findById(planDayId)
+        WorkoutPlanDay planDay = workoutPlanDayRepository.findWithExercisesByPlanDayId(planDayId)
                 .orElseThrow(() -> new ResourceNotFoundException("Workout plan day not found with ID: " + planDayId));
         if (!planDay.getWorkoutPlan().getUser().getUserId().equals(userId)) {
             throw new ForbiddenException("Workout plan does not belong to current user");
@@ -110,7 +110,7 @@ public class DailyWorkoutService {
     }
 
     public DailyWorkoutSet updateReps(Long userId, Long setId, Integer repsDone) {
-        DailyWorkoutSet set = dailyWorkoutSetRepository.findById(setId)
+        DailyWorkoutSet set = dailyWorkoutSetRepository.findWithWorkoutByDailyWorkoutSetId(setId)
                 .orElseThrow(() -> new ResourceNotFoundException("Daily workout set not found with ID: " + setId));
         if (!set.getDailyWorkout().getUser().getUserId().equals(userId)) {
             throw new ForbiddenException("Daily workout does not belong to current user");
@@ -120,7 +120,7 @@ public class DailyWorkoutService {
     }
 
     public void deleteSet(Long userId, Long setId) {
-        DailyWorkoutSet set = dailyWorkoutSetRepository.findById(setId)
+        DailyWorkoutSet set = dailyWorkoutSetRepository.findWithWorkoutByDailyWorkoutSetId(setId)
                 .orElseThrow(() -> new ResourceNotFoundException("Daily workout set not found with ID: " + setId));
         if (!set.getDailyWorkout().getUser().getUserId().equals(userId)) {
             throw new ForbiddenException("Daily workout does not belong to current user");

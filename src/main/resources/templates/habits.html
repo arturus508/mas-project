@@ -5,7 +5,10 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 
 <div class="container" style="max-width: 980px; margin-top: 24px;">
-  <h2>Habits - streak + mini heatmap (28d)</h2>
+  <div style="display:flex; align-items:center; justify-content:space-between;">
+    <h2>Habits - streak + mini heatmap (28d)</h2>
+    <a href="/today" class="btn btn-outline-secondary">Back to Today</a>
+  </div>
 
   <form method="get" action="#" style="margin:8px 0 16px;">
     <label for="date">Reference date:</label>
@@ -30,9 +33,14 @@
     <form method="post" th:action="@{/flow/habits}">
       <div th:replace="~{fragments/csrf :: csrf}"></div>
       <input type="hidden" name="date" th:value="${date}">
-      <div style="display:grid; grid-template-columns: 1fr 140px auto; gap:8px;">
+      <div style="display:grid; grid-template-columns: 1fr 140px 140px 160px auto; gap:8px;">
         <input name="name" aria-label="Habit name" placeholder="Habit name" required>
         <input name="targetPerDay" type="number" min="1" value="1" aria-label="Target per day">
+        <input name="targetPerWeek" type="number" min="1" value="3" aria-label="Target per week">
+        <select name="cadence" aria-label="Cadence">
+          <option value="DAILY">Daily</option>
+          <option value="WEEKLY">Weekly</option>
+        </select>
         <button type="submit">Add</button>
       </div>
     </form>
@@ -45,9 +53,13 @@
     <div class="name">
       <strong th:text="${h.name}">Habit</strong>
       <span class="target"
-            th:text="'x' + ${h.targetPerDay}"
-            th:title="${h.targetPerDay} + (${h.targetPerDay}==1 ? ' time' : ' times')">x1</span>
-      <span class="streak">streak: <span th:text="${streaks[h.id]}">0</span> days</span>
+            th:text="${h.cadence == 'WEEKLY'} ? ('x' + ${h.targetPerWeek} + '/week') : ('x' + ${h.targetPerDay} + '/day')"
+            th:title="${h.cadence == 'WEEKLY'} ? ('Target ' + ${h.targetPerWeek} + ' per week') : ('Target ' + ${h.targetPerDay} + ' per day')">x1</span>
+      <span class="streak">
+        streak:
+        <span th:text="${streaks[h.id]}">0</span>
+        <span th:text="${h.cadence == 'WEEKLY'} ? ' weeks' : ' days'">days</span>
+      </span>
     </div>
 
     <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end;">
@@ -58,6 +70,12 @@
         <button type="submit"
                 style="width:26px; height:26px; border:1px solid #bbb; border-radius:4px; background:#fff;"
                 th:text="${today[h.id]} ? 'x' : ''" aria-label="toggle today"></button>
+      </form>
+
+      <form method="post" th:action="@{/flow/habits/{id}/archive(id=${h.id})}" style="display:inline;">
+        <div th:replace="~{fragments/csrf :: csrf}"></div>
+        <input type="hidden" name="date" th:value="${date}">
+        <button type="submit">Archive</button>
       </form>
 
       <form method="post" th:action="@{/flow/habits/{id}/delete(id=${h.id})}" style="display:inline;">
@@ -76,6 +94,24 @@
           <button type="submit" class="cell"
                   th:classappend="${heat[h.id][#temporals.format(d,'yyyy-MM-dd')]} ? ' on' : ''"
                   th:title="${#temporals.format(d,'EEE, yyyy-MM-dd')}"></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;" th:if="${archivedHabits != null && !#lists.isEmpty(archivedHabits)}">
+    <h3 style="margin: 12px 0 6px;">Archived habits</h3>
+    <div th:each="h : ${archivedHabits}" class="row">
+      <div class="name">
+        <strong th:text="${h.name}">Habit</strong>
+        <span class="target"
+              th:text="${h.cadence == 'WEEKLY'} ? ('x' + ${h.targetPerWeek} + '/week') : ('x' + ${h.targetPerDay} + '/day')">x1</span>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end;">
+        <form method="post" th:action="@{/flow/habits/{id}/restore(id=${h.id})}" style="display:inline;">
+          <div th:replace="~{fragments/csrf :: csrf}"></div>
+          <input type="hidden" name="date" th:value="${date}">
+          <button type="submit">Restore</button>
         </form>
       </div>
     </div>

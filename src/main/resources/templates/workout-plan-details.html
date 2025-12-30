@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Workout Plan Details')}"></head>
 <body class="bg-light">
@@ -20,7 +20,8 @@
             <p class="mb-0"><strong>Days per Week:</strong> <span th:text="${workoutPlan.daysPerWeek}"></span></p>
         </div>
         <div class="card-footer">
-            <a th:href="@{'/workout-plans/edit/' + ${workoutPlan.workoutPlanId}}" class="btn btn-outline-primary">Edit Plan</a>
+            <a th:href="@{'/workout-plans/edit/' + ${workoutPlan.workoutPlanId} + '?returnTo=/workout-plans/' + ${workoutPlan.workoutPlanId} + '/exercises'}"
+               class="btn btn-outline-primary">Edit Plan</a>
         </div>
     </div>
 
@@ -44,8 +45,8 @@
                                 <div class="fw-semibold" th:text="${ex.exercise.exerciseName}">Exercise</div>
                                 <div class="text-muted small">
                                     <span th:text="${ex.setsPlanned}">2</span> sets
-                                    <span th:if="${ex.targetReps != null}">· <span th:text="${ex.targetReps}"></span> reps</span>
-                                    <span th:if="${ex.restTime != null}">· rest <span th:text="${ex.restTime}"></span>s</span>
+                                    <span th:if="${ex.targetReps != null}"> - <span th:text="${ex.targetReps}"></span> reps</span>
+                                    <span th:if="${ex.restTime != null}"> - rest <span th:text="${ex.restTime}"></span>s</span>
                                 </div>
                             </div>
                             <form th:action="@{'/workout-plans/' + ${workoutPlan.workoutPlanId} + '/days/' + ${day.planDayId} + '/exercises/delete/' + ${ex.planDayExerciseId}}" method="post">

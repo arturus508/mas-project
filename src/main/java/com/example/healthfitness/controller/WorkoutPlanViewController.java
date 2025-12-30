@@ -68,8 +68,10 @@ public class WorkoutPlanViewController {
      * WorkoutPlanForm} is added to the model for binding.
      */
     @GetMapping("/add")
-    public String addWorkoutPlanPage(Model model) {
+    public String addWorkoutPlanPage(@RequestParam(value = "returnTo", required = false) String returnTo,
+                                     Model model) {
         model.addAttribute("workoutPlanForm", new WorkoutPlanForm());
+        model.addAttribute("returnTo", sanitizeReturnTo(returnTo));
         return "add-workout-plan";
     }
 
@@ -81,13 +83,18 @@ public class WorkoutPlanViewController {
      */
     @PostMapping("/add")
     public String addWorkoutPlan(@Valid @ModelAttribute("workoutPlanForm") WorkoutPlanForm form,
-                                 BindingResult bindingResult) {
+                                 BindingResult bindingResult,
+                                 @RequestParam(value = "returnTo", required = false) String returnTo) {
         if (bindingResult.hasErrors()) {
             return "add-workout-plan";
         }
         Long userId = currentUserService.id();
-        workoutPlanService.saveWorkoutPlan(form, userId);
-        return "redirect:/workout-plans";
+        WorkoutPlan plan = workoutPlanService.saveWorkoutPlan(form, userId);
+        String safeReturn = sanitizeReturnTo(returnTo);
+        if (safeReturn != null) {
+            return "redirect:" + safeReturn;
+        }
+        return "redirect:/workout-plans/" + plan.getWorkoutPlanId() + "/exercises";
     }
 
     /**
@@ -96,7 +103,9 @@ public class WorkoutPlanViewController {
      * binding.  The id is also added separately for the form action.
      */
     @GetMapping("/edit/{id}")
-    public String editWorkoutPlanPage(@PathVariable Long id, Model model) {
+    public String editWorkoutPlanPage(@PathVariable Long id,
+                                      @RequestParam(value = "returnTo", required = false) String returnTo,
+                                      Model model) {
         Long userId = currentUserService.id();
         WorkoutPlan workoutPlan = workoutPlanService.getWorkoutPlanByIdForUser(userId, id);
         WorkoutPlanForm form = new WorkoutPlanForm();
@@ -107,6 +116,7 @@ public class WorkoutPlanViewController {
         form.setDaysPerWeek(workoutPlan.getDaysPerWeek());
         model.addAttribute("workoutPlanForm", form);
         model.addAttribute("workoutPlanId", id);
+        model.addAttribute("returnTo", sanitizeReturnTo(returnTo));
         return "edit-workout-plan";
     }
 
@@ -119,13 +129,31 @@ public class WorkoutPlanViewController {
     @PostMapping("/edit/{id}")
     public String editWorkoutPlan(@PathVariable Long id,
                                   @Valid @ModelAttribute("workoutPlanForm") WorkoutPlanForm form,
-                                  BindingResult bindingResult) {
+                                  BindingResult bindingResult,
+                                  @RequestParam(value = "returnTo", required = false) String returnTo,
+                                  Model model) {
         if (bindingResult.hasErrors()) {
+            model.addAttribute("returnTo", sanitizeReturnTo(returnTo));
             return "edit-workout-plan";
         }
         Long userId = currentUserService.id();
         workoutPlanService.updateWorkoutPlanForUser(userId, id, form);
-        return "redirect:/workout-plans";
+        String safeReturn = sanitizeReturnTo(returnTo);
+        if (safeReturn != null) {
+            return "redirect:" + safeReturn;
+        }
+        return "redirect:/workout-plans/" + id + "/exercises";
+    }
+
+    private String sanitizeReturnTo(String returnTo) {
+        if (returnTo == null || returnTo.isBlank()) {
+            return null;
+        }
+        String trimmed = returnTo.trim();
+        if (!trimmed.startsWith("/") || trimmed.startsWith("//")) {
+            return null;
+        }
+        return trimmed;
     }
 
     /**

@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `dream_entry` (
   `sleep_entry_id` BIGINT,
   `date` DATE NOT NULL,
   `title` VARCHAR(255) NOT NULL,
-  `content` CLOB NOT NULL,
+  `content` LONGTEXT NOT NULL,
   `tags` VARCHAR(255),
   `mood` INT,
   `lucid` BIT,

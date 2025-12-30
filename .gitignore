@@ -1,5 +1,12 @@
 HELP.md
 *.md
+*.log
+*.err
+.cookies.txt
+tmp_workout_plans.html
+user2.txt
+reg.txt
+src.zip
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

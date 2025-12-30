@@ -5,16 +5,19 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 
 <div class="container" style="max-width: 820px; margin-top: 24px;">
-  <h2>Stress Relief — Breathing Timer</h2>
+  <div style="display:flex; align-items:center; justify-content:space-between;">
+    <h2>Stress Relief - Breathing Timer</h2>
+    <a href="/today" class="btn btn-outline-secondary">Back to Today</a>
+  </div>
 
   <div style="border:1px solid #ddd; border-radius:12px; padding:16px;">
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; align-items:end;">
       <label>Pattern
         <select id="pattern">
-          <option value="44">Calm 4–4</option>
-          <option value="46">Relax 4–6</option>
-          <option value="33">Focus 3–3</option>
-          <option value="55">Slow 5–5</option>
+          <option value="44">Calm 4-4</option>
+          <option value="46">Relax 4-6</option>
+          <option value="33">Focus 3-3</option>
+          <option value="55">Slow 5-5</option>
           <option value="custom">Custom</option>
         </select>
       </label>
@@ -34,7 +37,7 @@
       <div id="circle" style="width:200px; height:200px; border-radius:50%; background:#eef6ff; transition: transform .9s ease; transform:scale(1.00);"></div>
       <div id="phase" style="font-size:20px; font-weight:600;">Ready</div>
       <div id="countdown" style="font-size:14px; color:#666;"></div>
-      <div style="font-size:12px; color:#888;">Runs until stopped • Inhale / Exhale only</div>
+      <div style="font-size:12px; color:#888;">Runs until stopped - Inhale / Exhale only</div>
     </div>
   </div>
 </div>
@@ -43,4 +46,3 @@
 <script th:src="@{/js/breathing.js}" defer></script>
 </body>
 </html>
-

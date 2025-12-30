@@ -10,7 +10,7 @@
   <h1>Ingredients for <span th:text="${meal.mealName}">Meal Name</span></h1>
   <nav>
     <ul>
-      <li><a th:href="@{/dashboard}">Dashboard</a></li>
+      <li><a th:href="@{/today}">Today</a></li>
       <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
     </ul>
   </nav>
@@ -33,14 +33,21 @@
       <td th:text="${ingredient.quantity}"></td>
       <td th:text="${ingredient.caloriesPerPortion}"></td>
       <td>
-        <a th:href="@{'/meals/' + ${mealId} + '/ingredients/delete/' + ${ingredient.ingredientId}}" class="delete-button">Remove</a>
+        <form th:action="@{'/meals/' + ${mealId} + '/ingredients/delete/' + ${ingredient.ingredientId}}" method="post">
+          <div th:replace="~{fragments/csrf :: csrf}"></div>
+          <button type="submit" class="delete-button" onclick="return confirm('Remove this ingredient?');">Remove</button>
+        </form>
       </td>
     </tr>
     </tbody>
   </table>
   <br/>
-  <!-- Back link to the Meal Details page (assumes Meal has a reference to its MealPlan) -->
-  <a th:href="@{'/meal-plans/' + ${meal.mealPlan.mealPlanId} + '/meals'}" class="back-button">Back to Meal Details</a>
+  <a th:if="${meal.mealPlan != null}"
+     th:href="@{'/meal-plans/' + ${meal.mealPlan.mealPlanId}}"
+     class="back-button">Back to Meal Plan</a>
+  <a th:if="${meal.mealPlan == null}"
+     th:href="@{/meal-plans}"
+     class="back-button">Back to Meal Library</a>
 </div>
 </body>
 </html>

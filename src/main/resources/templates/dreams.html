@@ -39,6 +39,9 @@
               </div>
               <form th:action="@{|/mind/dreams/${d.id}/delete|}" method="post">
                 <div th:replace="~{fragments/csrf :: csrf}"></div>
+                <input type="hidden" name="from" th:value="${from}">
+                <input type="hidden" name="to" th:value="${to}">
+                <input type="hidden" name="tag" th:value="${tag}">
                 <button class="btn btn-outline-danger btn-sm">Delete</button>
               </form>
             </div>
@@ -55,6 +58,9 @@
         <div class="card-body">
           <form th:action="@{/mind/dreams/add}" th:object="${dreamForm}" method="post" class="row g-2">
             <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <input type="hidden" name="from" th:value="${from}">
+            <input type="hidden" name="to" th:value="${to}">
+            <input type="hidden" name="tag" th:value="${tag}">
             <div class="col-12" th:if="${#fields.hasErrors('*')}">
               <div class="alert alert-danger py-2">
                 <div th:each="err : ${#fields.errors('*')}" th:text="${err}">Invalid input</div>
@@ -113,7 +119,7 @@
 
   <div class="mt-3 d-flex gap-2">
     <a href="/mind/sleep" class="btn btn-outline-secondary">Back to Sleep</a>
-    <a href="/dashboard" class="btn btn-outline-secondary">Back to Home</a>
+    <a href="/today" class="btn btn-outline-secondary">Back to Today</a>
   </div>
 </main>
 

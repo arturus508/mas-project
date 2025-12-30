@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface HabitRepository extends JpaRepository<Habit, Long> {
     List<Habit> findByUserOrderByIdAsc(User user);
+    List<Habit> findByUserAndActiveTrueOrderByIdAsc(User user);
 }

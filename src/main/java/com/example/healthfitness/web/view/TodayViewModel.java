@@ -20,6 +20,11 @@ public class TodayViewModel {
     private int habitsDone;
     private List<TodayTaskItem> topTasks;
     private List<TodayHabitItem> habits;
+    private boolean reviewPresent;
+    private Integer reviewMood;
+    private Integer reviewEnergy;
+    private String reviewNote;
+    private boolean reviewResetDone;
 
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
@@ -62,4 +67,19 @@ public class TodayViewModel {
 
     public List<TodayHabitItem> getHabits() { return habits; }
     public void setHabits(List<TodayHabitItem> habits) { this.habits = habits; }
+
+    public boolean isReviewPresent() { return reviewPresent; }
+    public void setReviewPresent(boolean reviewPresent) { this.reviewPresent = reviewPresent; }
+
+    public Integer getReviewMood() { return reviewMood; }
+    public void setReviewMood(Integer reviewMood) { this.reviewMood = reviewMood; }
+
+    public Integer getReviewEnergy() { return reviewEnergy; }
+    public void setReviewEnergy(Integer reviewEnergy) { this.reviewEnergy = reviewEnergy; }
+
+    public String getReviewNote() { return reviewNote; }
+    public void setReviewNote(String reviewNote) { this.reviewNote = reviewNote; }
+
+    public boolean isReviewResetDone() { return reviewResetDone; }
+    public void setReviewResetDone(boolean reviewResetDone) { this.reviewResetDone = reviewResetDone; }
 }

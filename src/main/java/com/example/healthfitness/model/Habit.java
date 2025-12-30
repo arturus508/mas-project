@@ -21,6 +21,9 @@ public class Habit {
     @Column(name = "target_per_day" , nullable = false)
     private Integer targetPerDay = 1;
 
+    @Column(name = "target_per_week")
+    private Integer targetPerWeek;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -36,6 +39,7 @@ public class Habit {
     public User getUser(){ return user; }                  public void setUser(User user){ this.user = user; }
     public String getName(){ return name; }                public void setName(String name){ this.name = name; }
     public Integer getTargetPerDay(){ return targetPerDay; } public void setTargetPerDay(Integer targetPerDay){ this.targetPerDay = targetPerDay; }
+    public Integer getTargetPerWeek(){ return targetPerWeek; } public void setTargetPerWeek(Integer targetPerWeek){ this.targetPerWeek = targetPerWeek; }
     public boolean isActive(){ return active; }            public void setActive(boolean active){ this.active = active; }
     public LocalDateTime getCreatedAt(){ return createdAt; } public void setCreatedAt(LocalDateTime createdAt){ this.createdAt = createdAt; }
     public String getCadence(){ return cadence; }          public void setCadence(String cadence){ this.cadence = cadence; }
@@ -44,6 +48,8 @@ public class Habit {
     void pre(){
         if (createdAt == null) createdAt = LocalDateTime.now();
         if (cadence == null || cadence.isBlank()) cadence = "DAILY";
+        if (targetPerDay == null || targetPerDay < 1) targetPerDay = 1;
+        if (targetPerWeek != null && targetPerWeek < 1) targetPerWeek = 1;
     }
 }
 

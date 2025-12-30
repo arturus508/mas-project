@@ -19,6 +19,9 @@
       <div class="card h-100">
         <div class="card-header">Add task</div>
         <div class="card-body">
+          <div class="alert alert-warning py-2" th:if="${topLimitReached}">
+            You can select up to 3 top tasks for the day.
+          </div>
           <form th:action="@{/flow/tasks/add}" th:object="${taskForm}" method="post" class="row g-2">
             <div th:replace="~{fragments/csrf :: csrf}"></div>
             <div class="col-12" th:if="${#fields.hasErrors('*')}">
@@ -40,6 +43,14 @@
               <label class="form-label" for="notes">Notes (optional)</label>
               <textarea id="notes" th:field="*{notes}" class="form-control" rows="2"></textarea>
               <div class="text-danger small" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}"></div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="priority">Priority</label>
+              <select id="priority" class="form-select" th:field="*{priority}">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM" selected>Medium</option>
+                <option value="HIGH">High</option>
+              </select>
             </div>
             <div class="col-12">
               <label class="form-label" for="dueDate">Due date (optional)</label>
@@ -77,7 +88,19 @@
                 <div class="small text-muted" th:if="${t.completedDate != null}">
                   Completed: <span th:text="${t.completedDate}">2025-08-20</span>
                 </div>
+                <div class="small" th:if="${t.priority != null}">
+                  Priority: <span class="badge text-bg-secondary" th:text="${t.priority}">MEDIUM</span>
+                </div>
+                <div class="small" th:if="${t.top}">
+                  <span class="badge text-bg-warning">Top task</span>
+                </div>
               </div>
+
+              <form method="post" th:action="@{/flow/tasks/top/{id}(id=${t.id})}">
+                <div th:replace="~{fragments/csrf :: csrf}"></div>
+                <input type="hidden" name="date" th:value="${date}">
+                <button type="submit" class="btn btn-outline-warning btn-sm" th:text="${t.top} ? 'Unpin' : 'Top'">Top</button>
+              </form>
 
               <form method="post" th:action="@{/flow/tasks/delete/{id}(id=${t.id})}">
                 <div th:replace="~{fragments/csrf :: csrf}"></div>
@@ -93,7 +116,7 @@
 
   <div class="mt-3 d-flex gap-2">
     <a href="/flow/habits" class="btn btn-outline-secondary">Back to Habits</a>
-    <a href="/dashboard" class="btn btn-outline-secondary">Back to Home</a>
+    <a href="/today" class="btn btn-outline-secondary">Back to Today</a>
   </div>
 </main>
 

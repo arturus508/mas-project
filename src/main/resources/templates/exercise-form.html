@@ -12,6 +12,7 @@
 <div class="content">
     <form th:action="@{/exercises/add}" method="post" th:object="${exercise}">
         <div th:replace="~{fragments/csrf :: csrf}"></div>
+        <input type="hidden" name="returnTo" th:value="${returnTo}">
         <div class="form-group">
             <label for="exerciseName">Exercise Name:</label>
             <input type="text" id="exerciseName" th:field="*{exerciseName}" placeholder="Enter exercise name" required>
@@ -30,7 +31,8 @@
         <button type="submit" class="btn">Create Exercise</button>
     </form>
     <br/>
-    <a th:href="@{/exercises}" class="back-button">Back to Global Exercises</a>
+    <a th:if="${returnTo != null}" th:href="${returnTo}" class="back-button">Back</a>
+    <a th:if="${returnTo == null}" th:href="@{/exercises}" class="back-button">Back to Global Exercises</a>
 </div>
 </body>
 </html>

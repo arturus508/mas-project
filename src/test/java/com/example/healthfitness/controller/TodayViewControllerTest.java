@@ -3,6 +3,7 @@ package com.example.healthfitness.controller;
 import com.example.healthfitness.model.Habit;
 import com.example.healthfitness.model.User;
 import com.example.healthfitness.service.CurrentUserService;
+import com.example.healthfitness.service.DailyReviewService;
 import com.example.healthfitness.service.HabitLogService;
 import com.example.healthfitness.service.HabitService;
 import com.example.healthfitness.service.TaskService;
@@ -42,6 +43,7 @@ class TodayViewControllerTest {
     @MockBean private HabitService habitService;
     @MockBean private HabitLogService habitLogService;
     @MockBean private UserService userService;
+    @MockBean private DailyReviewService dailyReviewService;
 
     @Test
     void todayRendersView() throws Exception {

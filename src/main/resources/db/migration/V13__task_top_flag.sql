@@ -1,0 +1,2 @@
+ALTER TABLE `task`
+  ADD COLUMN `is_top` BIT NOT NULL DEFAULT 0;
