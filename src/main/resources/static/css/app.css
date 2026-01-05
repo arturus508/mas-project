@@ -242,7 +242,7 @@ body[data-mode="mind"] .card:hover{
 }
 .section-header{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
   gap: var(--gap-4);
 }
@@ -258,6 +258,7 @@ body[data-mode="mind"] .card:hover{
 .section-actions{
   display:flex;
   align-items:center;
+  justify-content:flex-end;
   gap: .5rem;
   flex-wrap: wrap;
 }
@@ -277,6 +278,11 @@ body[data-mode="mind"] .card:hover{
   flex-direction: column;
   gap: var(--gap-3);
   align-items: flex-start;
+}
+.section-body.section-body-modern{
+  display:flex;
+  flex-direction: column;
+  gap: var(--gap-4);
 }
 .section-body > form,
 .section-body > .form-inline-actions,
@@ -343,6 +349,76 @@ body[data-mode="mind"] .card:hover{
 .form-inline-actions .form-actions .btn{
   white-space: nowrap;
 }
+.today-container .section-modern{
+  border: 1px solid rgba(148,163,184,.18);
+  background: linear-gradient(180deg, rgba(21, 36, 51, .82), rgba(12, 22, 32, .92));
+}
+body[data-mode="mind"] .today-container .section-modern{
+  border-color: rgba(120, 132, 121, .2);
+  background: linear-gradient(180deg, rgba(251, 250, 247, .94), rgba(237, 236, 228, .94));
+}
+.section-block{
+  width: 100%;
+  background: rgba(148,163,184,.06);
+  border: 1px solid rgba(148,163,184,.12);
+  border-radius: var(--r);
+  padding: var(--gap-5);
+  box-shadow: 0 10px 30px rgba(2, 6, 23, .15);
+}
+body[data-mode="mind"] .section-block{
+  background: rgba(120, 132, 121, .08);
+  border-color: rgba(120, 132, 121, .16);
+  box-shadow: 0 12px 32px rgba(44, 54, 46, .12);
+}
+.section-block-highlight{
+  background: radial-gradient(circle at 10% 20%, rgba(34,193,195,.16), transparent 45%),
+  radial-gradient(circle at 80% 0%, rgba(59,130,246,.12), transparent 40%),
+  linear-gradient(180deg, rgba(148,163,184,.08), rgba(148,163,184,.04));
+  border-color: rgba(148,163,184,.2);
+}
+body[data-mode="mind"] .section-block-highlight{
+  background: radial-gradient(circle at 10% 20%, rgba(95,155,122,.18), transparent 45%),
+  radial-gradient(circle at 80% 0%, rgba(106,166,214,.14), transparent 40%),
+  linear-gradient(180deg, rgba(120,132,121,.12), rgba(120,132,121,.05));
+  border-color: rgba(120,132,121,.26);
+}
+.section-block + .section-block{
+  margin-top: var(--gap-4);
+}
+.section-eyebrow{
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: .72rem;
+  color: var(--muted);
+  font-weight: 700;
+  margin-bottom: .25rem;
+}
+.section-lead{
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.section-form{
+  background: rgba(8,14,20,.45);
+  border-radius: var(--r);
+  border: 1px solid rgba(148,163,184,.14);
+  padding: var(--gap-4);
+}
+.section-form.section-form-balanced{
+  max-width: 920px;
+  margin: 0 auto;
+  box-shadow: 0 12px 34px rgba(2,6,23,.2);
+}
+body[data-mode="mind"] .section-form{
+  background: rgba(251,250,247,.6);
+  border-color: rgba(120,132,121,.18);
+}
+.section-form .form-fields{
+  align-items: center;
+}
+.section-form.section-form-balanced .form-actions{
+  justify-content:flex-start;
+}
 .today-list .list-group-item{
   background: transparent;
   border: 1px solid rgba(148,163,184,.12);
@@ -371,6 +447,37 @@ body[data-mode="mind"] .card:hover{
   .section-actions{ width: 100%; justify-content:flex-start; }
   .form-inline-actions{ grid-template-columns: 1fr; }
   .form-inline-actions .form-actions{ justify-content:flex-start; }
+}
+.section-actions .btn{
+  border-radius: 12px;
+}
+.section-toggle{
+  background: rgba(148,163,184,.08);
+  border: 1px solid rgba(148,163,184,.18);
+  width: 36px;
+  height: 34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 12px;
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+.section-toggle:hover{
+  background: rgba(148,163,184,.14);
+}
+.section-actions .btn-secondary{
+  background: rgba(148,163,184,.12);
+  border-color: rgba(148,163,184,.22);
+  color: var(--text);
+}
+.section-actions .btn-secondary:hover{
+  background: rgba(148,163,184,.18);
+  border-color: rgba(148,163,184,.32);
+}
+body[data-mode="mind"] .section-actions .btn-secondary{
+  background: rgba(120,132,121,.16);
+  border-color: rgba(120,132,121,.26);
 }
 .btn{
   transition: transform .08s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
