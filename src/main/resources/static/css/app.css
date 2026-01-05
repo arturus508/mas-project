@@ -308,9 +308,11 @@ body[data-mode="mind"] .card:hover{
 }
 .form-inline-actions{
   display:grid;
-  grid-template-columns: 1fr auto;
-  gap: .75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
   align-items:end;
+  width: 100%;
+  margin: 0 auto;
 }
 .form-compact{
   grid-template-columns: minmax(0, 760px) auto;
@@ -323,7 +325,7 @@ body[data-mode="mind"] .card:hover{
 .form-inline-actions .form-fields{
   display:grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: .75rem;
+  gap: 1rem;
   align-items:end;
 }
 .form-roomy{
@@ -515,10 +517,12 @@ body[data-mode="mind"] .metric-tile{
   background: rgba(8,14,20,.45);
   border-radius: var(--r);
   border: 1px solid rgba(148,163,184,.14);
-  padding: var(--gap-4);
+  padding: var(--gap-4) var(--gap-5);
+  margin: 0 auto;
+  width: 100%;
 }
 .section-form.section-form-balanced{
-  max-width: 920px;
+  max-width: 980px;
   margin: 0 auto;
   box-shadow: 0 12px 34px rgba(2,6,23,.2);
 }
@@ -551,12 +555,13 @@ body[data-mode="mind"] .section-form{
   align-items: end;
 }
 .span-12{ grid-column: span 12; }
+.span-8{ grid-column: span 8; }
 .span-6{ grid-column: span 6; }
 .span-4{ grid-column: span 4; }
 .span-3{ grid-column: span 3; }
 .span-2{ grid-column: span 2; }
 @media (max-width: 900px){
-  .span-6, .span-4, .span-3, .span-2{ grid-column: span 12; }
+  .span-8, .span-6, .span-4, .span-3, .span-2{ grid-column: span 12; }
   .section-actions{ width: 100%; justify-content:flex-start; }
   .form-inline-actions{ grid-template-columns: 1fr; }
   .form-inline-actions .form-actions{ justify-content:flex-start; }
