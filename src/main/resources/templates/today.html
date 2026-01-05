@@ -26,7 +26,7 @@
                   th:action="@{/today/{date}/workout/delete(date=${vm.date},mode=${hubMode},range=${hubRange})}"
                   method="post">
               <div th:replace="~{fragments/csrf :: csrf}"></div>
-              <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+              <button type="submit" class="btn btn-sm btn-outline-accent">Remove</button>
             </form>
             <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-workout" aria-label="Toggle workout section">
               <span class="chevron-icon" aria-hidden="true"></span>
@@ -97,14 +97,14 @@
                     </form>
                   </td>
                   <td>
-                    <form th:action="@{/today/{date}/workout/sets/{setId}/delete(date=${vm.date},setId=${set.setId},mode=${hubMode},range=${hubRange})}"
-                          method="post" class="m-0">
-                      <div th:replace="~{fragments/csrf :: csrf}"></div>
-                      <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
-                    </form>
-                  </td>
-                </tr>
-                </tbody>
+                <form th:action="@{/today/{date}/workout/sets/{setId}/delete(date=${vm.date},setId=${set.setId},mode=${hubMode},range=${hubRange})}"
+                      method="post" class="m-0">
+                  <div th:replace="~{fragments/csrf :: csrf}"></div>
+                  <button class="btn btn-sm btn-outline-accent" type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+            </tbody>
               </table>
             </div>
 
@@ -218,7 +218,7 @@
             </div>
           </div>
           <div class="section-actions">
-            <a class="btn btn-sm btn-secondary" th:href="@{/body-stats}"
+            <a class="btn btn-sm btn-secondary" th:href="@{/body-stats}" 
                th:text="${vm.todayWeight != null} ? 'Details / Edit' : 'Details'">Details</a>
             <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-body-stats" aria-label="Toggle body stats section">
               <span class="chevron-icon" aria-hidden="true"></span>
@@ -233,8 +233,33 @@
                  th:text="'Body fat ' + ${vm.todayBodyFatPercent} + '%'">Body fat</div>
           </div>
 
-          <div class="section-block" th:if="${vm.weightValues != null && !vm.weightValues.isEmpty()}">
-            <canvas id="todayWeightChart" height="120"></canvas>
+          <div class="section-block section-block-metrics">
+            <div class="metric-tiles">
+              <div class="metric-tile">
+                <div class="metric-label">Latest weight</div>
+                <div class="metric-value">
+                  <span th:text="${vm.todayWeight != null ? vm.todayWeight : vm.latestWeight != null ? vm.latestWeight : '--'}">0.0</span>
+                  <span class="metric-unit">kg</span>
+                </div>
+                <div class="metric-footnote">Uses today's entry when available.</div>
+              </div>
+              <div class="metric-tile">
+                <div class="metric-label">Body fat</div>
+                <div class="metric-value">
+                  <span th:text="${vm.todayBodyFatPercent != null ? vm.todayBodyFatPercent : '--'}">--</span>
+                  <span class="metric-unit">%</span>
+                </div>
+                <div class="metric-footnote">Keep it aligned with your weight updates.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-block section-block-chart">
+            <div class="section-block-header">
+              <p class="section-block-subtitle mb-1">7-day trend</p>
+              <p class="section-block-subtitle text-muted mb-0">Latest entries shown; defaults to zeroed placeholders.</p>
+            </div>
+            <canvas id="todayWeightChart" height="140"></canvas>
           </div>
 
           <div class="section-block section-block-form">
@@ -468,7 +493,7 @@
   </div>
 </div>
 
-<script th:if="${vm.weightValues != null && !vm.weightValues.isEmpty()}" th:inline="javascript">
+<script th:inline="javascript">
   const weightLabels = [[${vm.weightDates}]];
   const weightValues = [[${vm.weightValues}]];
   const ctx = document.getElementById("todayWeightChart");
@@ -480,19 +505,27 @@
         datasets: [{
           label: "Weight (kg)",
           data: weightValues,
-          borderColor: "#0d6efd",
-          backgroundColor: "rgba(13, 110, 253, 0.15)",
-          tension: 0.3,
+          borderColor: "#3b82f6",
+          backgroundColor: "rgba(59, 130, 246, 0.12)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 3,
+          pointBackgroundColor: "#3b82f6",
           fill: true
         }]
       },
       options: {
+        responsive: true,
         plugins: {
           legend: { display: false }
         },
         scales: {
           x: { display: false },
           y: { display: false }
+        },
+        interaction: {
+          intersect: false,
+          mode: "index"
         }
       }
     });

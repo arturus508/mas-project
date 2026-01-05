@@ -15,6 +15,7 @@ import com.example.healthfitness.web.view.TodayWorkoutSetItem;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -177,6 +178,9 @@ public class TodayViewService {
         });
 
         List<BodyStats> stats = bodyStatsService.getBodyStatsByUser(userId);
+        List<String> weightDates = new ArrayList<>();
+        List<Double> weightValues = new ArrayList<>();
+
         if (!stats.isEmpty()) {
             stats.sort(Comparator.comparing(BodyStats::getDateRecorded));
             BodyStats latest = stats.get(stats.size() - 1);
@@ -189,13 +193,24 @@ public class TodayViewService {
                 }
             }
             List<BodyStats> recent = stats.size() > 7 ? stats.subList(stats.size() - 7, stats.size()) : stats;
-            vm.setWeightDates(recent.stream()
-                    .map(s -> s.getDateRecorded() == null ? "" : s.getDateRecorded().toString())
-                    .toList());
-            vm.setWeightValues(recent.stream()
-                    .map(BodyStats::getWeight)
-                    .toList());
+            recent.forEach(s -> {
+                weightDates.add(s.getDateRecorded() == null ? "" : s.getDateRecorded().toString());
+                weightValues.add(s.getWeight() == null ? 0d : s.getWeight());
+            });
+        } else {
+            for (int i = 0; i < 7; i++) {
+                weightDates.add("");
+                weightValues.add(0d);
+            }
         }
+
+        while (weightDates.size() < 7) {
+            weightDates.add("");
+            weightValues.add(0d);
+        }
+
+        vm.setWeightDates(weightDates);
+        vm.setWeightValues(weightValues);
 
         return vm;
     }
