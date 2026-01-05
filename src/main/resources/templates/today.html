@@ -28,7 +28,9 @@
               <div th:replace="~{fragments/csrf :: csrf}"></div>
               <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
             </form>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-workout">⌄</button>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-workout" aria-label="Toggle workout section">
+              <span class="chevron-icon" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div class="card-body section-body section-body-modern">
@@ -40,8 +42,10 @@
             </div>
           </div>
 
-          <div class="section-block" th:if="${vm.dailyWorkoutId == null}">
-            <div class="text-muted small mb-3">Pick a plan day to log today's workout.</div>
+          <div class="section-block section-block-form" th:if="${vm.dailyWorkoutId == null}">
+            <div class="section-block-header">
+              <p class="section-block-subtitle mb-0">Pick a plan day to log today's workout.</p>
+            </div>
             <div th:if="${vm.workoutPlanDays == null || #lists.isEmpty(vm.workoutPlanDays)}" class="text-muted small">
               No plan days yet.
               <a th:href="@{/workout-plans}">Create a workout plan</a>.
@@ -63,8 +67,8 @@
                 <button class="btn btn-sm btn-primary" type="submit">+ Add</button>
               </div>
             </form>
-            <div class="text-muted small mt-2" th:if="${vm.workoutPlanDays != null && !#lists.isEmpty(vm.workoutPlanDays)}">
-              Missing a plan day? Use Details to edit your plan.
+            <div class="section-footnotes" th:if="${vm.workoutPlanDays != null && !#lists.isEmpty(vm.workoutPlanDays)}">
+              <span>Missing a plan day? Use Details to edit your plan.</span>
             </div>
           </div>
 
@@ -140,7 +144,9 @@
           </div>
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/meals/today}">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-meals">⌄</button>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-meals" aria-label="Toggle meals section">
+              <span class="chevron-icon" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div class="card-body section-body section-body-modern">
@@ -148,7 +154,11 @@
             <div class="section-eyebrow">Quick log</div>
             <div class="section-lead">Add meals without opening the full diary.</div>
           </div>
-          <div class="section-block">
+          <div class="section-block section-block-form">
+            <div class="section-block-header">
+              <p class="section-block-subtitle mb-0">Quick log</p>
+              <p class="section-block-subtitle mb-0">Add meals without opening the full diary.</p>
+            </div>
             <form th:action="@{/today/{date}/meals/add-food(date=${vm.date},mode=${hubMode},range=${hubRange})}"
                   method="post" class="form-inline-actions form-roomy form-compact section-form section-form-balanced">
               <div th:replace="~{fragments/csrf :: csrf}"></div>
@@ -182,11 +192,9 @@
                 <button class="btn btn-sm btn-primary" type="submit">+ Add</button>
               </div>
             </form>
-            <div class="form-text">
-              Quantity uses grams for foods defined per 100g.
-            </div>
-            <div class="form-text">
-              Missing a food? Add it in <a th:href="@{/meals/today}">Details</a>.
+            <div class="section-footnotes">
+              <span>Quantity uses grams for foods defined per 100g.</span>
+              <span>Missing a food? Add it in <a th:href="@{/meals/today}">Details</a>.</span>
             </div>
           </div>
         </div>
@@ -212,7 +220,9 @@
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/body-stats}"
                th:text="${vm.todayWeight != null} ? 'Details / Edit' : 'Details'">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-body-stats">⌄</button>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-body-stats" aria-label="Toggle body stats section">
+              <span class="chevron-icon" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div class="card-body section-body section-body-modern">
@@ -227,7 +237,11 @@
             <canvas id="todayWeightChart" height="120"></canvas>
           </div>
 
-          <div class="section-block">
+          <div class="section-block section-block-form">
+            <div class="section-block-header">
+              <p class="section-block-subtitle mb-0">Log today's stats quickly.</p>
+              <p class="section-block-subtitle mb-0">Keep weight and body fat aligned with your snapshot.</p>
+            </div>
             <form th:if="${vm.todayWeight == null}"
                   th:action="@{/today/{date}/body-stats/add(date=${vm.date},mode=${hubMode},range=${hubRange})}"
                   method="post" class="form-inline-actions form-roomy form-compact section-form section-form-balanced">
@@ -274,7 +288,9 @@
               <button class="btn btn-sm btn-secondary" type="submit">Copy</button>
             </form>
             <a class="btn btn-sm btn-secondary" th:href="@{/flow/tasks}">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-tasks">v</button>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-tasks" aria-label="Toggle tasks section">
+              <span class="chevron-icon" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div class="card-body section-body">
@@ -321,7 +337,9 @@
           </div>
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/flow/habits}">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-habits">v</button>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-habits" aria-label="Toggle habits section">
+              <span class="chevron-icon" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div class="card-body section-body">
@@ -357,7 +375,9 @@
           </div>
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/mind/sleep}">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-sleep">v</button>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-sleep" aria-label="Toggle sleep section">
+              <span class="chevron-icon" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div class="card-body section-body">
@@ -403,7 +423,9 @@
             </div>
           </div>
           <div class="section-actions">
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-review">v</button>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-review" aria-label="Toggle review section">
+              <span class="chevron-icon" aria-hidden="true"></span>
+            </button>
           </div>
         </div>
         <div class="card-body section-body">
@@ -480,5 +502,6 @@
 <script th:src="@{/js/section-toggle.js}" defer></script>
 </body>
 </html>
+
 
 

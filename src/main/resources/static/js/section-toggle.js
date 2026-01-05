@@ -17,7 +17,7 @@
     section.classList.toggle("collapsed", collapsed);
     const button = section.querySelector(".section-toggle");
     if (button) {
-      button.textContent = collapsed ? ">" : "v";
+      button.classList.toggle("is-collapsed", collapsed);
       button.setAttribute("aria-expanded", String(!collapsed));
     }
   };
