@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -51,7 +52,19 @@ public class BodyStatsViewController {
         List<com.example.healthfitness.model.BodyStats> stats = bodyStatsService.getBodyStatsByUser(userId);
         addChartData(model, stats);
         model.addAttribute("bodyStats", stats);
-        model.addAttribute("bodyStatsForm", new BodyStatsForm());
+        BodyStatsForm form = new BodyStatsForm();
+        LocalDate today = LocalDate.now();
+        form.setDateRecorded(today);
+        boolean exists = false;
+        var existingToday = bodyStatsService.getBodyStatsForDate(userId, today);
+        if (existingToday.isPresent()) {
+            exists = true;
+            var existing = existingToday.get();
+            form.setWeight(existing.getWeight());
+            form.setBodyFatPercent(existing.getBodyFatPercent());
+        }
+        model.addAttribute("bodyStatsForm", form);
+        model.addAttribute("bodyStatsUpdate", exists);
         return "body-stats";
     }
 
@@ -71,6 +84,11 @@ public class BodyStatsViewController {
             List<com.example.healthfitness.model.BodyStats> stats = bodyStatsService.getBodyStatsByUser(userId);
             addChartData(model, stats);
             model.addAttribute("bodyStats", stats);
+            boolean exists = false;
+            if (form.getDateRecorded() != null) {
+                exists = bodyStatsService.getBodyStatsForDate(userId, form.getDateRecorded()).isPresent();
+            }
+            model.addAttribute("bodyStatsUpdate", exists);
             return "body-stats";
         }
         Long userId = currentUserService.id();

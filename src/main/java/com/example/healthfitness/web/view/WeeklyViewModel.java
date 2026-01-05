@@ -28,6 +28,10 @@ public class WeeklyViewModel {
     private Integer avgMood;
     private Integer avgEnergy;
     private int reviewsCount;
+    private Double weightStart;
+    private Double weightEnd;
+    private java.util.List<String> weightDates;
+    private java.util.List<Double> weightValues;
 
     public LocalDate getWeekStart() { return weekStart; }
     public void setWeekStart(LocalDate weekStart) { this.weekStart = weekStart; }
@@ -79,4 +83,16 @@ public class WeeklyViewModel {
 
     public int getReviewsCount() { return reviewsCount; }
     public void setReviewsCount(int reviewsCount) { this.reviewsCount = reviewsCount; }
+
+    public Double getWeightStart() { return weightStart; }
+    public void setWeightStart(Double weightStart) { this.weightStart = weightStart; }
+
+    public Double getWeightEnd() { return weightEnd; }
+    public void setWeightEnd(Double weightEnd) { this.weightEnd = weightEnd; }
+
+    public java.util.List<String> getWeightDates() { return weightDates; }
+    public void setWeightDates(java.util.List<String> weightDates) { this.weightDates = weightDates; }
+
+    public java.util.List<Double> getWeightValues() { return weightValues; }
+    public void setWeightValues(java.util.List<Double> weightValues) { this.weightValues = weightValues; }
 }

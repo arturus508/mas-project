@@ -132,7 +132,7 @@ form button {
     margin: 10px 0;
 }
 
-nav {
+.legacy-nav {
     background: #4CAF50;
     padding: 10px 0;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -140,7 +140,7 @@ nav {
     justify-content: center;
 }
 
-nav ul {
+.legacy-nav ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -148,11 +148,11 @@ nav ul {
     gap: 20px;
 }
 
-nav li {
+.legacy-nav li {
     display: inline;
 }
 
-nav a {
+.legacy-nav a {
     text-decoration: none;
     color: white;
     font-size: 16px;
@@ -161,7 +161,7 @@ nav a {
     transition: background-color 0.3s ease;
 }
 
-nav a:hover {
+.legacy-nav a:hover {
     background-color: #45a049;
 }
 
@@ -303,4 +303,58 @@ body.bg-light .form-text,
 body.bg-light small,
 body.bg-light .text-muted {
     color: #6c757d;
+}
+
+/* Ensure Bootstrap navbar stays clickable above page content */
+.navbar {
+    position: relative;
+    z-index: 1030;
+    pointer-events: auto;
+}
+
+.navbar-collapse,
+.navbar-nav {
+    position: relative;
+    z-index: 1031;
+}
+
+.navbar .nav-link,
+.navbar .dropdown-toggle,
+.navbar .dropdown-menu,
+.navbar .dropdown-item {
+    pointer-events: auto;
+}
+
+/* Fallback dropdown behavior when JS is flaky: show on hover/focus */
+.navbar .dropdown-menu {
+    display: none;
+    margin-top: 0.25rem;
+    z-index: 1032;
+}
+
+.navbar .dropdown:hover > .dropdown-menu,
+.navbar .dropdown:focus-within > .dropdown-menu {
+    display: block;
+}
+
+/* Hub top bar + collapsible sections */
+.hub-topbar {
+    z-index: 1025;
+}
+
+.hub-topbar .btn {
+    white-space: nowrap;
+}
+
+.section .section-toggle {
+    min-width: 2.25rem;
+    text-align: center;
+}
+
+.section.collapsed .section-body {
+    display: none;
+}
+
+.section.collapsed .card-header {
+    border-bottom: 0;
 }

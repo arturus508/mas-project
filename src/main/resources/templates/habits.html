@@ -4,17 +4,23 @@
 <body>
 <div th:replace="~{fragments/nav :: nav}"></div>
 
-<div class="container" style="max-width: 980px; margin-top: 24px;">
-  <div style="display:flex; align-items:center; justify-content:space-between;">
-    <h2>Habits - streak + mini heatmap (28d)</h2>
-    <a href="/today" class="btn btn-outline-secondary">Back to Today</a>
+<div class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+    <h2 class="m-0">Habits - streak + mini heatmap (28d)</h2>
+    <a href="/today" class="btn btn-outline-secondary btn-sm">Back to Today</a>
   </div>
 
-  <form method="get" action="#" style="margin:8px 0 16px;">
-    <label for="date">Reference date:</label>
-    <input id="date" name="date" type="date" th:value="${date}">
-    <button type="submit">Go</button>
-    <span style="font-size:12px; color:#666; margin-left:8px;">Heatmap ends on this date.</span>
+  <form method="get" action="#" class="form-inline-actions mb-3">
+    <div class="form-fields">
+      <div class="span-4">
+        <label class="form-label" for="date">Reference date</label>
+        <input id="date" name="date" type="date" class="form-control form-control-sm" th:value="${date}">
+        <div class="form-text">Heatmap ends on this date.</div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-sm btn-outline-primary">Go</button>
+    </div>
   </form>
 
   <style>
@@ -28,22 +34,43 @@
     .target{ font-weight:600; margin-left:6px; color:#444; }
   </style>
 
-  <div style="margin: 12px 0; padding: 12px; border:1px solid #ddd; border-radius:8px;">
-    <h3 style="margin:0 0 8px;">Add habit</h3>
-    <form method="post" th:action="@{/flow/habits}">
+  <div class="card mb-3">
+    <div class="card-header section-header">
+      <div class="section-title">Add habit</div>
+    </div>
+    <div class="card-body">
+    <form method="post" th:action="@{/flow/habits}" class="form-inline-actions">
       <div th:replace="~{fragments/csrf :: csrf}"></div>
       <input type="hidden" name="date" th:value="${date}">
-      <div style="display:grid; grid-template-columns: 1fr 140px 140px 160px auto; gap:8px;">
-        <input name="name" aria-label="Habit name" placeholder="Habit name" required>
-        <input name="targetPerDay" type="number" min="1" value="1" aria-label="Target per day">
-        <input name="targetPerWeek" type="number" min="1" value="3" aria-label="Target per week">
-        <select name="cadence" aria-label="Cadence">
-          <option value="DAILY">Daily</option>
-          <option value="WEEKLY">Weekly</option>
-        </select>
-        <button type="submit">Add</button>
+      <div class="form-fields">
+        <div class="span-5">
+          <label class="form-label">Habit name</label>
+          <input name="name" class="form-control form-control-sm" aria-label="Habit name" placeholder="Habit name" required>
+        </div>
+        <div class="span-2">
+          <label class="form-label">Per day</label>
+          <input name="targetPerDay" type="number" min="1" value="1" class="form-control form-control-sm" aria-label="Target per day" placeholder="Per day">
+        </div>
+        <div class="span-2">
+          <label class="form-label">Per week</label>
+          <input name="targetPerWeek" type="number" min="1" value="3" class="form-control form-control-sm" aria-label="Target per week" placeholder="Per week">
+        </div>
+        <div class="span-3">
+          <label class="form-label">Cadence</label>
+          <select name="cadence" class="form-select form-select-sm" aria-label="Cadence">
+            <option value="DAILY">Daily</option>
+            <option value="WEEKLY">Weekly</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-sm btn-outline-primary">Add</button>
+      </div>
+      <div class="form-text">
+        Targets: per day / per week (used for streak + progress).
       </div>
     </form>
+    </div>
   </div>
 
   <h3 style="margin: 12px 0 6px;">Your habits</h3>
@@ -68,20 +95,20 @@
         <input type="hidden" name="date" th:value="${date}">
         <input type="hidden" name="refDate" th:value="${date}">
         <button type="submit"
-                style="width:26px; height:26px; border:1px solid #bbb; border-radius:4px; background:#fff;"
+                class="btn btn-xs btn-outline-primary"
                 th:text="${today[h.id]} ? 'x' : ''" aria-label="toggle today"></button>
       </form>
 
       <form method="post" th:action="@{/flow/habits/{id}/archive(id=${h.id})}" style="display:inline;">
         <div th:replace="~{fragments/csrf :: csrf}"></div>
         <input type="hidden" name="date" th:value="${date}">
-        <button type="submit">Archive</button>
+        <button type="submit" class="btn btn-xs btn-outline-warning">Archive</button>
       </form>
 
       <form method="post" th:action="@{/flow/habits/{id}/delete(id=${h.id})}" style="display:inline;">
         <div th:replace="~{fragments/csrf :: csrf}"></div>
         <input type="hidden" name="date" th:value="${date}">
-        <button type="submit">Delete</button>
+        <button type="submit" class="btn btn-xs btn-outline-danger">Delete</button>
       </form>
     </div>
 
@@ -108,13 +135,13 @@
               th:text="${h.cadence == 'WEEKLY'} ? ('x' + ${h.targetPerWeek} + '/week') : ('x' + ${h.targetPerDay} + '/day')">x1</span>
       </div>
       <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end;">
-        <form method="post" th:action="@{/flow/habits/{id}/restore(id=${h.id})}" style="display:inline;">
-          <div th:replace="~{fragments/csrf :: csrf}"></div>
-          <input type="hidden" name="date" th:value="${date}">
-          <button type="submit">Restore</button>
-        </form>
-      </div>
+      <form method="post" th:action="@{/flow/habits/{id}/restore(id=${h.id})}" style="display:inline;">
+        <div th:replace="~{fragments/csrf :: csrf}"></div>
+        <input type="hidden" name="date" th:value="${date}">
+        <button type="submit" class="btn btn-xs btn-outline-primary">Restore</button>
+      </form>
     </div>
+  </div>
   </div>
 </div>
 

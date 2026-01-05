@@ -8,46 +8,46 @@
 <main class="container py-4" style="max-width: 640px;">
   <h2 class="mb-3">Register</h2>
 
-  <form th:action="@{/register}" th:object="${registerForm}" method="post" class="row g-3">
+  <form th:action="@{/register}" th:object="${registerForm}" method="post" class="form-grid">
     <div th:replace="~{fragments/csrf :: csrf}"></div>
 
-    <div class="col-12">
+    <div class="span-12">
       <label class="form-label" for="name">Name</label>
-      <input id="name" type="text" class="form-control" th:field="*{name}" placeholder="Full name">
+      <input id="name" type="text" class="form-control form-control-sm" th:field="*{name}" placeholder="Full name">
       <div class="form-text">Use your real name.</div>
       <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
     </div>
 
-    <div class="col-12">
+    <div class="span-12">
       <label class="form-label" for="email">Email</label>
-      <input id="email" type="email" class="form-control" th:field="*{email}" placeholder="name@example.com">
+      <input id="email" type="email" class="form-control form-control-sm" th:field="*{email}" placeholder="name@example.com">
       <div class="form-text">We will use this to sign you in.</div>
       <div class="text-danger small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
     </div>
 
-    <div class="col-12">
+    <div class="span-12">
       <label class="form-label" for="password">Password</label>
-      <input id="password" type="password" class="form-control" th:field="*{password}" placeholder="Create a password">
+      <input id="password" type="password" class="form-control form-control-sm" th:field="*{password}" placeholder="Create a password">
       <div class="form-text">Use at least 8 characters.</div>
       <div class="text-danger small" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
     </div>
 
-    <div class="col-12">
+    <div class="span-12">
       <label class="form-label" for="confirmPassword">Confirm password</label>
-      <input id="confirmPassword" type="password" class="form-control" th:field="*{confirmPassword}" placeholder="Repeat password">
+      <input id="confirmPassword" type="password" class="form-control form-control-sm" th:field="*{confirmPassword}" placeholder="Repeat password">
       <div class="form-text">Repeat the same password.</div>
       <div class="text-danger small" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
     </div>
 
-    <div class="col-12" th:if="${#fields.hasErrors('*')}">
+    <div class="span-12" th:if="${#fields.hasErrors('*')}">
       <div class="alert alert-danger py-2">
         <div th:each="err : ${#fields.errors('*')}" th:text="${err}">Invalid input</div>
       </div>
     </div>
 
-    <div class="col-12 d-flex gap-2">
-      <button type="submit" class="btn btn-primary">Register</button>
-      <a th:href="@{/login}" class="btn btn-outline-secondary">Back to Login</a>
+    <div class="span-12 d-flex align-items-center justify-content-end gap-2">
+      <a th:href="@{/login}" class="btn btn-outline-secondary btn-sm">Back to Login</a>
+      <button type="submit" class="btn btn-sm btn-outline-primary">Register</button>
     </div>
   </form>
 </main>

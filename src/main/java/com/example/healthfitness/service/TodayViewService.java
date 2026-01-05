@@ -3,12 +3,19 @@ package com.example.healthfitness.service;
 import com.example.healthfitness.model.*;
 import com.example.healthfitness.repository.TaskRepository;
 import com.example.healthfitness.repository.UserRepository;
+import com.example.healthfitness.repository.FoodItemRepository;
+import com.example.healthfitness.repository.WorkoutPlanDayRepository;
 import com.example.healthfitness.web.view.TodayHabitItem;
+import com.example.healthfitness.web.view.TodayFoodOption;
+import com.example.healthfitness.web.view.TodayPlanDayOption;
 import com.example.healthfitness.web.view.TodayTaskItem;
+import com.example.healthfitness.web.view.TodayExerciseOption;
 import com.example.healthfitness.web.view.TodayViewModel;
+import com.example.healthfitness.web.view.TodayWorkoutSetItem;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,27 +26,39 @@ public class TodayViewService {
     private final TaskRepository taskRepository;
     private final MealMacroService mealMacroService;
     private final DailyWorkoutService dailyWorkoutService;
+    private final ExerciseService exerciseService;
+    private final BodyStatsService bodyStatsService;
     private final SleepService sleepService;
     private final HabitService habitService;
     private final HabitLogService habitLogService;
     private final DailyReviewService dailyReviewService;
+    private final WorkoutPlanDayRepository workoutPlanDayRepository;
+    private final FoodItemRepository foodItemRepository;
 
     public TodayViewService(UserRepository userRepository,
                             TaskRepository taskRepository,
                             MealMacroService mealMacroService,
                             DailyWorkoutService dailyWorkoutService,
+                            ExerciseService exerciseService,
+                            BodyStatsService bodyStatsService,
                             SleepService sleepService,
                             HabitService habitService,
                             HabitLogService habitLogService,
-                            DailyReviewService dailyReviewService) {
+                            DailyReviewService dailyReviewService,
+                            WorkoutPlanDayRepository workoutPlanDayRepository,
+                            FoodItemRepository foodItemRepository) {
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.mealMacroService = mealMacroService;
         this.dailyWorkoutService = dailyWorkoutService;
+        this.exerciseService = exerciseService;
+        this.bodyStatsService = bodyStatsService;
         this.sleepService = sleepService;
         this.habitService = habitService;
         this.habitLogService = habitLogService;
         this.dailyReviewService = dailyReviewService;
+        this.workoutPlanDayRepository = workoutPlanDayRepository;
+        this.foodItemRepository = foodItemRepository;
     }
 
     public TodayViewModel build(Long userId, LocalDate date) {
@@ -52,16 +71,50 @@ public class TodayViewService {
 
         Map<String, Integer> mealTotals = mealMacroService.totalsForDay(userId, d);
         vm.setMealTotals(mealTotals);
+        vm.setMealFoodOptions(foodItemRepository.findTop20ByNameContainingIgnoreCaseOrderByNameAsc("")
+                .stream()
+                .map(f -> new TodayFoodOption(
+                        f.getId(),
+                        f.getName() + (f.getUnit() == Unit.G ? " (per 100g)" : " (per piece)")))
+                .toList());
 
         DailyWorkout workout = dailyWorkoutService.findForDate(userId, d);
         if (workout != null) {
             vm.setWorkoutTitle(workout.getTitle());
+            vm.setDailyWorkoutId(workout.getDailyWorkoutId());
             List<DailyWorkoutSet> sets = dailyWorkoutService.getSets(userId, workout.getDailyWorkoutId());
+            sets.sort(Comparator
+                    .comparing((DailyWorkoutSet s) -> s.getExercise() == null ? "" : s.getExercise().getExerciseName())
+                    .thenComparing(DailyWorkoutSet::getSetNumber));
             vm.setWorkoutSetsTotal(sets.size());
             int done = (int) sets.stream()
                     .filter(s -> s.getRepsDone() != null && s.getRepsDone() > 0)
                     .count();
             vm.setWorkoutSetsDone(done);
+            vm.setWorkoutSets(sets.stream()
+                    .map(s -> new TodayWorkoutSetItem(
+                            s.getDailyWorkoutSetId(),
+                            s.getExercise() == null ? null : s.getExercise().getExerciseId(),
+                            s.getExercise() == null ? "Exercise" : s.getExercise().getExerciseName(),
+                            s.getSetNumber(),
+                            s.getRepsDone()))
+                    .toList());
+            vm.setWorkoutExercises(exerciseService.getAllExercises().stream()
+                    .sorted(Comparator.comparing(Exercise::getExerciseName, String.CASE_INSENSITIVE_ORDER))
+                    .map(ex -> new TodayExerciseOption(ex.getExerciseId(), ex.getExerciseName()))
+                    .toList());
+        } else {
+            List<WorkoutPlanDay> planDays = workoutPlanDayRepository
+                    .findWithPlanByWorkoutPlan_User_UserIdOrderByWorkoutPlan_WorkoutPlanIdAscDayOrderAsc(userId);
+            vm.setWorkoutPlanDays(planDays.stream()
+                    .map(day -> {
+                        String planName = day.getWorkoutPlan() != null ? day.getWorkoutPlan().getPlanName() : "Plan";
+                        String dayName = (day.getName() == null || day.getName().isBlank())
+                                ? "Day " + day.getDayOrder()
+                                : day.getName();
+                        return new TodayPlanDayOption(day.getPlanDayId(), planName + " — " + dayName);
+                    })
+                    .toList());
         }
 
         SleepEntry lastNight = sleepService.getByDate(userId, d.minusDays(1)).orElse(null);
@@ -76,10 +129,12 @@ public class TodayViewService {
         vm.setTasksTotal(tasks.size());
         vm.setTasksDone((int) tasks.stream().filter(Task::isDone).count());
 
-        List<Task> top = taskRepository.findByUserAndDateAndTopTrueOrderByIdAsc(user, d);
-        List<Task> source = top.isEmpty() ? tasks : top;
+        List<Task> source = tasks.stream()
+                .sorted(Comparator
+                        .comparing(Task::isTop).reversed()
+                        .thenComparing(Task::getId))
+                .toList();
         vm.setTopTasks(source.stream()
-                .limit(3)
                 .map(t -> new TodayTaskItem(t.getId(), t.getTitle(), t.isDone()))
                 .toList());
 
@@ -97,13 +152,11 @@ public class TodayViewService {
         for (Habit h : habits) {
             String cadence = h.getCadence() == null ? "DAILY" : h.getCadence().toUpperCase();
             if ("WEEKLY".equals(cadence)) {
-                int target = h.getTargetPerWeek() != null ? h.getTargetPerWeek() : 1;
-                int done = weekCounts.getOrDefault(h.getId(), 0L).intValue();
-                boolean complete = done >= target;
-                if (complete) {
+                boolean doneToday = Boolean.TRUE.equals(doneMap.get(h.getId()));
+                if (doneToday) {
                     doneHabits++;
                 }
-                items.add(new TodayHabitItem(h.getId(), h.getName(), complete, cadence, done, target));
+                items.add(new TodayHabitItem(h.getId(), h.getName(), doneToday, cadence, null, null));
             } else {
                 boolean done = Boolean.TRUE.equals(doneMap.get(h.getId()));
                 if (done) {
@@ -122,6 +175,27 @@ public class TodayViewService {
             vm.setReviewNote(review.getNote());
             vm.setReviewResetDone(review.isResetDone());
         });
+
+        List<BodyStats> stats = bodyStatsService.getBodyStatsByUser(userId);
+        if (!stats.isEmpty()) {
+            stats.sort(Comparator.comparing(BodyStats::getDateRecorded));
+            BodyStats latest = stats.get(stats.size() - 1);
+            vm.setLatestWeight(latest.getWeight());
+            for (BodyStats s : stats) {
+                if (s.getDateRecorded() != null && s.getDateRecorded().equals(d)) {
+                    vm.setTodayWeight(s.getWeight());
+                    vm.setTodayBodyFatPercent(s.getBodyFatPercent());
+                    break;
+                }
+            }
+            List<BodyStats> recent = stats.size() > 7 ? stats.subList(stats.size() - 7, stats.size()) : stats;
+            vm.setWeightDates(recent.stream()
+                    .map(s -> s.getDateRecorded() == null ? "" : s.getDateRecorded().toString())
+                    .toList());
+            vm.setWeightValues(recent.stream()
+                    .map(BodyStats::getWeight)
+                    .toList());
+        }
 
         return vm;
     }

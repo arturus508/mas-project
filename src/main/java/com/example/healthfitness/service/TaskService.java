@@ -8,6 +8,7 @@ import com.example.healthfitness.repository.UserRepository;
 import com.example.healthfitness.web.form.FlowTaskForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -44,6 +45,7 @@ public class TaskService {
         return taskRepository.save(t);
     }
 
+    @Transactional
     public void toggle(Long userId, Long id){
         var t = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
@@ -81,5 +83,30 @@ public class TaskService {
             throw new ForbiddenException("Task does not belong to current user");
         }
         taskRepository.delete(task);
+    }
+
+    public int copyFromDate(Long userId, LocalDate sourceDate, LocalDate targetDate) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        List<Task> source = taskRepository.findByUserAndDateOrderByIdAsc(user, sourceDate);
+        if (source.isEmpty()) {
+            return 0;
+        }
+        int copied = 0;
+        for (Task task : source) {
+            Task copy = new Task();
+            copy.setUser(user);
+            copy.setDate(targetDate);
+            copy.setTitle(task.getTitle());
+            copy.setNotes(task.getNotes());
+            copy.setPriority(task.getPriority());
+            copy.setDone(false);
+            copy.setTop(false);
+            copy.setCompletedDate(null);
+            copy.setDueDate(null);
+            taskRepository.save(copy);
+            copied++;
+        }
+        return copied;
     }
 }

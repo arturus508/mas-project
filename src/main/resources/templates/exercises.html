@@ -1,29 +1,31 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Global Exercises</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-  <h1>Global Exercises</h1>
-  <nav>
-    <ul>
-      <li><a th:href="@{/today}">Today</a></li>
-    </ul>
-  </nav>
-</header>
-<div class="content">
-  <div th:each="ex : ${exercises}" class="card">
-    <h3 th:text="${ex.exerciseName}"></h3>
-    <p>Muscle Group: <span th:text="${ex.muscleGroup}"></span></p>
-    <p>Intensity: <span th:text="${ex.intensityLevel}"></span></p>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Global Exercises')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<main class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+    <h1 class="m-0">Global Exercises</h1>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <a th:href="@{/exercises/add}" class="btn btn-outline-primary btn-sm">Create New Exercise</a>
+      <a th:href="@{/today}" class="btn btn-outline-secondary btn-sm">Back to Today</a>
+    </div>
   </div>
-  <br/>
-  <a th:href="@{/exercises/add}" class="add-button">Create New Exercise</a>
-  <br/><br/>
-  <a th:href="@{/today}" class="back-button">Back to Today</a>
-</div>
+
+  <div class="grid gap-3">
+    <div th:each="ex : ${exercises}" class="card card-hover">
+      <div class="card-body">
+        <h3 class="h6 mb-2" th:text="${ex.exerciseName}">Exercise</h3>
+        <div class="text-muted small">
+          Muscle group: <span th:text="${ex.muscleGroup}">Group</span>
+        </div>
+        <div class="text-muted small">
+          Intensity: <span th:text="${ex.intensityLevel}">Level</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
 </body>
 </html>

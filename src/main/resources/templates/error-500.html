@@ -2,12 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Server Error')}"></head>
 <body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
 <div class="container py-5">
-    <div class="alert alert-danger">
-        <div class="fw-semibold mb-2">Something went wrong</div>
-        <div th:text="${message}">An unexpected error occurred.</div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="h4">500 - Server Error</h1>
+            <p class="text-muted" th:text="${message}">An unexpected error occurred.</p>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
+            <a th:href="@{/settings}" class="btn btn-outline-primary">Settings</a>
+        </div>
     </div>
-    <a th:href="@{/}" class="btn btn-outline-secondary">Back to home</a>
 </div>
 </body>
 </html>

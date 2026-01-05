@@ -9,7 +9,10 @@ import com.example.healthfitness.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service layer for reading and writing {@link BodyStats} entities.
@@ -57,6 +60,19 @@ public class BodyStatsService {
         return bodyStatsRepository.findByUserUserIdOrderByDateRecordedDesc(userId);
     }
 
+    public Optional<BodyStats> getBodyStatsForDate(Long userId, LocalDate dateRecorded) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        List<BodyStats> stats = bodyStatsRepository.findByUserUserIdAndDateRecorded(userId, dateRecorded);
+        if (stats.isEmpty()) {
+            return Optional.empty();
+        }
+        BodyStats latest = stats.stream()
+                .max(Comparator.comparing(BodyStats::getBodyStatsId))
+                .orElse(stats.get(0));
+        return Optional.of(latest);
+    }
+
     /**
      * Persist an existing BodyStats entity and associate it with the
      * specified user.  Prefer using the overload that accepts a form
@@ -83,7 +99,21 @@ public class BodyStatsService {
     public void addBodyStatsToUser(Long userId, com.example.healthfitness.web.form.BodyStatsForm form) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-        BodyStats stats = new BodyStats(form.getDateRecorded(), form.getWeight(), form.getBodyFatPercent());
+        LocalDate date = form.getDateRecorded();
+        List<BodyStats> existing = bodyStatsRepository.findByUserUserIdAndDateRecorded(userId, date);
+        if (!existing.isEmpty()) {
+            existing.sort(Comparator.comparing(BodyStats::getBodyStatsId));
+            BodyStats stats = existing.get(existing.size() - 1);
+            stats.setWeight(form.getWeight());
+            stats.setBodyFatPercent(form.getBodyFatPercent());
+            stats.setDateRecorded(date);
+            bodyStatsRepository.save(stats);
+            for (int i = 0; i < existing.size() - 1; i++) {
+                bodyStatsRepository.delete(existing.get(i));
+            }
+            return;
+        }
+        BodyStats stats = new BodyStats(date, form.getWeight(), form.getBodyFatPercent());
         stats.setUser(user);
         bodyStatsRepository.save(stats);
     }

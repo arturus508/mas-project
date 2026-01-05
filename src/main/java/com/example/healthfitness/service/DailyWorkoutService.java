@@ -119,6 +119,18 @@ public class DailyWorkoutService {
         return dailyWorkoutSetRepository.save(set);
     }
 
+    public DailyWorkoutSet updateExercise(Long userId, Long setId, Long exerciseId) {
+        DailyWorkoutSet set = dailyWorkoutSetRepository.findWithWorkoutByDailyWorkoutSetId(setId)
+                .orElseThrow(() -> new ResourceNotFoundException("Daily workout set not found with ID: " + setId));
+        if (!set.getDailyWorkout().getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Daily workout does not belong to current user");
+        }
+        Exercise exercise = exerciseRepository.findById(exerciseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Exercise not found with ID: " + exerciseId));
+        set.setExercise(exercise);
+        return dailyWorkoutSetRepository.save(set);
+    }
+
     public void deleteSet(Long userId, Long setId) {
         DailyWorkoutSet set = dailyWorkoutSetRepository.findWithWorkoutByDailyWorkoutSetId(setId)
                 .orElseThrow(() -> new ResourceNotFoundException("Daily workout set not found with ID: " + setId));
@@ -126,5 +138,15 @@ public class DailyWorkoutService {
             throw new ForbiddenException("Daily workout does not belong to current user");
         }
         dailyWorkoutSetRepository.delete(set);
+    }
+
+    public void deleteWorkoutForDate(Long userId, LocalDate date) {
+        LocalDate targetDate = date == null ? LocalDate.now() : date;
+        DailyWorkout workout = dailyWorkoutRepository.findByUser_UserIdAndDate(userId, targetDate)
+                .orElseThrow(() -> new ResourceNotFoundException("Daily workout not found for date: " + targetDate));
+        if (!workout.getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Daily workout does not belong to current user");
+        }
+        dailyWorkoutRepository.delete(workout);
     }
 }

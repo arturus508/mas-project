@@ -7,7 +7,7 @@
 <div class="container py-4">
     <div class="d-flex align-items-center justify-content-between mb-3">
         <h1 class="mb-0">Workout Plans</h1>
-        <a th:href="@{/workout-plans/add(returnTo='/workout-plans')}" class="btn btn-primary">Add Workout Plan</a>
+        <a th:href="@{/workout-plans/add(returnTo='/workout-plans')}" class="btn btn-sm btn-outline-primary">Add Workout Plan</a>
     </div>
 
     <div class="table-responsive" th:if="${!#lists.isEmpty(workoutPlans)}">

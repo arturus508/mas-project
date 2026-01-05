@@ -75,16 +75,17 @@ public class MealDayViewController {
         Long userId = currentUserService.id();
         MealType type = mealTypeFromSegment(segment);
         Meal meal = mealMacroService.getOrCreateMeal(userId, date, type);
+        String query = q == null ? "" : q.trim();
         model.addAttribute("date", date);
         model.addAttribute("segment", segment);
         model.addAttribute("meal", meal);
         model.addAttribute("items", mealMacroService.getItems(userId, meal.getMealId()));
         model.addAttribute("totals", mealMacroService.totalsForMeal(meal.getMealId()));
-        List<FoodItem> foods = q != null && !q.isBlank()
-                ? foodItemRepository.findTop20ByNameContainingIgnoreCaseOrderByNameAsc(q)
-                : foodItemRepository.findTop20ByNameContainingIgnoreCaseOrderByNameAsc("");
+        List<FoodItem> foods = !query.isBlank()
+                ? foodItemRepository.findTop50ByNameContainingIgnoreCaseOrderByNameAsc(query)
+                : foodItemRepository.findTop50ByOrderByNameAsc();
         model.addAttribute("foods", foods);
-        model.addAttribute("q", q);
+        model.addAttribute("q", query);
         return "meal-details";
     }
 

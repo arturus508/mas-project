@@ -1,20 +1,119 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>Settings</header>
-<div class="content">
-    <div class="settings-buttons">
-        <!-- Only Logout button remains. -->
-        <a th:href="@{/logout}" class="logout-button">Logout</a>
+<head th:replace="~{fragments/head :: head('Settings')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<div class="container py-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <h1 class="mb-0">Settings</h1>
+        <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
     </div>
-    <br/>
-    <a th:href="@{/today}" class="back-button">Back to Today</a>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Today — Body</div>
+                <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(todayBodySections)}">
+                    <li class="list-group-item d-flex align-items-center justify-content-between"
+                        th:each="item : ${todayBodySections}">
+                        <div>
+                            <div class="fw-semibold" th:text="${item.label}">Section</div>
+                            <div class="text-muted small" th:text="${item.hidden ? 'Hidden' : 'Visible'}">Visible</div>
+                        </div>
+                        <form th:action="@{/settings/sections/{key}(key=${item.key})}" method="post" class="m-0">
+                            <div th:replace="~{fragments/csrf :: csrf}"></div>
+                            <input type="hidden" name="hidden" th:value="${item.hidden ? false : true}">
+                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                                    th:text="${item.hidden ? 'Show' : 'Hide'}">Hide</button>
+                        </form>
+                    </li>
+                </ul>
+                <div class="card-body text-muted small" th:if="${#lists.isEmpty(todayBodySections)}">
+                    No sections available.
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Today — Mind</div>
+                <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(todayMindSections)}">
+                    <li class="list-group-item d-flex align-items-center justify-content-between"
+                        th:each="item : ${todayMindSections}">
+                        <div>
+                            <div class="fw-semibold" th:text="${item.label}">Section</div>
+                            <div class="text-muted small" th:text="${item.hidden ? 'Hidden' : 'Visible'}">Visible</div>
+                        </div>
+                        <form th:action="@{/settings/sections/{key}(key=${item.key})}" method="post" class="m-0">
+                            <div th:replace="~{fragments/csrf :: csrf}"></div>
+                            <input type="hidden" name="hidden" th:value="${item.hidden ? false : true}">
+                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                                    th:text="${item.hidden ? 'Show' : 'Hide'}">Hide</button>
+                        </form>
+                    </li>
+                </ul>
+                <div class="card-body text-muted small" th:if="${#lists.isEmpty(todayMindSections)}">
+                    No sections available.
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Week — Body</div>
+                <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(weekBodySections)}">
+                    <li class="list-group-item d-flex align-items-center justify-content-between"
+                        th:each="item : ${weekBodySections}">
+                        <div>
+                            <div class="fw-semibold" th:text="${item.label}">Section</div>
+                            <div class="text-muted small" th:text="${item.hidden ? 'Hidden' : 'Visible'}">Visible</div>
+                        </div>
+                        <form th:action="@{/settings/sections/{key}(key=${item.key})}" method="post" class="m-0">
+                            <div th:replace="~{fragments/csrf :: csrf}"></div>
+                            <input type="hidden" name="hidden" th:value="${item.hidden ? false : true}">
+                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                                    th:text="${item.hidden ? 'Show' : 'Hide'}">Hide</button>
+                        </form>
+                    </li>
+                </ul>
+                <div class="card-body text-muted small" th:if="${#lists.isEmpty(weekBodySections)}">
+                    No sections available.
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Week — Mind</div>
+                <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(weekMindSections)}">
+                    <li class="list-group-item d-flex align-items-center justify-content-between"
+                        th:each="item : ${weekMindSections}">
+                        <div>
+                            <div class="fw-semibold" th:text="${item.label}">Section</div>
+                            <div class="text-muted small" th:text="${item.hidden ? 'Hidden' : 'Visible'}">Visible</div>
+                        </div>
+                        <form th:action="@{/settings/sections/{key}(key=${item.key})}" method="post" class="m-0">
+                            <div th:replace="~{fragments/csrf :: csrf}"></div>
+                            <input type="hidden" name="hidden" th:value="${item.hidden ? false : true}">
+                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                                    th:text="${item.hidden ? 'Show' : 'Hide'}">Hide</button>
+                        </form>
+                    </li>
+                </ul>
+                <div class="card-body text-muted small" th:if="${#lists.isEmpty(weekMindSections)}">
+                    No sections available.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <form th:action="@{/logout}" method="post" class="d-inline">
+            <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <button type="submit" class="btn btn-outline-danger">Logout</button>
+        </form>
+    </div>
 </div>
 </body>
 </html>

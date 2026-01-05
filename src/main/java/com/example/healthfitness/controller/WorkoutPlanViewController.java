@@ -233,6 +233,19 @@ public class WorkoutPlanViewController {
         return "redirect:/workout-plans/" + workoutPlanId + "/exercises";
     }
 
+    @PostMapping("/days/{dayId}/rename")
+    public String renameWorkoutPlanDay(@PathVariable Long dayId,
+                                       @RequestParam("planId") Long planId,
+                                       @RequestParam("name") String name) {
+        Long userId = currentUserService.id();
+        try {
+            workoutPlanDayService.renamePlanDay(userId, dayId, name);
+        } catch (IllegalArgumentException ex) {
+            return "redirect:/workout-plans/" + planId + "/exercises?renameError=1&dayId=" + dayId;
+        }
+        return "redirect:/workout-plans/" + planId + "/exercises";
+    }
+
     @PostMapping("/days/{dayId}/add-to-today")
     public String addPlanDayToToday(@PathVariable Long dayId) {
         Long userId = currentUserService.id();

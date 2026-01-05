@@ -5,11 +5,13 @@ import com.example.healthfitness.exception.ResourceNotFoundException;
 import com.example.healthfitness.model.User;
 import com.example.healthfitness.model.WorkoutPlan;
 import com.example.healthfitness.model.WorkoutPlanExercise;
+import com.example.healthfitness.repository.DailyWorkoutRepository;
 import com.example.healthfitness.repository.UserRepository;
 import com.example.healthfitness.repository.WorkoutPlanExerciseRepository;
 import com.example.healthfitness.repository.WorkoutPlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +30,8 @@ public class WorkoutPlanService {
     private WorkoutPlanExerciseRepository workoutPlanExerciseRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private DailyWorkoutRepository dailyWorkoutRepository;
 
     /**
      * Retrieve all workout plans.  Typically used only for
@@ -102,9 +106,11 @@ public class WorkoutPlanService {
      * Delete a workout plan by id.  If the id does not exist the
      * repository will silently ignore the call.
      */
+    @Transactional
     public void deleteWorkoutPlan(Long workoutPlanId) {
         WorkoutPlan plan = workoutPlanRepository.findById(workoutPlanId)
                 .orElseThrow(() -> new ResourceNotFoundException("Workout plan not found with ID: " + workoutPlanId));
+        dailyWorkoutRepository.clearPlanDayForWorkoutPlan(plan.getWorkoutPlanId());
         workoutPlanRepository.delete(plan);
     }
 

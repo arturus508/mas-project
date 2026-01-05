@@ -2,12 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Bad Request')}"></head>
 <body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
 <div class="container py-5">
-    <div class="alert alert-warning">
-        <div class="fw-semibold mb-2">Bad request</div>
-        <div th:text="${message}">The request could not be processed.</div>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="h4">400 - Bad Request</h1>
+            <p class="text-muted" th:text="${message}">The request could not be processed.</p>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
+            <a th:href="@{/settings}" class="btn btn-outline-primary">Settings</a>
+        </div>
     </div>
-    <a th:href="@{/}" class="btn btn-outline-secondary">Back to home</a>
 </div>
 </body>
 </html>

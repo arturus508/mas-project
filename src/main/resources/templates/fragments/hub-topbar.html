@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="hubTopbar(mode, range, date)">
+  <div class="hub-topbar sticky-top">
+    <div class="container py-2 d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="btn-group" role="group" aria-label="Mode toggle">
+        <a class="btn btn-sm btn-secondary"
+           th:classappend="${mode} == 'body' ? '' : ' btn-ghost'"
+           th:href="@{/today(mode='body', range=${range}, date=${date})}">Body</a>
+        <a class="btn btn-sm btn-secondary"
+           th:classappend="${mode} == 'mind' ? '' : ' btn-ghost'"
+           th:href="@{/today(mode='mind', range=${range}, date=${date})}">Mind</a>
+      </div>
+
+      <div class="btn-group" role="group" aria-label="Range toggle">
+        <a class="btn btn-sm btn-secondary"
+           th:classappend="${range} == 'today' ? '' : ' btn-ghost'"
+           th:href="@{/today(mode=${mode}, range='today', date=${date})}">Today</a>
+        <a class="btn btn-sm btn-secondary"
+           th:classappend="${range} == 'week' ? '' : ' btn-ghost'"
+           th:href="@{/today(mode=${mode}, range='week', date=${date})}">Week</a>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <a class="btn btn-sm btn-ghost"
+           th:href="@{/today(mode=${mode}, range=${range}, date=${date.minusDays(1)})}">Prev</a>
+        <form method="get" th:action="@{/today}" class="d-flex align-items-center gap-1 m-0">
+          <input type="hidden" name="mode" th:value="${mode}">
+          <input type="hidden" name="range" th:value="${range}">
+          <input type="date" class="form-control form-control-sm" name="date"
+                 th:value="${date}">
+          <button class="btn btn-sm btn-ghost" type="submit">Go</button>
+        </form>
+        <a class="btn btn-sm btn-ghost"
+           th:href="@{/today(mode=${mode}, range=${range}, date=${date.plusDays(1)})}">Next</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

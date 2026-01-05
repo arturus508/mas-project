@@ -2,6 +2,8 @@ package com.example.healthfitness.repository;
 
 import com.example.healthfitness.model.BodyStats;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.time.LocalDate;
 import java.util.List;
 
 public interface BodyStatsRepository extends JpaRepository<BodyStats, Long> {
@@ -14,4 +16,5 @@ public interface BodyStatsRepository extends JpaRepository<BodyStats, Long> {
      * @return list of body stats sorted by most recent first
      */
     List<BodyStats> findByUserUserIdOrderByDateRecordedDesc(Long userId);
+    List<BodyStats> findByUserUserIdAndDateRecorded(Long userId, LocalDate dateRecorded);
 }

@@ -10,4 +10,5 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
     Optional<FoodItem> findByNameIgnoreCase(String name);
     List<FoodItem> findTop50ByOrderByNameAsc();
     List<FoodItem> findTop20ByNameContainingIgnoreCaseOrderByNameAsc(String q);
+    List<FoodItem> findTop50ByNameContainingIgnoreCaseOrderByNameAsc(String q);
 }

@@ -1,7 +1,4 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<body>
-<div th:fragment="nav">
+<div th:fragment="nav" xmlns:th="http://www.thymeleaf.org">
   <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container">
       <a class="navbar-brand" th:href="@{/today}">SelfImprovement</a>
@@ -13,41 +10,9 @@
 
       <div class="collapse navbar-collapse" id="navMain">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
           <li class="nav-item">
             <a class="nav-link" th:href="@{/today}">Today</a>
           </li>
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Fitness</a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" th:href="@{/workout-plans}">Workout Plans</a></li>
-              <li><a class="dropdown-item" th:href="@{/workouts/today}">Workout Today</a></li>
-              <li><a class="dropdown-item" th:href="@{/meal-plans}">Meal Library</a></li>
-              <li><a class="dropdown-item" th:href="@{/meals/today}">Meals Today</a></li>
-              <li><a class="dropdown-item" th:href="@{/body-stats}">Body Stats</a></li>
-            </ul>
-          </li>
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Mind</a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" th:href="@{/mind/sleep}">Sleep</a></li>
-              <li><a class="dropdown-item" th:href="@{/mind/dreams}">Dreams</a></li>
-              <li><a class="dropdown-item" th:href="@{/mind/stress-relief}">Stress Relief</a></li>
-            </ul>
-          </li>
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">Daily Flow</a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" th:href="@{/flow/habits}">Habits</a></li>
-              <li><a class="dropdown-item" th:href="@{/flow/tasks}">Tasks</a></li>
-              <li><a class="dropdown-item" th:href="@{/flow/weekly-goals}">Weekly Goals</a></li>
-              <li><a class="dropdown-item" th:href="@{/week}">Weekly Overview</a></li>
-            </ul>
-          </li>
-
         </ul>
 
         <ul class="navbar-nav">
@@ -63,7 +28,4 @@
       </div>
     </div>
   </nav>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </div>
-</body>
-</html>

@@ -3,6 +3,9 @@ package com.example.healthfitness.repository;
 import com.example.healthfitness.model.WorkoutPlanExercise;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -23,4 +26,8 @@ public interface WorkoutPlanExerciseRepository extends JpaRepository<WorkoutPlan
 
     @EntityGraph(attributePaths = "exercise")
     java.util.List<WorkoutPlanExercise> findWithExerciseByWorkoutPlan_User_UserId(Long userId);
+
+    @Modifying
+    @Query("update WorkoutPlanExercise e set e.exercise = null where e.exercise.exerciseId = :exerciseId")
+    int clearExercise(@Param("exerciseId") Long exerciseId);
 }

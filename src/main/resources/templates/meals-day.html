@@ -11,17 +11,17 @@
       <h2 class="mb-0" th:text="${date.equals(T(java.time.LocalDate).now()) ? 'Meals Today' : 'Meals'}">Meals</h2>
       <div class="text-muted" th:text="${date}">2025-08-20</div>
     </div>
-    <div class="d-flex gap-2 align-items-center">
-      <div class="btn-group">
-        <a class="btn btn-outline-secondary btn-sm"
-           th:href="@{/meals(date=${date.minusDays(1)})}">Yesterday</a>
-        <a class="btn btn-outline-secondary btn-sm"
-           th:href="@{/meals/today}">Today</a>
-        <a class="btn btn-outline-secondary btn-sm"
-           th:href="@{/meals(date=${date.plusDays(1)})}">Tomorrow</a>
-      </div>
-      <a th:href="@{/meal-plans}" class="btn btn-outline-secondary">Meal Library</a>
-      <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
+      <div class="d-flex gap-2 align-items-center">
+        <div class="btn-group">
+          <a class="btn btn-outline-secondary btn-sm"
+             th:href="@{/meals(date=${date.minusDays(1)})}">Yesterday</a>
+          <a class="btn btn-outline-secondary btn-sm"
+             th:href="@{/meals/today}">Today</a>
+          <a class="btn btn-outline-secondary btn-sm"
+             th:href="@{/meals(date=${date.plusDays(1)})}">Tomorrow</a>
+        </div>
+      <a th:href="@{/meal-plans}" class="btn btn-outline-secondary btn-sm">Meal Library</a>
+      <a th:href="@{/today}" class="btn btn-outline-secondary btn-sm">Back to Today</a>
     </div>
   </div>
 
@@ -45,9 +45,16 @@
 
   <div class="card mb-3">
     <div class="card-body">
-      <form class="d-flex flex-wrap gap-2" method="get" th:action="@{/meals}">
-        <input type="date" class="form-control" name="date" th:value="${date}">
-        <button class="btn btn-outline-primary">Go</button>
+      <form class="form-inline-actions" method="get" th:action="@{/meals}">
+        <div class="form-fields">
+          <div class="span-4">
+            <label class="form-label" for="mealsDate">Date</label>
+            <input id="mealsDate" type="date" class="form-control form-control-sm" name="date" th:value="${date}">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-sm btn-outline-primary">Go</button>
+        </div>
       </form>
     </div>
   </div>

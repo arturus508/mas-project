@@ -10,68 +10,68 @@
     <h2 class="m-0">Add Meal</h2>
     <a th:if="${mealForm.mealPlanId != null}"
        th:href="@{'/meal-plans/' + ${mealForm.mealPlanId}}"
-       class="btn btn-outline-secondary">Back to Meal Plan</a>
+       class="btn btn-outline-secondary btn-sm">Back to Meal Plan</a>
     <a th:if="${mealForm.mealPlanId == null}"
        th:href="@{'/meals?date=' + ${mealForm.date}}"
-       class="btn btn-outline-secondary">Back to Meals Day</a>
+       class="btn btn-outline-secondary btn-sm">Back to Meals Day</a>
   </div>
 
-  <form th:action="@{/meals/add}" th:object="${mealForm}" method="post" class="row g-3">
+  <form th:action="@{/meals/add}" th:object="${mealForm}" method="post" class="form-grid">
     <div th:replace="~{fragments/csrf :: csrf}"></div>
     <input type="hidden" th:field="*{mealPlanId}">
 
-    <div class="col-md-6">
+    <div class="span-6">
       <label class="form-label" for="date">Date</label>
-      <input id="date" type="date" class="form-control" th:field="*{date}" required>
+      <input id="date" type="date" class="form-control form-control-sm" th:field="*{date}" required>
       <div class="form-text">Day this meal was eaten.</div>
       <div class="text-danger small" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></div>
     </div>
 
-    <div class="col-md-6">
+    <div class="span-6">
       <label class="form-label" for="type">Type</label>
-      <select id="type" class="form-select" th:field="*{type}">
+      <select id="type" class="form-select form-select-sm" th:field="*{type}">
         <option th:each="t : ${T(com.example.healthfitness.model.MealType).values()}"
                 th:value="${t}" th:text="${t}">BREAKFAST</option>
       </select>
       <div class="form-text">Pick breakfast, lunch, dinner, or snack.</div>
     </div>
 
-    <div class="col-12">
+    <div class="span-12">
       <div class="form-text">Optional quick macros override (use when you do not add items).</div>
     </div>
 
-    <div class="col-6 col-md-3">
+    <div class="span-3">
       <label class="form-label" for="kcal">Calories</label>
-      <input id="kcal" type="number" min="0" step="1" class="form-control" th:field="*{kcal}" placeholder="e.g., 650">
+      <input id="kcal" type="number" min="0" step="1" class="form-control form-control-sm" th:field="*{kcal}" placeholder="e.g., 650">
       <div class="text-danger small" th:if="${#fields.hasErrors('kcal')}" th:errors="*{kcal}"></div>
     </div>
 
-    <div class="col-6 col-md-3">
+    <div class="span-3">
       <label class="form-label" for="protein">Protein (g)</label>
-      <input id="protein" type="number" min="0" step="1" class="form-control" th:field="*{protein}" placeholder="e.g., 35">
+      <input id="protein" type="number" min="0" step="1" class="form-control form-control-sm" th:field="*{protein}" placeholder="e.g., 35">
       <div class="text-danger small" th:if="${#fields.hasErrors('protein')}" th:errors="*{protein}"></div>
     </div>
 
-    <div class="col-6 col-md-3">
+    <div class="span-3">
       <label class="form-label" for="fat">Fat (g)</label>
-      <input id="fat" type="number" min="0" step="1" class="form-control" th:field="*{fat}" placeholder="e.g., 20">
+      <input id="fat" type="number" min="0" step="1" class="form-control form-control-sm" th:field="*{fat}" placeholder="e.g., 20">
       <div class="text-danger small" th:if="${#fields.hasErrors('fat')}" th:errors="*{fat}"></div>
     </div>
 
-    <div class="col-6 col-md-3">
+    <div class="span-3">
       <label class="form-label" for="carbs">Carbs (g)</label>
-      <input id="carbs" type="number" min="0" step="1" class="form-control" th:field="*{carbs}" placeholder="e.g., 70">
+      <input id="carbs" type="number" min="0" step="1" class="form-control form-control-sm" th:field="*{carbs}" placeholder="e.g., 70">
       <div class="text-danger small" th:if="${#fields.hasErrors('carbs')}" th:errors="*{carbs}"></div>
     </div>
 
-    <div class="col-12 d-flex gap-2">
-      <button type="submit" class="btn btn-primary">Save</button>
+    <div class="span-12 d-flex align-items-center justify-content-end gap-2">
       <a th:if="${mealForm.mealPlanId != null}"
          th:href="@{'/meal-plans/' + ${mealForm.mealPlanId}}"
-         class="btn btn-outline-secondary">Cancel</a>
+         class="btn btn-outline-secondary btn-sm">Cancel</a>
       <a th:if="${mealForm.mealPlanId == null}"
          th:href="@{'/meals?date=' + ${mealForm.date}}"
-         class="btn btn-outline-secondary">Cancel</a>
+         class="btn btn-outline-secondary btn-sm">Cancel</a>
+      <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
     </div>
   </form>
 </main>

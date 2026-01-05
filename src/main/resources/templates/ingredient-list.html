@@ -1,54 +1,61 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Ingredients for Meal</title>
-  <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-  <h1>Ingredients for <span th:text="${meal.mealName}">Meal Name</span></h1>
-  <nav>
-    <ul>
-      <li><a th:href="@{/today}">Today</a></li>
-      <li><a th:href="@{/meal-plans}">Meal Plans</a></li>
-    </ul>
-  </nav>
-</header>
-<div class="content">
-  <a th:href="@{'/meals/' + ${mealId} + '/ingredients/add'}" class="add-button">Add Ingredient</a>
-  <br/><br/>
-  <table>
-    <thead>
-    <tr>
-      <th>Name</th>
-      <th>Quantity</th>
-      <th>Calories Per Portion</th>
-      <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="ingredient : ${ingredients}">
-      <td th:text="${ingredient.name}"></td>
-      <td th:text="${ingredient.quantity}"></td>
-      <td th:text="${ingredient.caloriesPerPortion}"></td>
-      <td>
-        <form th:action="@{'/meals/' + ${mealId} + '/ingredients/delete/' + ${ingredient.ingredientId}}" method="post">
-          <div th:replace="~{fragments/csrf :: csrf}"></div>
-          <button type="submit" class="delete-button" onclick="return confirm('Remove this ingredient?');">Remove</button>
-        </form>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-  <br/>
-  <a th:if="${meal.mealPlan != null}"
-     th:href="@{'/meal-plans/' + ${meal.mealPlan.mealPlanId}}"
-     class="back-button">Back to Meal Plan</a>
-  <a th:if="${meal.mealPlan == null}"
-     th:href="@{/meal-plans}"
-     class="back-button">Back to Meal Library</a>
-</div>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Meal Ingredients')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<main class="container py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+    <h1 class="m-0">
+      Ingredients for <span th:text="${meal.mealName}">Meal</span>
+    </h1>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <a th:href="@{'/meals/' + ${mealId} + '/ingredients/add'}" class="btn btn-outline-primary btn-sm">
+        Add Ingredient
+      </a>
+      <a th:if="${meal.mealPlan != null}"
+         th:href="@{'/meal-plans/' + ${meal.mealPlan.mealPlanId}}"
+         class="btn btn-outline-secondary btn-sm">Back to Meal Plan</a>
+      <a th:if="${meal.mealPlan == null}"
+         th:href="@{/meal-plans}"
+         class="btn btn-outline-secondary btn-sm">Back to Meal Library</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header section-header">
+      <div class="section-title">Ingredients list</div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+          <tr>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Calories per portion</th>
+            <th class="text-end">Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="ingredient : ${ingredients}">
+            <td th:text="${ingredient.name}"></td>
+            <td th:text="${ingredient.quantity}"></td>
+            <td th:text="${ingredient.caloriesPerPortion}"></td>
+            <td class="text-end">
+              <form th:action="@{'/meals/' + ${mealId} + '/ingredients/delete/' + ${ingredient.ingredientId}}" method="post">
+                <div th:replace="~{fragments/csrf :: csrf}"></div>
+                <button type="submit" class="btn btn-outline-danger btn-xs"
+                        onclick="return confirm('Remove this ingredient?');">Remove</button>
+              </form>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
 </body>
 </html>
 

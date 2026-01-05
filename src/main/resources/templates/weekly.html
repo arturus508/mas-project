@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Weekly Overview')}"></head>
-<body class="bg-light">
-<div th:replace="~{fragments/nav :: nav}"></div>
+<body th:attr="data-mode=${hubMode}">
+<div th:replace="~{fragments/hub-topbar :: hubTopbar(${hubMode}, ${hubRange}, ${hubDate})}"></div>
 
 <div class="container py-4">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
         <div>
-            <h1 class="mb-1">Weekly Overview</h1>
+            <h1 class="mb-1">Week</h1>
             <div class="text-muted small" th:text="${vm.weekStart} + ' - ' + ${vm.weekEnd}">2025-01-01 - 2025-01-07</div>
         </div>
         <div class="btn-group">
             <a class="btn btn-outline-secondary btn-sm"
-               th:href="@{/week/{date}(date=${vm.weekStart.minusDays(7)})}">Prev</a>
+               th:href="@{/today(mode=${hubMode}, range='week', date=${vm.weekStart.minusDays(7)})}">Prev</a>
             <a class="btn btn-outline-secondary btn-sm"
-               th:href="@{/week}">This Week</a>
+               th:href="@{/today(mode=${hubMode}, range='week', date=${T(java.time.LocalDate).now()})}">This Week</a>
             <a class="btn btn-outline-secondary btn-sm"
-               th:href="@{/week/{date}(date=${vm.weekStart.plusDays(7)})}">Next</a>
+               th:href="@{/today(mode=${hubMode}, range='week', date=${vm.weekStart.plusDays(7)})}">Next</a>
         </div>
     </div>
 
-    <div class="row g-3">
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header">Nutrition (avg per day)</div>
+    <div class="row g-3" th:if="${hubMode == 'body'}">
+        <div class="col-12">
+            <div class="card" th:if="${hiddenSections['week-nutrition']} != true">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Nutrition (avg per day)</span>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/meals/today}">Details</a>
+                </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-2">
                         <span class="badge text-bg-primary" th:text="${vm.avgKcal} + ' kcal'">0 kcal</span>
@@ -35,29 +38,12 @@
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header">Sleep (avg)</div>
-                <div class="card-body" th:with="mins=${vm.avgSleepMinutes}">
-                    <div th:if="${mins != null}">
-                        <div class="fw-semibold">
-                            <span th:text="${mins / 60}">0</span>h
-                            <span th:text="${mins % 60}">0</span>m
-                        </div>
-                        <div class="text-muted small" th:if="${vm.avgSleepQuality != null}">
-                            Quality: <span th:text="${vm.avgSleepQuality}">0</span>
-                        </div>
-                    </div>
-                    <div class="text-muted small" th:if="${mins == null}">
-                        No sleep entries this week.
-                    </div>
+        <div class="col-12">
+            <div class="card" th:if="${hiddenSections['week-workouts']} != true">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Workouts</span>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/workouts/today}">Details</a>
                 </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header">Workouts</div>
                 <div class="card-body">
                     <div class="fw-semibold">
                         <span th:text="${vm.workoutsCount}">0</span> sessions
@@ -76,9 +62,60 @@
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header">Tasks & Habits</div>
+        <div class="col-12">
+            <div class="card" th:if="${hiddenSections['week-weight']} != true">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Weight trend</span>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/body-stats}">Details</a>
+                </div>
+                <div class="card-body">
+                    <div class="text-muted small" th:if="${vm.weightStart == null}">
+                        No weight entries this week.
+                    </div>
+                    <div th:if="${vm.weightStart != null}">
+                        <div class="fw-semibold">
+                            Start: <span th:text="${vm.weightStart}">0</span> kg
+                            &rarr; End: <span th:text="${vm.weightEnd}">0</span> kg
+                        </div>
+                        <div class="mt-2" th:if="${vm.weightValues != null && !vm.weightValues.isEmpty()}">
+                            <canvas id="weeklyWeightChart" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3" th:if="${hubMode == 'mind'}">
+        <div class="col-12">
+            <div class="card" th:if="${hiddenSections['week-sleep']} != true">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Sleep (avg)</span>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/mind/sleep}">Details</a>
+                </div>
+                <div class="card-body" th:with="mins=${vm.avgSleepMinutes}">
+                    <div th:if="${mins != null}">
+                        <div class="fw-semibold">
+                            <span th:text="${mins / 60}">0</span>h
+                            <span th:text="${mins % 60}">0</span>m
+                        </div>
+                        <div class="text-muted small" th:if="${vm.avgSleepQuality != null}">
+                            Quality: <span th:text="${vm.avgSleepQuality}">0</span>
+                        </div>
+                    </div>
+                    <div class="text-muted small" th:if="${mins == null}">
+                        No sleep entries this week.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card" th:if="${hiddenSections['week-tasks-habits']} != true">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Tasks & Habits</span>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/flow/tasks(date=${vm.weekStart})}">Details</a>
+                </div>
                 <div class="card-body">
                     <div class="fw-semibold mb-2">
                         Tasks done:
@@ -95,9 +132,12 @@
             </div>
         </div>
 
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header">Review (avg)</div>
+        <div class="col-12">
+            <div class="card" th:if="${hiddenSections['week-review']} != true">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Review (avg)</span>
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/today(mode='mind', range='today', date=${vm.weekStart})}">Details</a>
+                </div>
                 <div class="card-body">
                     <div class="text-muted small mb-2">
                         Entries: <span th:text="${vm.reviewsCount}">0</span>
@@ -115,6 +155,45 @@
             </div>
         </div>
     </div>
+
 </div>
+
+<div class="container pb-4" th:if="${hiddenItems != null && !#lists.isEmpty(hiddenItems)}">
+    <div class="text-muted small">
+        Some sections are hidden. You can manage them in
+        <a th:href="@{/settings}">Settings</a>.
+    </div>
+</div>
+
+<script th:if="${vm.weightValues != null && !vm.weightValues.isEmpty()}" th:inline="javascript">
+  const weekWeightLabels = [[${vm.weightDates}]];
+  const weekWeightValues = [[${vm.weightValues}]];
+  const weekCtx = document.getElementById("weeklyWeightChart");
+  if (weekCtx) {
+    new Chart(weekCtx, {
+      type: "line",
+      data: {
+        labels: weekWeightLabels,
+        datasets: [{
+          label: "Weight (kg)",
+          data: weekWeightValues,
+          borderColor: "#0d6efd",
+          backgroundColor: "rgba(13, 110, 253, 0.15)",
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        }
+      }
+    });
+  }
+</script>
 </body>
 </html>

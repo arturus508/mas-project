@@ -11,6 +11,7 @@ import com.example.healthfitness.repository.WorkoutPlanDayExerciseRepository;
 import com.example.healthfitness.repository.WorkoutPlanDayRepository;
 import com.example.healthfitness.repository.WorkoutPlanRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class WorkoutPlanDayService {
                                                        Integer setsPlanned,
                                                        Integer targetReps,
                                                        Integer restTime) {
-        WorkoutPlanDay day = workoutPlanDayRepository.findById(planDayId)
+        WorkoutPlanDay day = workoutPlanDayRepository.findWithExercisesByPlanDayId(planDayId)
                 .orElseThrow(() -> new ResourceNotFoundException("Workout plan day not found with ID: " + planDayId));
         if (!day.getWorkoutPlan().getUser().getUserId().equals(userId)) {
             throw new ForbiddenException("Workout plan does not belong to current user");
@@ -88,6 +89,22 @@ public class WorkoutPlanDayService {
         return workoutPlanDayExerciseRepository.save(wpe);
     }
 
+    @Transactional
+    public void renamePlanDay(Long userId, Long planDayId, String name) {
+        WorkoutPlanDay day = workoutPlanDayRepository.findById(planDayId)
+                .orElseThrow(() -> new ResourceNotFoundException("Workout plan day not found with ID: " + planDayId));
+        if (!day.getWorkoutPlan().getUser().getUserId().equals(userId)) {
+            throw new ForbiddenException("Workout plan does not belong to current user");
+        }
+        String trimmed = name == null ? "" : name.trim();
+        if (trimmed.isBlank() || trimmed.length() > 64) {
+            throw new IllegalArgumentException("Day name must be between 1 and 64 characters");
+        }
+        day.setName(trimmed);
+        workoutPlanDayRepository.save(day);
+    }
+
+    @Transactional
     public void deletePlanDayExercise(Long userId, Long planDayExerciseId) {
         WorkoutPlanDayExercise exercise = workoutPlanDayExerciseRepository.findById(planDayExerciseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Plan day exercise not found with ID: " + planDayExerciseId));

@@ -1,189 +1,472 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Today')}"></head>
-<body>
-<div th:replace="~{fragments/nav :: nav}"></div>
+<body th:attr="data-mode=${hubMode}">
+<div th:replace="~{fragments/hub-topbar :: hubTopbar(${hubMode}, ${hubRange}, ${hubDate})}"></div>
 
 <div class="container my-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h1 class="h3 mb-1">Today</h1>
-      <div class="text-muted" th:text="${#temporals.format(vm.date, 'yyyy-MM-dd')}">2025-01-01</div>
+  <div class="row g-3" th:if="${hubMode == 'body'}">
+    <div class="col-12">
+      <div class="card section" data-section="today-workout" data-default="expanded"
+           th:if="${hiddenSections['today-workout']} != true">
+        <div class="card-header section-header">
+          <div>
+            <div class="section-title">Workout</div>
+            <div class="section-meta" th:if="${vm.workoutTitle != null}"
+                 th:text="${vm.workoutSetsDone + '/' + vm.workoutSetsTotal + ' sets'}">
+              0/0 sets
+            </div>
+            <div class="section-meta" th:if="${vm.workoutTitle == null}">
+              No workout logged yet.
+            </div>
+          </div>
+          <div class="section-actions">
+            <a class="btn btn-sm btn-secondary" th:href="@{/workout-plans}">Details</a>
+            <form th:if="${vm.dailyWorkoutId != null}"
+                  th:action="@{/today/{date}/workout/delete(date=${vm.date},mode=${hubMode},range=${hubRange})}"
+                  method="post">
+              <div th:replace="~{fragments/csrf :: csrf}"></div>
+              <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+            </form>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-workout">v</button>
+          </div>
+        </div>
+        <div class="card-body section-body">
+          <div class="fw-semibold" th:text="${vm.workoutTitle != null ? vm.workoutTitle : 'No workout logged today'}">Workout</div>
+          <div class="text-muted small" th:if="${vm.workoutTitle == null}">
+            Add a workout from a plan day.
+          </div>
+
+          <div th:if="${vm.dailyWorkoutId == null}">
+            <div class="text-muted small mb-2">Pick a plan day to log today's workout.</div>
+            <div th:if="${vm.workoutPlanDays == null || #lists.isEmpty(vm.workoutPlanDays)}" class="text-muted small">
+              No plan days yet.
+              <a th:href="@{/workout-plans}">Create a workout plan</a>.
+            </div>
+            <form th:if="${vm.workoutPlanDays != null && !#lists.isEmpty(vm.workoutPlanDays)}"
+                  th:action="@{/today/{date}/workout/add(date=${vm.date},mode=${hubMode},range=${hubRange})}"
+                  method="post" class="form-inline-actions form-roomy form-compact">
+              <div th:replace="~{fragments/csrf :: csrf}"></div>
+              <div class="form-fields">
+                <div class="span-12">
+                  <label class="form-label mb-1">Plan day</label>
+                  <select class="form-select form-select-sm" name="planDayId" required>
+                    <option value="" disabled selected>Select day</option>
+                    <option th:each="day : ${vm.workoutPlanDays}" th:value="${day.id}" th:text="${day.label}">Plan day</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-sm btn-primary" type="submit">+ Add</button>
+              </div>
+            </form>
+            <div class="text-muted small mt-2" th:if="${vm.workoutPlanDays != null && !#lists.isEmpty(vm.workoutPlanDays)}">
+              Missing a plan day? Use Details to edit your plan.
+            </div>
+          </div>
+
+          <div th:if="${vm.dailyWorkoutId != null}">
+            <div class="table-wrap">
+              <table class="table table-sm align-middle mb-0">
+                <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Set</th>
+                  <th>Reps</th>
+                  <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="set : ${vm.workoutSets}">
+                  <td th:text="${set.exerciseName}">Exercise</td>
+                  <td th:text="${set.setNumber}">1</td>
+                  <td>
+                    <form th:action="@{/today/{date}/workout/sets/{setId}/reps(date=${vm.date},setId=${set.setId},mode=${hubMode},range=${hubRange})}"
+                          method="post" class="d-flex align-items-center gap-2 m-0">
+                      <div th:replace="~{fragments/csrf :: csrf}"></div>
+                      <input type="number" min="0" class="form-control form-control-sm" name="repsDone"
+                             th:value="${set.repsDone}">
+                      <button class="btn btn-sm btn-secondary" type="submit">Save</button>
+                    </form>
+                  </td>
+                  <td>
+                    <form th:action="@{/today/{date}/workout/sets/{setId}/delete(date=${vm.date},setId=${set.setId},mode=${hubMode},range=${hubRange})}"
+                          method="post" class="m-0">
+                      <div th:replace="~{fragments/csrf :: csrf}"></div>
+                      <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <form th:action="@{/today/{date}/workout/{workoutId}/sets/add(date=${vm.date},workoutId=${vm.dailyWorkoutId},mode=${hubMode},range=${hubRange})}"
+                  method="post" class="form-inline-actions form-roomy form-compact">
+              <div th:replace="~{fragments/csrf :: csrf}"></div>
+              <div class="form-fields">
+                <div class="span-12">
+                  <label class="form-label mb-1">Add set</label>
+                  <select class="form-select form-select-sm" name="exerciseId" required>
+                    <option value="" disabled selected>Pick exercise</option>
+                    <option th:each="ex : ${vm.workoutExercises}" th:value="${ex.id}" th:text="${ex.name}">Exercise</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="btn btn-sm btn-primary" type="submit">+ Add</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="d-flex gap-2 align-items-center">
-      <a class="btn btn-outline-primary btn-sm" th:href="@{/week}">Weekly Overview</a>
-      <div class="btn-group">
-        <a class="btn btn-outline-secondary btn-sm"
-           th:href="@{/today/{date}(date=${vm.date.minusDays(1)})}">Yesterday</a>
-        <a class="btn btn-outline-secondary btn-sm"
-           th:href="@{/today}">Today</a>
-        <a class="btn btn-outline-secondary btn-sm"
-           th:href="@{/today/{date}(date=${vm.date.plusDays(1)})}">Tomorrow</a>
+
+    <div class="col-12">
+      <div class="card section" data-section="today-meals" data-default="collapsed"
+           th:if="${hiddenSections['today-meals']} != true">
+        <div class="card-header section-header">
+          <div>
+            <div class="section-title">Meals</div>
+            <div class="section-meta" th:with="tot=${vm.mealTotals}">
+              kcal <span th:text="${tot != null ? tot.kcal : 0}">0</span>
+              | P <span th:text="${tot != null ? tot.protein : 0}">0</span>
+              / C <span th:text="${tot != null ? tot.carbs : 0}">0</span>
+              / F <span th:text="${tot != null ? tot.fat : 0}">0</span>
+            </div>
+          </div>
+          <div class="section-actions">
+            <a class="btn btn-sm btn-secondary" th:href="@{/meals/today}">Details</a>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-meals">v</button>
+          </div>
+        </div>
+        <div class="card-body section-body">
+          <form th:action="@{/today/{date}/meals/add-food(date=${vm.date},mode=${hubMode},range=${hubRange})}"
+                method="post" class="form-inline-actions form-roomy form-compact">
+            <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <div class="form-fields">
+              <div class="span-6">
+                <label class="form-label" for="todayMealFood">Food (database)</label>
+                <select id="todayMealFood" class="form-select form-select-sm" name="foodItemId" required>
+                  <option value="" disabled selected>Select food</option>
+                  <option th:each="f : ${vm.mealFoodOptions}"
+                          th:value="${f.id}"
+                          th:text="${f.label}">
+                    Food
+                  </option>
+                </select>
+              </div>
+              <div class="span-3">
+                <label class="form-label" for="todayMealSegment">Meal</label>
+                <select id="todayMealSegment" class="form-select form-select-sm" name="segment" required>
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                  <option value="snacks">Snacks</option>
+                </select>
+              </div>
+              <div class="span-3">
+                <label class="form-label" for="todayMealQuantity">Qty</label>
+                <input id="todayMealQuantity" type="number" class="form-control form-control-sm" name="quantity" min="1" value="100">
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-sm btn-primary" type="submit">+ Add</button>
+            </div>
+          </form>
+          <div class="form-text">
+            Quantity uses grams for foods defined per 100g.
+          </div>
+          <div class="form-text">
+            Missing a food? Add it in <a th:href="@{/meals/today}">Details</a>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card section" data-section="today-body-stats" data-default="collapsed"
+           th:if="${hiddenSections['today-body-stats']} != true">
+        <div class="card-header section-header">
+          <div>
+            <div class="section-title">Body Stats</div>
+            <div class="section-meta" th:if="${vm.todayWeight != null}">
+              Today: <span th:text="${vm.todayWeight}">0</span> kg
+            </div>
+            <div class="section-meta" th:if="${vm.todayWeight == null && vm.latestWeight != null}">
+              Latest: <span th:text="${vm.latestWeight}">0</span> kg
+            </div>
+            <div class="section-meta" th:if="${vm.todayWeight == null && vm.latestWeight == null}">
+              No weight logged yet.
+            </div>
+          </div>
+          <div class="section-actions">
+            <a class="btn btn-sm btn-secondary" th:href="@{/body-stats}"
+               th:text="${vm.todayWeight != null} ? 'Details / Edit' : 'Details'">Details</a>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-body-stats">v</button>
+          </div>
+        </div>
+        <div class="card-body section-body">
+          <div class="text-muted small">
+            Track today's weight to see your trend over time.
+          </div>
+          <div class="text-muted small" th:if="${vm.todayBodyFatPercent != null}"
+               th:text="'Body fat ' + ${vm.todayBodyFatPercent} + '%'">Body fat</div>
+
+          <div th:if="${vm.weightValues != null && !vm.weightValues.isEmpty()}">
+            <canvas id="todayWeightChart" height="120"></canvas>
+          </div>
+
+          <form th:if="${vm.todayWeight == null}"
+                th:action="@{/today/{date}/body-stats/add(date=${vm.date},mode=${hubMode},range=${hubRange})}"
+                method="post" class="form-inline-actions form-roomy form-compact">
+            <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <div class="form-fields">
+              <div class="span-6">
+                <label class="form-label" for="todayWeight">Weight (kg)</label>
+                <input id="todayWeight" type="number" step="0.1" min="0" name="weight"
+                       class="form-control form-control-sm" required>
+              </div>
+              <div class="span-6">
+                <label class="form-label" for="todayBodyFat">Body fat % (optional)</label>
+                <input id="todayBodyFat" type="number" step="0.1" min="0" name="bodyFatPercent"
+                       class="form-control form-control-sm">
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-sm btn-primary" type="submit">Save</button>
+            </div>
+          </form>
+          <div class="text-muted small" th:if="${vm.todayWeight != null}">
+            Logged for today.
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="row g-3">
-    <div class="col-lg-6">
-      <div class="card h-100">
-        <div class="card-header">Plan</div>
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div>
-              <div class="fw-semibold">Top Tasks</div>
-              <div class="text-muted small"
-                   th:text="${vm.tasksDone + '/' + vm.tasksTotal}">0/0</div>
-            </div>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/flow/tasks}">Open</a>
+  <div class="row g-3" th:if="${hubMode == 'mind'}">
+    <div class="col-12">
+        <div class="card section" data-section="today-tasks" data-default="expanded"
+           th:if="${hiddenSections['today-tasks']} != true">
+        <div class="card-header section-header">
+          <div>
+            <div class="section-title">Tasks</div>
+            <div class="section-meta"
+                 th:text="${vm.tasksDone + '/' + vm.tasksTotal}">0/0</div>
           </div>
+          <div class="section-actions">
+            <form th:action="@{/today/{date}/tasks/copy-yesterday(date=${vm.date},mode=${hubMode},range=${hubRange})}"
+                  method="post" class="m-0">
+              <div th:replace="~{fragments/csrf :: csrf}"></div>
+              <button class="btn btn-sm btn-secondary" type="submit">Copy</button>
+            </form>
+            <a class="btn btn-sm btn-secondary" th:href="@{/flow/tasks}">Details</a>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-tasks">v</button>
+          </div>
+        </div>
+        <div class="card-body section-body">
+          <div class="fw-semibold">Top Tasks</div>
+          <form th:action="@{/today/{date}/tasks/add(date=${vm.date},mode=${hubMode},range=${hubRange})}"
+                method="post" class="form-inline-actions form-compact">
+            <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <div class="form-fields">
+              <div class="span-12">
+                <input type="text" name="title" class="form-control form-control-sm" placeholder="Quick add task" required>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-sm btn-primary" type="submit">+ Add</button>
+            </div>
+          </form>
           <div class="mb-3">
             <div class="text-muted small" th:if="${#lists.isEmpty(vm.topTasks)}">No tasks for this day.</div>
-            <div class="list-group list-group-flush" th:if="${!#lists.isEmpty(vm.topTasks)}">
+            <div class="list-group today-list" th:if="${!#lists.isEmpty(vm.topTasks)}">
               <div class="list-group-item d-flex align-items-center gap-2"
                    th:each="t : ${vm.topTasks}">
-                <form th:action="@{/today/{date}/tasks/{id}/toggle(date=${vm.date},id=${t.id})}"
+                <form th:action="@{/today/{date}/tasks/{id}/toggle(date=${vm.date},id=${t.id},mode=${hubMode},range=${hubRange})}"
                       method="post" class="m-0">
                   <div th:replace="~{fragments/csrf :: csrf}"></div>
-                  <input class="form-check-input" type="checkbox" th:checked="${t.done}" onchange="this.form.submit()">
+                  <input class="form-check-input js-auto-submit" type="checkbox" th:checked="${t.done}">
                 </form>
                 <span th:text="${t.title}" th:classappend="${t.done} ? 'text-decoration-line-through text-muted' : ''">Task</span>
               </div>
             </div>
           </div>
 
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div>
-              <div class="fw-semibold">Habits</div>
-              <div class="text-muted small"
-                   th:text="${vm.habitsDone + '/' + vm.habitsTotal}">0/0</div>
-            </div>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/flow/habits}">Open</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card section" data-section="today-habits" data-default="collapsed"
+           th:if="${hiddenSections['today-habits']} != true">
+        <div class="card-header section-header">
+          <div>
+            <div class="section-title">Habits</div>
+            <div class="section-meta"
+                 th:text="${vm.habitsDone + '/' + vm.habitsTotal}">0/0</div>
           </div>
+          <div class="section-actions">
+            <a class="btn btn-sm btn-secondary" th:href="@{/flow/habits}">Details</a>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-habits">v</button>
+          </div>
+        </div>
+        <div class="card-body section-body">
           <div class="text-muted small" th:if="${#lists.isEmpty(vm.habits)}">No habits yet.</div>
-          <div class="list-group list-group-flush" th:if="${!#lists.isEmpty(vm.habits)}">
+          <div class="list-group today-list" th:if="${!#lists.isEmpty(vm.habits)}">
             <div class="list-group-item d-flex align-items-center gap-2"
                  th:each="h : ${vm.habits}">
-              <form th:action="@{/today/{date}/habits/{id}/toggle(date=${vm.date},id=${h.id})}"
+              <form th:action="@{/today/{date}/habits/{id}/toggle(date=${vm.date},id=${h.id},mode=${hubMode},range=${hubRange})}"
                     method="post" class="m-0">
                 <div th:replace="~{fragments/csrf :: csrf}"></div>
-                <input class="form-check-input" type="checkbox" th:checked="${h.done}" onchange="this.form.submit()">
+                <input class="form-check-input js-auto-submit" type="checkbox" th:checked="${h.done}">
               </form>
               <span th:text="${h.name}" th:classappend="${h.done} ? 'text-decoration-line-through text-muted' : ''">Habit</span>
-              <span class="text-muted small" th:if="${h.progressTarget != null}"
-                    th:text="'(week ' + h.progressDone + '/' + h.progressTarget + ')'">(week 0/0)</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-lg-6">
-      <div class="card h-100">
-        <div class="card-header">Track</div>
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div>
-              <div class="fw-semibold">Meals</div>
-              <div class="text-muted small" th:with="tot=${vm.mealTotals}">
-                <span>kcal </span>
-                <span th:text="${tot != null ? tot.kcal : 0}">0</span>
-                <span> | P </span>
-                <span th:text="${tot != null ? tot.protein : 0}">0</span>
-                <span> / C </span>
-                <span th:text="${tot != null ? tot.carbs : 0}">0</span>
-                <span> / F </span>
-                <span th:text="${tot != null ? tot.fat : 0}">0</span>
-              </div>
+    <div class="col-12">
+      <div class="card section" data-section="today-sleep" data-default="collapsed"
+           th:if="${hiddenSections['today-sleep']} != true">
+        <div class="card-header section-header">
+          <div>
+            <div class="section-title">Sleep</div>
+            <div class="section-meta" th:if="${vm.sleepHours != null}"
+                 th:text="${vm.sleepHours + 'h ' + vm.sleepMinutes + 'm - quality ' + vm.sleepQuality}">
+              0h 0m - quality 0
             </div>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/meals/today}">Open</a>
-          </div>
-          <div class="d-flex flex-wrap gap-2 mb-3">
-            <a class="btn btn-sm btn-outline-secondary"
-               th:href="@{/meals/{date}/breakfast(date=${vm.date})}">Breakfast</a>
-            <a class="btn btn-sm btn-outline-secondary"
-               th:href="@{/meals/{date}/lunch(date=${vm.date})}">Lunch</a>
-            <a class="btn btn-sm btn-outline-secondary"
-               th:href="@{/meals/{date}/dinner(date=${vm.date})}">Dinner</a>
-            <a class="btn btn-sm btn-outline-secondary"
-               th:href="@{/meals/{date}/snacks(date=${vm.date})}">Snacks</a>
-          </div>
-
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <div>
-              <div class="fw-semibold">Workout</div>
-              <div class="text-muted small" th:if="${vm.workoutTitle != null}"
-                   th:text="${vm.workoutTitle + '  -  ' + vm.workoutSetsDone + '/' + vm.workoutSetsTotal + ' sets'}">
-                Workout  -  0/0 sets
-              </div>
-              <div class="text-muted small" th:if="${vm.workoutTitle == null}">
-                No workout logged today
-              </div>
+            <div class="section-meta" th:if="${vm.sleepHours == null}">
+              No sleep logged for last night.
             </div>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/workouts/today}">Open</a>
           </div>
-
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <div class="fw-semibold">Sleep (Last Night)</div>
-              <div class="text-muted small" th:if="${vm.sleepHours != null}"
-                   th:text="${vm.sleepHours + 'h ' + vm.sleepMinutes + 'm  -  quality ' + vm.sleepQuality}">
-                0h 0m  -  quality 0
-              </div>
-              <div class="text-muted small" th:if="${vm.sleepHours == null}">
-                No sleep logged for last night
-              </div>
-            </div>
-            <a class="btn btn-sm btn-outline-primary" th:href="@{/mind/sleep}">Open</a>
+          <div class="section-actions">
+            <a class="btn btn-sm btn-secondary" th:href="@{/mind/sleep}">Details</a>
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-sleep">v</button>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="col-lg-6">
-      <div class="card h-100">
-        <div class="card-header">Reset</div>
-        <div class="card-body">
-          <p class="text-muted mb-3">Quick reset for stressful moments.</p>
-          <a class="btn btn-outline-primary" th:href="@{/mind/stress-relief}">2-minute reset</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-6">
-      <div class="card h-100">
-        <div class="card-header">Review</div>
-        <div class="card-body">
-          <div class="text-muted small mb-3" th:if="${vm.reviewPresent}">
-            Saved for this day.
-          </div>
-          <form th:action="@{/today/{date}/review(date=${vm.date})}" method="post" th:object="${dailyReviewForm}" class="row g-2">
+        <div class="card-body section-body">
+          <form th:action="@{/today/{date}/sleep/add(date=${vm.date},mode=${hubMode},range=${hubRange})}"
+                method="post" class="form-inline-actions form-roomy form-compact">
             <div th:replace="~{fragments/csrf :: csrf}"></div>
-            <div class="col-6">
-              <label class="form-label" for="reviewMood">Mood (1-5)</label>
-              <input id="reviewMood" type="number" min="1" max="5" class="form-control" th:field="*{mood}">
-              <div class="text-danger small" th:if="${#fields.hasErrors('mood')}" th:errors="*{mood}"></div>
+            <div class="form-fields">
+              <div class="span-8">
+                <label class="form-label">Duration (hh:mm)</label>
+                <div class="sleep-duration">
+                  <input id="todaySleepHours" type="number" min="0" max="24" name="hours"
+                         class="form-control form-control-sm" placeholder="7" required>
+                  <span class="duration-sep">:</span>
+                  <input id="todaySleepMinutes" type="number" min="0" max="59" name="minutes"
+                         class="form-control form-control-sm" placeholder="30" required>
+                </div>
+              </div>
+              <div class="span-4">
+                <label class="form-label" for="todaySleepQuality">Quality (1-5)</label>
+                <input id="todaySleepQuality" type="number" min="1" max="5" name="quality"
+                       class="form-control form-control-sm" placeholder="1-5" required>
+              </div>
             </div>
-            <div class="col-6">
-              <label class="form-label" for="reviewEnergy">Energy (1-5)</label>
-              <input id="reviewEnergy" type="number" min="1" max="5" class="form-control" th:field="*{energy}">
-              <div class="text-danger small" th:if="${#fields.hasErrors('energy')}" th:errors="*{energy}"></div>
-            </div>
-            <div class="col-12">
-              <label class="form-label" for="reviewNote">Note</label>
-              <textarea id="reviewNote" class="form-control" rows="3" th:field="*{note}" placeholder="Short note (optional)"></textarea>
-            </div>
-            <div class="col-12 d-flex align-items-center gap-2">
-              <input id="reviewReset" class="form-check-input" type="checkbox" th:field="*{resetDone}">
-              <label class="form-check-label" for="reviewReset">Reset done</label>
-            </div>
-            <div class="col-12">
-              <button class="btn btn-outline-primary">Save review</button>
+            <div class="form-actions">
+              <button class="btn btn-sm btn-primary" type="submit">Save</button>
             </div>
           </form>
         </div>
       </div>
     </div>
+
+    <div class="col-12">
+      <div class="card section" data-section="today-review" data-default="collapsed"
+           th:if="${hiddenSections['today-review']} != true">
+        <div class="card-header section-header">
+          <div>
+            <div class="section-title">Review</div>
+            <div class="section-meta" th:if="${vm.reviewPresent}">
+              Saved for this day.
+            </div>
+            <div class="section-meta" th:if="${!vm.reviewPresent}">
+              Log your mood, energy, and quick note.
+            </div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-review">v</button>
+          </div>
+        </div>
+        <div class="card-body section-body">
+          <form th:action="@{/today/{date}/review(date=${vm.date},mode=${hubMode},range=${hubRange})}" method="post" th:object="${dailyReviewForm}" class="form-grid form-roomy form-compact">
+            <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <div class="span-6">
+              <label class="form-label" for="reviewMood">Mood (1-5)</label>
+              <input id="reviewMood" type="number" min="1" max="5" class="form-control form-control-sm" th:field="*{mood}">
+              <div class="text-danger small" th:if="${#fields.hasErrors('mood')}" th:errors="*{mood}"></div>
+            </div>
+            <div class="span-6">
+              <label class="form-label" for="reviewEnergy">Energy (1-5)</label>
+              <input id="reviewEnergy" type="number" min="1" max="5" class="form-control form-control-sm" th:field="*{energy}">
+              <div class="text-danger small" th:if="${#fields.hasErrors('energy')}" th:errors="*{energy}"></div>
+            </div>
+            <div class="span-12">
+              <label class="form-label" for="reviewNote">Note</label>
+              <textarea id="reviewNote" class="form-control form-control-sm" rows="3" th:field="*{note}" placeholder="Short note (optional)"></textarea>
+            </div>
+            <div class="span-12 d-flex align-items-center gap-2">
+              <input id="reviewReset" class="form-check-input" type="checkbox" th:field="*{resetDone}">
+              <label class="form-check-label" for="reviewReset">Reset done</label>
+            </div>
+            <div class="span-12 d-flex justify-content-end">
+              <button class="btn btn-primary btn-sm">Save review</button>
+            </div>
+          </form>
+
+          <div class="d-flex flex-wrap align-items-center gap-2 mt-3"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+
+<div class="container pb-4" th:if="${hiddenItems != null && !#lists.isEmpty(hiddenItems)}">
+  <div class="text-muted small">
+    Some sections are hidden. You can manage them in
+    <a th:href="@{/settings}">Settings</a>.
+  </div>
+</div>
+
+<script th:if="${vm.weightValues != null && !vm.weightValues.isEmpty()}" th:inline="javascript">
+  const weightLabels = [[${vm.weightDates}]];
+  const weightValues = [[${vm.weightValues}]];
+  const ctx = document.getElementById("todayWeightChart");
+  if (ctx) {
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: weightLabels,
+        datasets: [{
+          label: "Weight (kg)",
+          data: weightValues,
+          borderColor: "#0d6efd",
+          backgroundColor: "rgba(13, 110, 253, 0.15)",
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: { display: false },
+          y: { display: false }
+        }
+      }
+    });
+  }
+</script>
+<script th:src="@{/js/auto-submit.js}" defer></script>
+<script th:src="@{/js/section-toggle.js}" defer></script>
 </body>
 </html>
+
+

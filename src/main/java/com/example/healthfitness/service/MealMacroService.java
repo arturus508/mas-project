@@ -54,16 +54,40 @@ public class MealMacroService {
         if (!meal.getUser().getUserId().equals(userId)) {
             throw new ForbiddenException("Meal does not belong to current user");
         }
+        String trimmedName = name == null ? "" : name.trim();
+        int qty = quantity == null ? 1 : Math.max(1, quantity);
+
         var mi = new MealItem();
         mi.setMeal(meal);
-        mi.setName(name == null ? "" : name.trim());
+        mi.setName(trimmedName);
         mi.setKcal(kcal);
         mi.setProtein(p);
         mi.setFat(f);
         mi.setCarbs(c);
-        mi.setQuantity(quantity == null ? 1 : Math.max(1, quantity));
+        mi.setQuantity(qty);
         mi.setSourceType(MealItemSourceType.CUSTOM);
-        return mealItemRepository.save(mi);
+        MealItem saved = mealItemRepository.save(mi);
+
+        if (!trimmedName.isBlank()) {
+            var existing = foodItemRepository.findByNameIgnoreCase(trimmedName);
+            if (existing.isEmpty()) {
+                int baseQty = quantity == null ? 100 : Math.max(1, quantity);
+                FoodItem food = new FoodItem();
+                food.setName(trimmedName);
+                food.setUnit(Unit.G);
+                food.setKcal100(scalePer100(kcal, baseQty));
+                food.setProtein100(scalePer100(p, baseQty));
+                food.setFat100(scalePer100(f, baseQty));
+                food.setCarbs100(scalePer100(c, baseQty));
+                foodItemRepository.save(food);
+            }
+        }
+        return saved;
+    }
+
+    private int scalePer100(Integer value, int quantity) {
+        int safe = value == null ? 0 : value;
+        return (int) Math.round(safe * 100.0 / quantity);
     }
 
     public void removeItem(Long userId, Long itemId) {

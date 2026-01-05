@@ -7,33 +7,36 @@
 <div class="container py-4">
     <h1 class="mb-4">Body Stats</h1>
 
-    <form th:action="@{/body-stats/add}" th:object="${bodyStatsForm}" method="post" class="row g-3">
+    <form th:action="@{/body-stats/add}" th:object="${bodyStatsForm}" method="post" class="form-inline-actions">
         <div th:replace="~{fragments/csrf :: csrf}"></div>
 
-        <div class="col-md-4">
-            <label class="form-label" for="dateRecorded">Date</label>
-            <input id="dateRecorded" class="form-control" type="date" th:field="*{dateRecorded}" required>
-            <div class="form-text">Pick the day of this measurement.</div>
-            <div class="text-danger small" th:if="${#fields.hasErrors('dateRecorded')}" th:errors="*{dateRecorded}"></div>
+        <div class="form-fields">
+            <div class="span-4">
+                <label class="form-label" for="dateRecorded">Date</label>
+                <input id="dateRecorded" class="form-control form-control-sm" type="date" th:field="*{dateRecorded}" required>
+                <div class="form-text">Pick the day of this measurement.</div>
+                <div class="text-danger small" th:if="${#fields.hasErrors('dateRecorded')}" th:errors="*{dateRecorded}"></div>
+            </div>
+
+            <div class="span-4">
+                <label class="form-label" for="weight">Weight (kg)</label>
+                <input id="weight" class="form-control form-control-sm" type="number" step="0.1" th:field="*{weight}" placeholder="e.g., 78.5" required>
+                <div class="form-text">Use the same scale for consistency.</div>
+                <div class="text-danger small" th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}"></div>
+            </div>
+
+            <div class="span-4">
+                <label class="form-label" for="bodyFatPercent">Body Fat (%)</label>
+                <input id="bodyFatPercent" class="form-control form-control-sm" type="number" step="0.1" th:field="*{bodyFatPercent}" placeholder="e.g., 18.2">
+                <div class="form-text">Optional if you do not track body fat.</div>
+                <div class="text-danger small" th:if="${#fields.hasErrors('bodyFatPercent')}" th:errors="*{bodyFatPercent}"></div>
+            </div>
         </div>
 
-        <div class="col-md-4">
-            <label class="form-label" for="weight">Weight (kg)</label>
-            <input id="weight" class="form-control" type="number" step="0.1" th:field="*{weight}" placeholder="e.g., 78.5" required>
-            <div class="form-text">Use the same scale for consistency.</div>
-            <div class="text-danger small" th:if="${#fields.hasErrors('weight')}" th:errors="*{weight}"></div>
-        </div>
-
-        <div class="col-md-4">
-            <label class="form-label" for="bodyFatPercent">Body Fat (%)</label>
-            <input id="bodyFatPercent" class="form-control" type="number" step="0.1" th:field="*{bodyFatPercent}" placeholder="e.g., 18.2" required>
-            <div class="form-text">Optional if you do not track body fat.</div>
-            <div class="text-danger small" th:if="${#fields.hasErrors('bodyFatPercent')}" th:errors="*{bodyFatPercent}"></div>
-        </div>
-
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Add Stats</button>
-            <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
+        <div class="form-actions">
+            <a th:href="@{/today}" class="btn btn-outline-secondary btn-sm">Back to Today</a>
+            <button type="submit" class="btn btn-sm btn-outline-primary"
+                    th:text="${bodyStatsUpdate} ? 'Update Stats' : 'Save Stats'">Save Stats</button>
         </div>
     </form>
 

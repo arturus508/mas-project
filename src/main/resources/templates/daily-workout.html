@@ -19,8 +19,8 @@
                 <a class="btn btn-outline-secondary btn-sm"
                    th:href="@{/workouts/{date}(date=${viewDate.plusDays(1)})}">Tomorrow</a>
             </div>
-            <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
-            <a th:href="@{/workout-plans}" class="btn btn-outline-secondary">Back to Plans</a>
+            <a th:href="@{/today}" class="btn btn-outline-secondary btn-sm">Back to Today</a>
+            <a th:href="@{/workout-plans}" class="btn btn-outline-secondary btn-sm">Back to Plans</a>
         </div>
     </div>
 
@@ -60,20 +60,24 @@
     </div>
 
     <div class="card" th:if="${dailyWorkout != null}">
-        <div class="card-header">Add set</div>
+        <div class="card-header section-header">
+            <div class="section-title">Add set</div>
+        </div>
         <div class="card-body">
-            <form th:action="@{'/workouts/' + ${dailyWorkout.dailyWorkoutId} + '/sets/add'}" method="post" class="row g-3">
+            <form th:action="@{'/workouts/' + ${dailyWorkout.dailyWorkoutId} + '/sets/add'}" method="post" class="form-inline-actions">
                 <div th:replace="~{fragments/csrf :: csrf}"></div>
                 <input type="hidden" name="date" th:value="${viewDate}">
-                <div class="col-md-8">
-                    <label class="form-label" for="exerciseId">Exercise</label>
-                    <select id="exerciseId" name="exerciseId" class="form-select" required>
-                        <option value="" disabled selected>Select exercise</option>
-                        <option th:each="ex : ${globalExercises}" th:value="${ex.exerciseId}" th:text="${ex.exerciseName}"></option>
-                    </select>
+                <div class="form-fields">
+                    <div class="span-12">
+                        <label class="form-label" for="exerciseId">Exercise</label>
+                        <select id="exerciseId" name="exerciseId" class="form-select form-select-sm" required>
+                            <option value="" disabled selected>Select exercise</option>
+                            <option th:each="ex : ${globalExercises}" th:value="${ex.exerciseId}" th:text="${ex.exerciseName}"></option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-success w-100">Add set</button>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-sm btn-outline-primary">Add set</button>
                 </div>
             </form>
         </div>

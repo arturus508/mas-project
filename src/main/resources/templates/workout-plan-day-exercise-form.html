@@ -8,37 +8,37 @@
     <h1 class="mb-4">Add Exercise to Day</h1>
 
     <form th:action="@{'/workout-plans/' + ${workoutPlanId} + '/days/' + ${planDayId} + '/exercises/add'}"
-          th:object="${workoutPlanDayExerciseForm}" method="post" class="row g-3">
+          th:object="${workoutPlanDayExerciseForm}" method="post" class="form-grid">
         <div th:replace="~{fragments/csrf :: csrf}"></div>
 
-        <div class="col-md-6">
+        <div class="span-6">
             <label class="form-label" for="exerciseId">Exercise</label>
-            <select id="exerciseId" class="form-select" th:field="*{exerciseId}" required>
+            <select id="exerciseId" class="form-select form-select-sm" th:field="*{exerciseId}" required>
                 <option value="" disabled selected>Select exercise</option>
                 <option th:each="ex : ${globalExercises}" th:value="${ex.exerciseId}" th:text="${ex.exerciseName}"></option>
             </select>
             <div class="text-danger small" th:if="${#fields.hasErrors('exerciseId')}" th:errors="*{exerciseId}"></div>
         </div>
 
-        <div class="col-md-2">
+        <div class="span-2">
             <label class="form-label" for="setsPlanned">Sets</label>
-            <input id="setsPlanned" class="form-control" type="number" min="1" th:field="*{setsPlanned}" required>
+            <input id="setsPlanned" class="form-control form-control-sm" type="number" min="1" th:field="*{setsPlanned}" required>
             <div class="text-danger small" th:if="${#fields.hasErrors('setsPlanned')}" th:errors="*{setsPlanned}"></div>
         </div>
 
-        <div class="col-md-2">
+        <div class="span-2">
             <label class="form-label" for="targetReps">Target Reps</label>
-            <input id="targetReps" class="form-control" type="number" min="1" th:field="*{targetReps}" placeholder="optional">
+            <input id="targetReps" class="form-control form-control-sm" type="number" min="1" th:field="*{targetReps}" placeholder="optional">
         </div>
 
-        <div class="col-md-2">
+        <div class="span-2">
             <label class="form-label" for="restTime">Rest (sec)</label>
-            <input id="restTime" class="form-control" type="number" min="0" th:field="*{restTime}" placeholder="optional">
+            <input id="restTime" class="form-control form-control-sm" type="number" min="0" th:field="*{restTime}" placeholder="optional">
         </div>
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Add Exercise</button>
-            <a th:href="@{'/workout-plans/' + ${workoutPlanId} + '/exercises'}" class="btn btn-outline-secondary">Back</a>
+        <div class="span-12 d-flex align-items-center justify-content-end gap-2">
+            <a th:href="@{'/workout-plans/' + ${workoutPlanId} + '/exercises'}" class="btn btn-outline-secondary btn-sm">Back</a>
+            <button type="submit" class="btn btn-sm btn-outline-primary">Add Exercise</button>
         </div>
     </form>
 </div>

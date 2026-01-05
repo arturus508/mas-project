@@ -12,7 +12,7 @@
                 <span th:text="${date}">2025-08-20</span>
             </div>
         </div>
-        <a th:href="@{'/meals?date=' + ${date}}" class="btn btn-outline-secondary">Back to Meals</a>
+        <a th:href="@{'/meals?date=' + ${date}}" class="btn btn-outline-secondary btn-sm">Back to Meals</a>
     </div>
     <div class="d-flex flex-wrap gap-2 mb-3">
         <a class="btn btn-sm btn-outline-secondary"
@@ -49,13 +49,17 @@
             <li class="list-group-item d-flex align-items-center justify-content-between" th:each="item : ${items}">
                 <div>
                     <div class="fw-semibold" th:text="${item.foodItem != null ? item.foodItem.name : item.name}">Item</div>
-                    <div class="text-muted small">
-                        <span th:if="${item.quantity != null}">Qty: <span th:text="${item.quantity}"></span></span>
+                    <div class="text-muted small" th:if="${item.quantity != null}">
+                        <span>Qty: </span>
+                        <span th:text="${item.quantity}"></span>
+                        <span th:if="${item.foodItem != null}">
+                            <span th:text="${item.foodItem.unit == T(com.example.healthfitness.model.Unit).G ? ' g' : ' pcs'}"> g</span>
+                        </span>
                     </div>
                 </div>
                 <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/' + ${item.id} + '/delete'}" method="post">
                     <div th:replace="~{fragments/csrf :: csrf}"></div>
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                    <button type="submit" class="btn btn-xs btn-outline-danger">Remove</button>
                 </form>
             </li>
         </ul>
@@ -66,28 +70,46 @@
             <div class="card h-100">
                 <div class="card-header">Add food from database</div>
                 <div class="card-body">
-                    <form class="row g-2 mb-3" method="get" th:action="@{'/meals/' + ${date} + '/' + ${segment}}">
-                        <div class="col-8">
-                            <input type="text" class="form-control" name="q" placeholder="Search food" th:value="${q}">
+                    <form class="form-inline-actions mb-3" method="get" th:action="@{'/meals/' + ${date} + '/' + ${segment}}">
+                        <div class="form-fields">
+                            <div class="span-12">
+                                <label class="form-label" for="foodSearch">Search</label>
+                                <input id="foodSearch" type="text" class="form-control form-control-sm" name="q"
+                                       placeholder="Type a food name" th:value="${q}">
+                                <div class="form-text">Search filters the dropdown list below.</div>
+                            </div>
                         </div>
-                        <div class="col-4">
-                            <button class="btn btn-outline-primary w-100">Search</button>
+                        <div class="form-actions">
+                            <button class="btn btn-sm btn-outline-primary" type="submit">Search</button>
                         </div>
                     </form>
+                    <div class="text-muted small mb-2" th:if="${q != null && !q.isBlank() && #lists.isEmpty(foods)}">
+                        No results for "<span th:text="${q}">query</span>".
+                    </div>
+                    <div class="text-muted small mb-2" th:if="${(q == null || q.isBlank()) && !#lists.isEmpty(foods)}">
+                        Showing top foods. Use search to filter.
+                    </div>
 
-                    <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/add-food'}" method="post" class="row g-2">
+                    <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/add-food'}" method="post" class="form-inline-actions">
                         <div th:replace="~{fragments/csrf :: csrf}"></div>
-                        <div class="col-12 col-md-7">
-                            <select class="form-select" name="foodItemId" required>
-                                <option value="" disabled selected>Select food</option>
-                                <option th:each="f : ${foods}" th:value="${f.id}" th:text="${f.name}">Food</option>
-                            </select>
+                        <div class="form-fields">
+                            <div class="span-8">
+                                <label class="form-label" for="foodItemId">Food item</label>
+                                <select id="foodItemId" class="form-select form-select-sm" name="foodItemId" required>
+                                    <option value="" disabled selected>Select food</option>
+                                    <option th:each="f : ${foods}"
+                                            th:value="${f.id}"
+                                            th:text="${f.name + (f.unit == T(com.example.healthfitness.model.Unit).G ? ' (per 100g)' : ' (per piece)')}">Food</option>
+                                </select>
+                            </div>
+                            <div class="span-4">
+                                <label class="form-label" for="foodQuantity">Quantity (g / pcs)</label>
+                                <input id="foodQuantity" type="number" class="form-control form-control-sm" name="quantity" min="1" value="100">
+                                <div class="form-text">Use grams for foods measured per 100g.</div>
+                            </div>
                         </div>
-                        <div class="col-6 col-md-3">
-                            <input type="number" class="form-control" name="quantity" min="1" value="100">
-                        </div>
-                        <div class="col-6 col-md-2">
-                            <button class="btn btn-success w-100">Add</button>
+                        <div class="form-actions">
+                            <button class="btn btn-sm btn-outline-primary" type="submit">Add</button>
                         </div>
                     </form>
                 </div>
@@ -98,28 +120,37 @@
             <div class="card h-100">
                 <div class="card-header">Add custom item</div>
                 <div class="card-body">
-                    <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/add-custom'}" method="post" class="row g-2">
+                    <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/add-custom'}" method="post" class="form-inline-actions">
                         <div th:replace="~{fragments/csrf :: csrf}"></div>
-                        <div class="col-12">
-                            <input type="text" class="form-control" name="name" placeholder="Item name" required>
+                        <div class="form-fields">
+                            <div class="span-12">
+                                <label class="form-label" for="customName">Item name</label>
+                                <input id="customName" type="text" class="form-control form-control-sm" name="name" placeholder="Item name" required>
+                            </div>
+                            <div class="span-3">
+                                <label class="form-label" for="customKcal">kcal</label>
+                                <input id="customKcal" type="number" class="form-control form-control-sm" name="kcal" placeholder="kcal" required>
+                            </div>
+                            <div class="span-3">
+                                <label class="form-label" for="customProtein">protein</label>
+                                <input id="customProtein" type="number" class="form-control form-control-sm" name="protein" placeholder="protein" required>
+                            </div>
+                            <div class="span-3">
+                                <label class="form-label" for="customFat">fat</label>
+                                <input id="customFat" type="number" class="form-control form-control-sm" name="fat" placeholder="fat" required>
+                            </div>
+                            <div class="span-3">
+                                <label class="form-label" for="customCarbs">carbs</label>
+                                <input id="customCarbs" type="number" class="form-control form-control-sm" name="carbs" placeholder="carbs" required>
+                            </div>
+                            <div class="span-12">
+                                <label class="form-label" for="customQuantity">Quantity (optional)</label>
+                                <input id="customQuantity" type="number" class="form-control form-control-sm" name="quantity" placeholder="grams or pieces">
+                                <div class="form-text">Optional reference only for custom items. Custom items are saved to the food list.</div>
+                            </div>
                         </div>
-                        <div class="col-6">
-                            <input type="number" class="form-control" name="kcal" placeholder="kcal" required>
-                        </div>
-                        <div class="col-6">
-                            <input type="number" class="form-control" name="protein" placeholder="protein" required>
-                        </div>
-                        <div class="col-6">
-                            <input type="number" class="form-control" name="fat" placeholder="fat" required>
-                        </div>
-                        <div class="col-6">
-                            <input type="number" class="form-control" name="carbs" placeholder="carbs" required>
-                        </div>
-                        <div class="col-12">
-                            <input type="number" class="form-control" name="quantity" placeholder="quantity (optional)">
-                        </div>
-                        <div class="col-12">
-                            <button class="btn btn-primary w-100">Add custom</button>
+                        <div class="form-actions">
+                            <button class="btn btn-sm btn-outline-primary">Add custom</button>
                         </div>
                     </form>
                 </div>

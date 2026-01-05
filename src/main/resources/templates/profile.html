@@ -5,9 +5,15 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 
 <div class="container py-4">
-    <h1 class="mb-4">Profile</h1>
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
+        <h1 class="m-0">Profile</h1>
+        <form th:action="@{/logout}" method="post">
+            <div th:replace="~{fragments/csrf :: csrf}"></div>
+            <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
+        </form>
+    </div>
 
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mb-4">
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-md-6">
@@ -23,6 +29,62 @@
         <div class="card-footer d-flex gap-2">
             <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
             <a th:href="@{/settings}" class="btn btn-outline-primary">Settings</a>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Update name</div>
+                <div class="card-body">
+                    <div class="alert alert-success py-2" th:if="${nameUpdated}">
+                        Name updated.
+                    </div>
+                    <form th:action="@{/profile/name}" th:object="${profileNameForm}" method="post" class="row g-2">
+                        <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <div class="col-12">
+                            <label class="form-label" for="profileName">Name</label>
+                            <input id="profileName" type="text" th:field="*{name}" class="form-control" placeholder="Your name">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-outline-primary" type="submit">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">Change password</div>
+                <div class="card-body">
+                    <div class="alert alert-success py-2" th:if="${passwordUpdated}">
+                        Password updated.
+                    </div>
+                    <form th:action="@{/profile/password}" th:object="${passwordChangeForm}" method="post" class="row g-2">
+                        <div th:replace="~{fragments/csrf :: csrf}"></div>
+                        <div class="col-12">
+                            <label class="form-label" for="currentPassword">Current password</label>
+                            <input id="currentPassword" type="password" th:field="*{currentPassword}" class="form-control">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="newPassword">New password</label>
+                            <input id="newPassword" type="password" th:field="*{newPassword}" class="form-control">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="confirmPassword">Confirm new password</label>
+                            <input id="confirmPassword" type="password" th:field="*{confirmPassword}" class="form-control">
+                            <div class="text-danger small" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-outline-primary" type="submit">Update password</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

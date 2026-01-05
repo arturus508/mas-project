@@ -7,46 +7,46 @@
 <div class="container py-4">
     <h1 class="mb-4">Add Workout Plan</h1>
 
-    <form th:action="@{/workout-plans/add}" th:object="${workoutPlanForm}" method="post" class="row g-3">
+    <form th:action="@{/workout-plans/add}" th:object="${workoutPlanForm}" method="post" class="form-grid">
         <div th:replace="~{fragments/csrf :: csrf}"></div>
         <input type="hidden" name="returnTo" th:value="${returnTo}">
 
-        <div class="col-md-6">
+        <div class="span-6">
             <label class="form-label" for="planName">Name</label>
-            <input id="planName" class="form-control" type="text" th:field="*{planName}" placeholder="e.g., Strength Phase" required>
+            <input id="planName" class="form-control form-control-sm" type="text" th:field="*{planName}" placeholder="e.g., Strength Phase" required>
             <div class="form-text">Give your plan a short, clear name.</div>
             <div class="text-danger small" th:if="${#fields.hasErrors('planName')}" th:errors="*{planName}"></div>
         </div>
 
-        <div class="col-md-6">
+        <div class="span-6">
             <label class="form-label" for="daysPerWeek">Days per Week</label>
-            <input id="daysPerWeek" class="form-control" type="number" min="1" max="7" th:field="*{daysPerWeek}" placeholder="e.g., 3">
+            <input id="daysPerWeek" class="form-control form-control-sm" type="number" min="1" max="7" th:field="*{daysPerWeek}" placeholder="e.g., 3">
             <div class="form-text">How many training days in a week (1-7).</div>
         </div>
 
-        <div class="col-12">
+        <div class="span-12">
             <label class="form-label" for="description">Description</label>
-            <textarea id="description" class="form-control" rows="3" th:field="*{description}" placeholder="Short goal or focus for this plan"></textarea>
+            <textarea id="description" class="form-control form-control-sm" rows="3" th:field="*{description}" placeholder="Short goal or focus for this plan"></textarea>
             <div class="form-text">Optional notes about goals or focus.</div>
         </div>
 
-        <div class="col-md-6">
+        <div class="span-6">
             <label class="form-label" for="startDate">Start Date</label>
-            <input id="startDate" class="form-control" type="date" th:field="*{startDate}" required>
+            <input id="startDate" class="form-control form-control-sm" type="date" th:field="*{startDate}" required>
             <div class="form-text">When this plan starts.</div>
             <div class="text-danger small" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></div>
         </div>
 
-        <div class="col-md-6">
+        <div class="span-6">
             <label class="form-label" for="endDate">End Date</label>
-            <input id="endDate" class="form-control" type="date" th:field="*{endDate}">
+            <input id="endDate" class="form-control form-control-sm" type="date" th:field="*{endDate}">
             <div class="form-text">Optional end date.</div>
         </div>
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Save</button>
-            <a th:if="${returnTo != null}" th:href="${returnTo}" class="btn btn-outline-secondary">Cancel</a>
-            <a th:if="${returnTo == null}" th:href="@{/workout-plans}" class="btn btn-outline-secondary">Cancel</a>
+        <div class="span-12 d-flex align-items-center justify-content-end gap-2">
+            <a th:if="${returnTo != null}" th:href="${returnTo}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            <a th:if="${returnTo == null}" th:href="@{/workout-plans}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+            <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
         </div>
     </form>
 </div>

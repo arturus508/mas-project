@@ -11,9 +11,19 @@ public class TodayViewModel {
     private String workoutTitle;
     private int workoutSetsTotal;
     private int workoutSetsDone;
+    private Long dailyWorkoutId;
+    private List<TodayWorkoutSetItem> workoutSets;
+    private List<TodayExerciseOption> workoutExercises;
+    private List<TodayPlanDayOption> workoutPlanDays;
+    private List<TodayFoodOption> mealFoodOptions;
     private Integer sleepHours;
     private Integer sleepMinutes;
     private Integer sleepQuality;
+    private Double latestWeight;
+    private Double todayWeight;
+    private Double todayBodyFatPercent;
+    private List<String> weightDates;
+    private List<Double> weightValues;
     private int tasksTotal;
     private int tasksDone;
     private int habitsTotal;
@@ -41,6 +51,21 @@ public class TodayViewModel {
     public int getWorkoutSetsDone() { return workoutSetsDone; }
     public void setWorkoutSetsDone(int workoutSetsDone) { this.workoutSetsDone = workoutSetsDone; }
 
+    public Long getDailyWorkoutId() { return dailyWorkoutId; }
+    public void setDailyWorkoutId(Long dailyWorkoutId) { this.dailyWorkoutId = dailyWorkoutId; }
+
+    public List<TodayWorkoutSetItem> getWorkoutSets() { return workoutSets; }
+    public void setWorkoutSets(List<TodayWorkoutSetItem> workoutSets) { this.workoutSets = workoutSets; }
+
+    public List<TodayExerciseOption> getWorkoutExercises() { return workoutExercises; }
+    public void setWorkoutExercises(List<TodayExerciseOption> workoutExercises) { this.workoutExercises = workoutExercises; }
+
+    public List<TodayPlanDayOption> getWorkoutPlanDays() { return workoutPlanDays; }
+    public void setWorkoutPlanDays(List<TodayPlanDayOption> workoutPlanDays) { this.workoutPlanDays = workoutPlanDays; }
+
+    public List<TodayFoodOption> getMealFoodOptions() { return mealFoodOptions; }
+    public void setMealFoodOptions(List<TodayFoodOption> mealFoodOptions) { this.mealFoodOptions = mealFoodOptions; }
+
     public Integer getSleepHours() { return sleepHours; }
     public void setSleepHours(Integer sleepHours) { this.sleepHours = sleepHours; }
 
@@ -49,6 +74,21 @@ public class TodayViewModel {
 
     public Integer getSleepQuality() { return sleepQuality; }
     public void setSleepQuality(Integer sleepQuality) { this.sleepQuality = sleepQuality; }
+
+    public Double getLatestWeight() { return latestWeight; }
+    public void setLatestWeight(Double latestWeight) { this.latestWeight = latestWeight; }
+
+    public Double getTodayWeight() { return todayWeight; }
+    public void setTodayWeight(Double todayWeight) { this.todayWeight = todayWeight; }
+
+    public Double getTodayBodyFatPercent() { return todayBodyFatPercent; }
+    public void setTodayBodyFatPercent(Double todayBodyFatPercent) { this.todayBodyFatPercent = todayBodyFatPercent; }
+
+    public List<String> getWeightDates() { return weightDates; }
+    public void setWeightDates(List<String> weightDates) { this.weightDates = weightDates; }
+
+    public List<Double> getWeightValues() { return weightValues; }
+    public void setWeightValues(List<Double> weightValues) { this.weightValues = weightValues; }
 
     public int getTasksTotal() { return tasksTotal; }
     public void setTasksTotal(int tasksTotal) { this.tasksTotal = tasksTotal; }

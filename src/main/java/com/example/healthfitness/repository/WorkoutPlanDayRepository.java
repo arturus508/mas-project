@@ -12,6 +12,9 @@ public interface WorkoutPlanDayRepository extends JpaRepository<WorkoutPlanDay, 
     @EntityGraph(attributePaths = {"exercises", "exercises.exercise"})
     List<WorkoutPlanDay> findWithExercisesByWorkoutPlan_WorkoutPlanIdOrderByDayOrderAsc(Long workoutPlanId);
 
+    @EntityGraph(attributePaths = {"workoutPlan"})
+    List<WorkoutPlanDay> findWithPlanByWorkoutPlan_User_UserIdOrderByWorkoutPlan_WorkoutPlanIdAscDayOrderAsc(Long userId);
+
     @EntityGraph(attributePaths = {"exercises", "exercises.exercise", "workoutPlan", "workoutPlan.user"})
     java.util.Optional<WorkoutPlanDay> findWithExercisesByPlanDayId(Long planDayId);
 }

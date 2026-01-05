@@ -7,6 +7,7 @@ import com.example.healthfitness.model.HabitLog;
 import com.example.healthfitness.model.SleepEntry;
 import com.example.healthfitness.model.Task;
 import com.example.healthfitness.model.User;
+import com.example.healthfitness.model.BodyStats;
 import com.example.healthfitness.repository.DailyReviewRepository;
 import com.example.healthfitness.repository.DailyWorkoutRepository;
 import com.example.healthfitness.repository.DailyWorkoutSetRepository;
@@ -35,6 +36,7 @@ public class WeeklyViewService {
     private final HabitService habitService;
     private final HabitLogRepository habitLogRepository;
     private final DailyReviewRepository dailyReviewRepository;
+    private final BodyStatsService bodyStatsService;
 
     public WeeklyViewService(UserRepository userRepository,
                              MealMacroService mealMacroService,
@@ -44,7 +46,8 @@ public class WeeklyViewService {
                              TaskRepository taskRepository,
                              HabitService habitService,
                              HabitLogRepository habitLogRepository,
-                             DailyReviewRepository dailyReviewRepository) {
+                             DailyReviewRepository dailyReviewRepository,
+                             BodyStatsService bodyStatsService) {
         this.userRepository = userRepository;
         this.mealMacroService = mealMacroService;
         this.dailyWorkoutRepository = dailyWorkoutRepository;
@@ -54,6 +57,7 @@ public class WeeklyViewService {
         this.habitService = habitService;
         this.habitLogRepository = habitLogRepository;
         this.dailyReviewRepository = dailyReviewRepository;
+        this.bodyStatsService = bodyStatsService;
     }
 
     public WeeklyViewModel build(Long userId, LocalDate anchorDate) {
@@ -168,6 +172,28 @@ public class WeeklyViewService {
         }
         if (energyCount > 0) {
             vm.setAvgEnergy(energySum / energyCount);
+        }
+
+        List<BodyStats> stats = bodyStatsService.getBodyStatsByUser(userId);
+        if (!stats.isEmpty()) {
+            List<BodyStats> weekStats = stats.stream()
+                    .filter(s -> s.getDateRecorded() != null
+                            && !s.getDateRecorded().isBefore(start)
+                            && !s.getDateRecorded().isAfter(end))
+                    .sorted(java.util.Comparator.comparing(BodyStats::getDateRecorded))
+                    .toList();
+            if (!weekStats.isEmpty()) {
+                BodyStats first = weekStats.get(0);
+                BodyStats last = weekStats.get(weekStats.size() - 1);
+                vm.setWeightStart(first.getWeight());
+                vm.setWeightEnd(last.getWeight());
+                vm.setWeightDates(weekStats.stream()
+                        .map(s -> s.getDateRecorded().toString())
+                        .toList());
+                vm.setWeightValues(weekStats.stream()
+                        .map(BodyStats::getWeight)
+                        .toList());
+            }
         }
 
         return vm;

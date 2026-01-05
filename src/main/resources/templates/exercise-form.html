@@ -1,39 +1,44 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Create New Exercise</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-<header>
-    <h1>Create New Exercise</h1>
-</header>
-<div class="content">
-    <form th:action="@{/exercises/add}" method="post" th:object="${exercise}">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Create New Exercise')}"></head>
+<body class="bg-light">
+<div th:replace="~{fragments/nav :: nav}"></div>
+
+<main class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="mb-0">Create New Exercise</h1>
+    <a th:if="${returnTo != null}" th:href="${returnTo}" class="btn btn-outline-secondary btn-sm">Back</a>
+    <a th:if="${returnTo == null}" th:href="@{/exercises}" class="btn btn-outline-secondary btn-sm">Back to Exercises</a>
+  </div>
+
+  <div class="card">
+    <div class="card-header section-header">
+      <div class="section-title">Exercise details</div>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/exercises/add}" method="post" th:object="${exercise}" class="form-grid">
         <div th:replace="~{fragments/csrf :: csrf}"></div>
         <input type="hidden" name="returnTo" th:value="${returnTo}">
-        <div class="form-group">
-            <label for="exerciseName">Exercise Name:</label>
-            <input type="text" id="exerciseName" th:field="*{exerciseName}" placeholder="Enter exercise name" required>
-            <small>Use a clear, common name.</small>
+        <div class="span-6">
+          <label class="form-label" for="exerciseName">Exercise Name</label>
+          <input type="text" id="exerciseName" class="form-control form-control-sm" th:field="*{exerciseName}" placeholder="Enter exercise name" required>
+          <div class="form-text">Use a clear, common name.</div>
         </div>
-        <div class="form-group">
-            <label for="muscleGroup">Muscle Group:</label>
-            <input type="text" id="muscleGroup" th:field="*{muscleGroup}" placeholder="Enter muscle group" required>
-            <small>Example: Chest, Back, Legs.</small>
+        <div class="span-3">
+          <label class="form-label" for="muscleGroup">Muscle Group</label>
+          <input type="text" id="muscleGroup" class="form-control form-control-sm" th:field="*{muscleGroup}" placeholder="Chest, Back, Legs" required>
         </div>
-        <div class="form-group">
-            <label for="intensityLevel">Intensity Level:</label>
-            <input type="text" id="intensityLevel" th:field="*{intensityLevel}" placeholder="Enter intensity level" required>
-            <small>Example: Low, Medium, High.</small>
+        <div class="span-3">
+          <label class="form-label" for="intensityLevel">Intensity Level</label>
+          <input type="text" id="intensityLevel" class="form-control form-control-sm" th:field="*{intensityLevel}" placeholder="Low / Medium / High" required>
         </div>
-        <button type="submit" class="btn">Create Exercise</button>
-    </form>
-    <br/>
-    <a th:if="${returnTo != null}" th:href="${returnTo}" class="back-button">Back</a>
-    <a th:if="${returnTo == null}" th:href="@{/exercises}" class="back-button">Back to Global Exercises</a>
-</div>
+        <div class="span-12 d-flex align-items-center justify-content-end gap-2">
+          <button type="submit" class="btn btn-sm btn-outline-primary">Create Exercise</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
 </body>
 </html>
 
