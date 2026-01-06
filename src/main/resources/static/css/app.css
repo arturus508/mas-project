@@ -494,6 +494,48 @@ body[data-mode="mind"] .metric-tile{
   color: var(--muted);
   font-size: .9rem;
 }
+.meal-macro-pills{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--gap-3);
+  margin-top: var(--gap-3);
+}
+.meal-macro-pill{
+  background: rgba(148,163,184,.08);
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius: var(--r);
+  padding: var(--gap-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, .12);
+}
+body[data-mode="mind"] .meal-macro-pill{
+  background: rgba(120, 132, 121, .12);
+  border-color: rgba(120, 132, 121, .24);
+  box-shadow: 0 8px 20px rgba(44, 54, 46, .14);
+}
+.meal-macro-label{
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: .75rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+.meal-macro-value{
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-2);
+  font-family: var(--heading-font);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.meal-macro-unit{
+  color: var(--muted);
+  font-size: .95rem;
+  font-weight: 600;
+}
 .section-block-chart{
   padding-top: calc(var(--gap-5) + 4px);
 }

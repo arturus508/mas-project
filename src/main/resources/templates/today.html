@@ -151,13 +151,43 @@
         </div>
         <div class="card-body section-body section-body-modern">
           <div class="section-block section-block-highlight">
-            <div class="section-eyebrow">Quick log</div>
+            <div class="section-eyebrow">Today's meals</div>
             <div class="section-lead">Add meals without opening the full diary.</div>
+            <div class="meal-macro-pills" th:with="tot=${vm.mealTotals}">
+              <div class="meal-macro-pill">
+                <div class="meal-macro-label">Calories</div>
+                <div class="meal-macro-value">
+                  <span th:text="${tot != null ? tot.kcal : 0}">0</span>
+                  <span class="meal-macro-unit">kcal</span>
+                </div>
+              </div>
+              <div class="meal-macro-pill">
+                <div class="meal-macro-label">Protein</div>
+                <div class="meal-macro-value">
+                  <span th:text="${tot != null ? tot.protein : 0}">0</span>
+                  <span class="meal-macro-unit">g</span>
+                </div>
+              </div>
+              <div class="meal-macro-pill">
+                <div class="meal-macro-label">Carbs</div>
+                <div class="meal-macro-value">
+                  <span th:text="${tot != null ? tot.carbs : 0}">0</span>
+                  <span class="meal-macro-unit">g</span>
+                </div>
+              </div>
+              <div class="meal-macro-pill">
+                <div class="meal-macro-label">Fat</div>
+                <div class="meal-macro-value">
+                  <span th:text="${tot != null ? tot.fat : 0}">0</span>
+                  <span class="meal-macro-unit">g</span>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="section-block section-block-form">
             <div class="section-block-header">
-              <p class="section-block-subtitle mb-0">Quick log</p>
-              <p class="section-block-subtitle mb-0">Add meals without opening the full diary.</p>
+              <p class="section-block-subtitle mb-1">Quick log</p>
+              <p class="section-block-subtitle text-muted mb-0">Search a food, pick the meal, and track it instantly.</p>
             </div>
             <form th:action="@{/today/{date}/meals/add-food(date=${vm.date},mode=${hubMode},range=${hubRange})}"
                   method="post" class="form-inline-actions form-roomy section-form section-form-balanced">
