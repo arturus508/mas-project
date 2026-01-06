@@ -228,6 +228,27 @@ body[data-mode="mind"] .hub-topbar input[type="date"]{
   border-color: rgba(var(--accent-rgb), .6);
   color: var(--accent-600);
 }
+.weekly-details{
+  background: rgba(59,130,246,.2);
+  border: 1px solid rgba(59,130,246,.6);
+  color: #f8fbff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+body[data-mode="mind"] .weekly-details{
+  background: rgba(var(--accent-rgb), .2);
+  border-color: rgba(var(--accent-rgb), .6);
+  color: #f6fbf8;
+}
+.weekly-details:hover{
+  background: rgba(59,130,246,.3);
+  border-color: rgba(59,130,246,.75);
+  color: #ffffff;
+}
+body[data-mode="mind"] .weekly-details:hover{
+  background: rgba(var(--accent-rgb), .3);
+  border-color: rgba(var(--accent-rgb), .75);
+  color: #ffffff;
+}
 .brand{
   display:flex; align-items:center; gap: .6rem;
   font-weight: 700; letter-spacing: .3px;

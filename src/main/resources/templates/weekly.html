@@ -25,7 +25,8 @@
             <div class="card" th:if="${hiddenSections['week-nutrition']} != true">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Nutrition (avg per day)</span>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/meals/today}">Details</a>
+                    <a th:class="'btn btn-sm ' + (${hubMode} == 'body' ? 'weekly-details' : 'btn-outline-primary')"
+                       th:href="@{/meals/today}">Details</a>
                 </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-2">
@@ -42,7 +43,8 @@
             <div class="card" th:if="${hiddenSections['week-workouts']} != true">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Workouts</span>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/workouts/today}">Details</a>
+                    <a th:class="'btn btn-sm ' + (${hubMode} == 'body' ? 'weekly-details' : 'btn-outline-primary')"
+                       th:href="@{/workouts/today}">Details</a>
                 </div>
                 <div class="card-body">
                     <div class="fw-semibold">
@@ -66,7 +68,8 @@
             <div class="card" th:if="${hiddenSections['week-weight']} != true">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Weight trend</span>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/body-stats}">Details</a>
+                    <a th:class="'btn btn-sm ' + (${hubMode} == 'body' ? 'weekly-details' : 'btn-outline-primary')"
+                       th:href="@{/body-stats}">Details</a>
                 </div>
                 <div class="card-body">
                     <div class="text-muted small" th:if="${vm.weightStart == null}">
@@ -91,7 +94,8 @@
             <div class="card" th:if="${hiddenSections['week-sleep']} != true">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Sleep (avg)</span>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/mind/sleep}">Details</a>
+                    <a th:class="'btn btn-sm ' + (${hubMode} == 'body' ? 'weekly-details' : 'btn-outline-primary')"
+                       th:href="@{/mind/sleep}">Details</a>
                 </div>
                 <div class="card-body" th:with="mins=${vm.avgSleepMinutes}">
                     <div th:if="${mins != null}">
@@ -114,7 +118,8 @@
             <div class="card" th:if="${hiddenSections['week-tasks-habits']} != true">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Tasks & Habits</span>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/flow/tasks(date=${vm.weekStart})}">Details</a>
+                    <a th:class="'btn btn-sm ' + (${hubMode} == 'body' ? 'weekly-details' : 'btn-outline-primary')"
+                       th:href="@{/flow/tasks(date=${vm.weekStart})}">Details</a>
                 </div>
                 <div class="card-body">
                     <div class="fw-semibold mb-2">
@@ -136,7 +141,8 @@
             <div class="card" th:if="${hiddenSections['week-review']} != true">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Review (avg)</span>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/today(mode='mind', range='today', date=${vm.weekStart})}">Details</a>
+                    <a th:class="'btn btn-sm ' + (${hubMode} == 'body' ? 'weekly-details' : 'btn-outline-primary')"
+                       th:href="@{/today(mode='mind', range='today', date=${vm.weekStart})}">Details</a>
                 </div>
                 <div class="card-body">
                     <div class="text-muted small mb-2">
