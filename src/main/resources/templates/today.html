@@ -144,7 +144,7 @@
           </div>
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/meals/today}">Details</a>
-            <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-meals" aria-label="Toggle meals section">
+            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-meals" aria-label="Toggle meals section">
               <span class="chevron-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -190,32 +190,38 @@
               <p class="section-block-subtitle text-muted mb-0">Search a food, pick the meal, and track it instantly.</p>
             </div>
             <form th:action="@{/today/{date}/meals/add-food(date=${vm.date},mode=${hubMode},range=${hubRange})}"
-                  method="post" class="form-inline-actions form-roomy section-form section-form-balanced">
+                  method="post" class="form-inline-actions form-roomy form-compact section-form section-form-balanced meals-quick-log">
               <div th:replace="~{fragments/csrf :: csrf}"></div>
               <div class="form-fields">
-                <div class="span-8">
-                  <label class="form-label" for="todayMealFood">Food (database)</label>
-                  <select id="todayMealFood" class="form-select form-select-sm" name="foodItemId" required>
-                    <option value="" disabled selected>Select food</option>
-                    <option th:each="f : ${vm.mealFoodOptions}"
-                            th:value="${f.id}"
-                            th:text="${f.label}">
-                      Food
-                    </option>
-                  </select>
+                <div class="span-6">
+                  <div class="form-field-card">
+                    <label class="form-label" for="todayMealFood">Food (database)</label>
+                    <select id="todayMealFood" class="form-select form-select-sm" name="foodItemId" required>
+                      <option value="" disabled selected>Select food</option>
+                      <option th:each="f : ${vm.mealFoodOptions}"
+                              th:value="${f.id}"
+                              th:text="${f.label}">
+                        Food
+                      </option>
+                    </select>
+                  </div>
                 </div>
-                <div class="span-2">
-                  <label class="form-label" for="todayMealSegment">Meal</label>
-                  <select id="todayMealSegment" class="form-select form-select-sm" name="segment" required>
-                    <option value="breakfast">Breakfast</option>
-                    <option value="lunch">Lunch</option>
-                    <option value="dinner">Dinner</option>
-                    <option value="snacks">Snacks</option>
-                  </select>
+                <div class="span-3">
+                  <div class="form-field-card">
+                    <label class="form-label" for="todayMealSegment">Meal</label>
+                    <select id="todayMealSegment" class="form-select form-select-sm" name="segment" required>
+                      <option value="breakfast">Breakfast</option>
+                      <option value="lunch">Lunch</option>
+                      <option value="dinner">Dinner</option>
+                      <option value="snacks">Snacks</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="span-2">
-                  <label class="form-label" for="todayMealQuantity">Qty</label>
-                  <input id="todayMealQuantity" type="number" class="form-control form-control-sm" name="quantity" min="1" value="100">
+                <div class="span-3">
+                  <div class="form-field-card">
+                    <label class="form-label" for="todayMealQuantity">Qty</label>
+                    <input id="todayMealQuantity" type="number" class="form-control form-control-sm" name="quantity" min="1" value="100">
+                  </div>
                 </div>
               </div>
               <div class="form-actions">
