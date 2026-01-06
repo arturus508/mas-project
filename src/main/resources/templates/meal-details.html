@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Meal Details')}"></head>
-<body class="bg-light">
+<body class="bg-light meal-details-page">
 <div th:replace="~{fragments/nav :: nav}"></div>
 
 <div class="container py-4">
@@ -12,16 +12,16 @@
                 <span th:text="${date}">2025-08-20</span>
             </div>
         </div>
-        <a th:href="@{'/meals?date=' + ${date}}" class="btn btn-outline-secondary btn-sm">Back to Meals</a>
+        <a th:href="@{'/meals?date=' + ${date}}" class="btn btn-outline-primary btn-sm">Back to Meals</a>
     </div>
     <div class="d-flex flex-wrap gap-2 mb-3">
-        <a class="btn btn-sm btn-outline-secondary"
+        <a class="btn btn-sm btn-outline-primary"
            th:href="@{'/meals/' + ${date} + '/breakfast'}">Breakfast</a>
-        <a class="btn btn-sm btn-outline-secondary"
+        <a class="btn btn-sm btn-outline-primary"
            th:href="@{'/meals/' + ${date} + '/lunch'}">Lunch</a>
-        <a class="btn btn-sm btn-outline-secondary"
+        <a class="btn btn-sm btn-outline-primary"
            th:href="@{'/meals/' + ${date} + '/dinner'}">Dinner</a>
-        <a class="btn btn-sm btn-outline-secondary"
+        <a class="btn btn-sm btn-outline-primary"
            th:href="@{'/meals/' + ${date} + '/snacks'}">Snacks</a>
     </div>
     <div class="alert alert-success py-2" th:if="${param.saved}">
@@ -45,21 +45,23 @@
         <div class="card-body" th:if="${#lists.isEmpty(items)}">
             <div class="text-muted">No items yet. Add your first item below.</div>
         </div>
-        <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(items)}">
-            <li class="list-group-item d-flex align-items-center justify-content-between" th:each="item : ${items}">
-                <div>
-                    <div class="fw-semibold" th:text="${item.foodItem != null ? item.foodItem.name : item.name}">Item</div>
-                    <div class="text-muted small" th:if="${item.quantity != null}">
-                        <span>Qty: </span>
-                        <span th:text="${item.quantity}"></span>
-                        <span th:if="${item.foodItem != null}">
-                            <span th:text="${item.foodItem.unit == T(com.example.healthfitness.model.Unit).G ? ' g' : ' pcs'}"> g</span>
-                        </span>
+        <ul class="list-group body-stats-list" th:if="${!#lists.isEmpty(items)}">
+            <li class="list-group-item body-stats-item" th:each="item : ${items}">
+                <div class="stat-meta">
+                    <div class="stat-chip">
+                        <span class="stat-label">Item</span>
+                        <span class="stat-value" th:text="${item.foodItem != null ? item.foodItem.name : item.name}">Item</span>
+                    </div>
+                    <div class="stat-chip" th:if="${item.quantity != null}">
+                        <span class="stat-label">Qty</span>
+                        <span class="stat-value" th:text="${item.quantity}">0</span>
+                        <span class="stat-unit" th:if="${item.foodItem != null}"
+                              th:text="${item.foodItem.unit == T(com.example.healthfitness.model.Unit).G ? 'g' : 'pcs'}">g</span>
                     </div>
                 </div>
-                <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/' + ${item.id} + '/delete'}" method="post">
+                <form th:action="@{'/meals/' + ${date} + '/' + ${segment} + '/items/' + ${item.id} + '/delete'}" method="post" class="stat-actions">
                     <div th:replace="~{fragments/csrf :: csrf}"></div>
-                    <button type="submit" class="btn btn-xs btn-outline-danger">Remove</button>
+                    <button type="submit" class="btn btn-ghost btn-danger btn-sm">Remove</button>
                 </form>
             </li>
         </ul>
@@ -80,7 +82,7 @@
                             </div>
                         </div>
                         <div class="form-actions">
-                            <button class="btn btn-sm btn-outline-primary" type="submit">Search</button>
+                            <button class="btn btn-sm btn-primary" type="submit">Search</button>
                         </div>
                     </form>
                     <div class="text-muted small mb-2" th:if="${q != null && !q.isBlank() && #lists.isEmpty(foods)}">
@@ -109,7 +111,7 @@
                             </div>
                         </div>
                         <div class="form-actions">
-                            <button class="btn btn-sm btn-outline-primary" type="submit">Add</button>
+                            <button class="btn btn-sm btn-primary" type="submit">Add</button>
                         </div>
                     </form>
                 </div>
@@ -150,7 +152,7 @@
                             </div>
                         </div>
                         <div class="form-actions">
-                            <button class="btn btn-sm btn-outline-primary">Add custom</button>
+                            <button class="btn btn-sm btn-primary">Add custom</button>
                         </div>
                     </form>
                 </div>

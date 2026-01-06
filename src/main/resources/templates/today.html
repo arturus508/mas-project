@@ -26,7 +26,7 @@
                   th:action="@{/today/{date}/workout/delete(date=${vm.date},mode=${hubMode},range=${hubRange})}"
                   method="post">
               <div th:replace="~{fragments/csrf :: csrf}"></div>
-              <button type="submit" class="btn btn-sm btn-outline-accent">Remove</button>
+              <button type="submit" class="btn btn-sm btn-primary">Remove</button>
             </form>
             <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-workout" aria-label="Toggle workout section">
               <span class="chevron-icon" aria-hidden="true"></span>
@@ -93,14 +93,14 @@
                       <div th:replace="~{fragments/csrf :: csrf}"></div>
                       <input type="number" min="0" class="form-control form-control-sm" name="repsDone"
                              th:value="${set.repsDone}">
-                      <button class="btn btn-sm btn-secondary" type="submit">Save</button>
+                      <button class="btn btn-sm btn-primary" type="submit">Save</button>
                     </form>
                   </td>
                   <td>
                 <form th:action="@{/today/{date}/workout/sets/{setId}/delete(date=${vm.date},setId=${set.setId},mode=${hubMode},range=${hubRange})}"
                       method="post" class="m-0">
                   <div th:replace="~{fragments/csrf :: csrf}"></div>
-                  <button class="btn btn-sm btn-outline-accent" type="submit">Delete</button>
+                  <button class="btn btn-sm btn-primary" type="submit">Delete</button>
                 </form>
               </td>
             </tr>

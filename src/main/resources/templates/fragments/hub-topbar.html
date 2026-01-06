@@ -35,6 +35,15 @@
         <a class="btn btn-sm btn-ghost"
            th:href="@{/today(mode=${mode}, range=${range}, date=${date.plusDays(1)})}">Next</a>
       </div>
+
+      <div class="hub-topbar-actions d-flex align-items-center gap-2">
+        <a class="btn btn-sm hub-topbar-action" th:href="@{/profile}">Profile</a>
+        <a class="btn btn-sm hub-topbar-action" th:href="@{/settings}">Settings</a>
+        <form th:action="@{/logout}" method="post" class="m-0">
+          <div th:replace="~{fragments/csrf :: csrf}"></div>
+          <button class="btn btn-sm hub-topbar-action" type="submit">Logout</button>
+        </form>
+      </div>
     </div>
   </div>
 </div>

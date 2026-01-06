@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Profile')}"></head>
-<body class="bg-light">
+<body class="bg-light profile-page">
 <div th:replace="~{fragments/nav :: nav}"></div>
 
 <div class="container py-4">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
         <h1 class="m-0">Profile</h1>
-        <form th:action="@{/logout}" method="post">
-            <div th:replace="~{fragments/csrf :: csrf}"></div>
-            <button type="submit" class="btn btn-outline-danger btn-sm">Logout</button>
-        </form>
     </div>
 
     <div class="card shadow-sm mb-4">
@@ -27,8 +23,7 @@
             </div>
         </div>
         <div class="card-footer d-flex gap-2">
-            <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
-            <a th:href="@{/settings}" class="btn btn-outline-primary">Settings</a>
+            <a th:href="@{/settings}" class="btn btn-primary">Settings</a>
         </div>
     </div>
 
@@ -48,7 +43,7 @@
                             <div class="text-danger small" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
                         </div>
                         <div class="col-12">
-                            <button class="btn btn-outline-primary" type="submit">Save</button>
+                            <button class="btn btn-primary" type="submit">Save</button>
                         </div>
                     </form>
                 </div>
@@ -80,7 +75,7 @@
                             <div class="text-danger small" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
                         </div>
                         <div class="col-12">
-                            <button class="btn btn-outline-primary" type="submit">Update password</button>
+                            <button class="btn btn-primary" type="submit">Update password</button>
                         </div>
                     </form>
                 </div>

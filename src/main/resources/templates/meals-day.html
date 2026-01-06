@@ -9,19 +9,19 @@
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
     <div>
       <h2 class="mb-0" th:text="${date.equals(T(java.time.LocalDate).now()) ? 'Meals Today' : 'Meals'}">Meals</h2>
-      <div class="text-muted" th:text="${date}">2025-08-20</div>
+      <div class="text-soft" th:text="${date}">2025-08-20</div>
     </div>
       <div class="d-flex gap-2 align-items-center">
         <div class="btn-group">
-          <a class="btn btn-outline-secondary btn-sm"
+          <a class="btn btn-primary btn-sm"
              th:href="@{/meals(date=${date.minusDays(1)})}">Yesterday</a>
-          <a class="btn btn-outline-secondary btn-sm"
+          <a class="btn btn-primary btn-sm"
              th:href="@{/meals/today}">Today</a>
-          <a class="btn btn-outline-secondary btn-sm"
+          <a class="btn btn-primary btn-sm"
              th:href="@{/meals(date=${date.plusDays(1)})}">Tomorrow</a>
         </div>
-      <a th:href="@{/meal-plans}" class="btn btn-outline-secondary btn-sm">Meal Library</a>
-      <a th:href="@{/today}" class="btn btn-outline-secondary btn-sm">Back to Today</a>
+      <a th:href="@{/meal-plans}" class="btn btn-primary btn-sm">Meal Library</a>
+      <a th:href="@{/today}" class="btn btn-primary btn-sm">Back to Today</a>
     </div>
   </div>
 
@@ -38,7 +38,7 @@
       <form class="ms-auto" th:action="@{/meals/copy-yesterday}" method="post">
         <div th:replace="~{fragments/csrf :: csrf}"></div>
         <input type="hidden" name="date" th:value="${date}">
-        <button class="btn btn-outline-primary btn-sm">Copy yesterday</button>
+        <button class="btn btn-primary btn-sm">Copy yesterday</button>
       </form>
     </div>
   </div>
@@ -53,7 +53,7 @@
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-sm btn-outline-primary">Go</button>
+          <button class="btn btn-sm btn-primary">Go</button>
         </div>
       </form>
     </div>
@@ -64,7 +64,7 @@
       <div class="card h-100">
         <div class="card-header d-flex align-items-center justify-content-between">
           <span>Breakfast</span>
-          <a th:href="@{'/meals/' + ${date} + '/breakfast'}" class="btn btn-sm btn-outline-primary">Open</a>
+          <a th:href="@{'/meals/' + ${date} + '/breakfast'}" class="btn btn-sm btn-primary">Open</a>
         </div>
         <div class="card-body" th:with="meal=${breakfast}, totals=${totB}, items=${itemsB}">
           <div class="d-flex flex-wrap gap-2 mb-3">
@@ -87,7 +87,7 @@
       <div class="card h-100">
         <div class="card-header d-flex align-items-center justify-content-between">
           <span>Lunch</span>
-          <a th:href="@{'/meals/' + ${date} + '/lunch'}" class="btn btn-sm btn-outline-primary">Open</a>
+          <a th:href="@{'/meals/' + ${date} + '/lunch'}" class="btn btn-sm btn-primary">Open</a>
         </div>
         <div class="card-body" th:with="meal=${lunch}, totals=${totL}, items=${itemsL}">
           <div class="d-flex flex-wrap gap-2 mb-3">
@@ -110,7 +110,7 @@
       <div class="card h-100">
         <div class="card-header d-flex align-items-center justify-content-between">
           <span>Dinner</span>
-          <a th:href="@{'/meals/' + ${date} + '/dinner'}" class="btn btn-sm btn-outline-primary">Open</a>
+          <a th:href="@{'/meals/' + ${date} + '/dinner'}" class="btn btn-sm btn-primary">Open</a>
         </div>
         <div class="card-body" th:with="meal=${dinner}, totals=${totD}, items=${itemsD}">
           <div class="d-flex flex-wrap gap-2 mb-3">
@@ -133,7 +133,7 @@
       <div class="card h-100">
         <div class="card-header d-flex align-items-center justify-content-between">
           <span>Snacks</span>
-          <a th:href="@{'/meals/' + ${date} + '/snack'}" class="btn btn-sm btn-outline-primary">Open</a>
+          <a th:href="@{'/meals/' + ${date} + '/snack'}" class="btn btn-sm btn-primary">Open</a>
         </div>
         <div class="card-body" th:with="meal=${snack}, totals=${totS}, items=${itemsS}">
           <div class="d-flex flex-wrap gap-2 mb-3">

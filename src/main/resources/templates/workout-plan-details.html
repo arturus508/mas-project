@@ -7,7 +7,7 @@
 <div class="container py-4">
     <div class="d-flex align-items-center justify-content-between mb-4">
         <h1 class="mb-0">Workout Plan Details</h1>
-        <a th:href="@{/workout-plans}" class="btn btn-outline-secondary btn-sm">Back</a>
+        <a th:href="@{/workout-plans}" class="btn btn-outline-primary btn-sm">Back</a>
     </div>
 
     <div class="card mb-4">
@@ -21,7 +21,7 @@
         </div>
         <div class="card-footer">
             <a th:href="@{'/workout-plans/edit/' + ${workoutPlan.workoutPlanId} + '?returnTo=/workout-plans/' + ${workoutPlan.workoutPlanId} + '/exercises'}"
-               class="btn btn-sm btn-outline-primary">Edit Plan</a>
+               class="btn btn-sm btn-primary">Edit Plan</a>
         </div>
     </div>
 
@@ -47,7 +47,7 @@
                     <form th:action="@{'/workout-plans/days/' + ${day.planDayId} + '/add-to-today'}" method="post">
                         <div th:replace="~{fragments/csrf :: csrf}"></div>
                         <button type="submit"
-                                class="btn btn-sm btn-outline-primary"
+                                class="btn btn-sm btn-primary"
                                 th:disabled="${#lists.isEmpty(day.exercises)}"
                                 th:title="${#lists.isEmpty(day.exercises)} ? 'Add exercises first' : 'Add to Today'">
                             Add to Today
@@ -82,7 +82,7 @@
                 </div>
                 <div class="card-footer">
                     <a th:href="@{'/workout-plans/' + ${workoutPlan.workoutPlanId} + '/days/' + ${day.planDayId} + '/exercises/add'}"
-                       class="btn btn-sm btn-outline-primary">Add Exercise</a>
+                       class="btn btn-sm btn-primary">Add Exercise</a>
                 </div>
             </div>
         </div>

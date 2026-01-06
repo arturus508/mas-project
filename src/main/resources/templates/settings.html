@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Settings')}"></head>
-<body class="bg-light">
+<body class="bg-light settings-page">
 <div th:replace="~{fragments/nav :: nav}"></div>
 
 <div class="container py-4">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
         <h1 class="mb-0">Settings</h1>
-        <a th:href="@{/today}" class="btn btn-outline-secondary">Back to Today</a>
     </div>
 
     <div class="row g-3">
@@ -15,7 +14,7 @@
             <div class="card h-100">
                 <div class="card-header">Today — Body</div>
                 <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(todayBodySections)}">
-                    <li class="list-group-item d-flex align-items-center justify-content-between"
+                    <li class="list-group-item settings-item d-flex align-items-center justify-content-between"
                         th:each="item : ${todayBodySections}">
                         <div>
                             <div class="fw-semibold" th:text="${item.label}">Section</div>
@@ -24,7 +23,7 @@
                         <form th:action="@{/settings/sections/{key}(key=${item.key})}" method="post" class="m-0">
                             <div th:replace="~{fragments/csrf :: csrf}"></div>
                             <input type="hidden" name="hidden" th:value="${item.hidden ? false : true}">
-                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                            <button class="btn btn-sm btn-outline-primary btn-outline-soft" type="submit"
                                     th:text="${item.hidden ? 'Show' : 'Hide'}">Hide</button>
                         </form>
                     </li>
@@ -39,7 +38,7 @@
             <div class="card h-100">
                 <div class="card-header">Today — Mind</div>
                 <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(todayMindSections)}">
-                    <li class="list-group-item d-flex align-items-center justify-content-between"
+                    <li class="list-group-item settings-item d-flex align-items-center justify-content-between"
                         th:each="item : ${todayMindSections}">
                         <div>
                             <div class="fw-semibold" th:text="${item.label}">Section</div>
@@ -48,7 +47,7 @@
                         <form th:action="@{/settings/sections/{key}(key=${item.key})}" method="post" class="m-0">
                             <div th:replace="~{fragments/csrf :: csrf}"></div>
                             <input type="hidden" name="hidden" th:value="${item.hidden ? false : true}">
-                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                            <button class="btn btn-sm btn-outline-primary btn-outline-soft" type="submit"
                                     th:text="${item.hidden ? 'Show' : 'Hide'}">Hide</button>
                         </form>
                     </li>
@@ -63,7 +62,7 @@
             <div class="card h-100">
                 <div class="card-header">Week — Body</div>
                 <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(weekBodySections)}">
-                    <li class="list-group-item d-flex align-items-center justify-content-between"
+                    <li class="list-group-item settings-item d-flex align-items-center justify-content-between"
                         th:each="item : ${weekBodySections}">
                         <div>
                             <div class="fw-semibold" th:text="${item.label}">Section</div>
@@ -72,7 +71,7 @@
                         <form th:action="@{/settings/sections/{key}(key=${item.key})}" method="post" class="m-0">
                             <div th:replace="~{fragments/csrf :: csrf}"></div>
                             <input type="hidden" name="hidden" th:value="${item.hidden ? false : true}">
-                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                            <button class="btn btn-sm btn-outline-primary btn-outline-soft" type="submit"
                                     th:text="${item.hidden ? 'Show' : 'Hide'}">Hide</button>
                         </form>
                     </li>
@@ -87,7 +86,7 @@
             <div class="card h-100">
                 <div class="card-header">Week — Mind</div>
                 <ul class="list-group list-group-flush" th:if="${!#lists.isEmpty(weekMindSections)}">
-                    <li class="list-group-item d-flex align-items-center justify-content-between"
+                    <li class="list-group-item settings-item d-flex align-items-center justify-content-between"
                         th:each="item : ${weekMindSections}">
                         <div>
                             <div class="fw-semibold" th:text="${item.label}">Section</div>
@@ -96,7 +95,7 @@
                         <form th:action="@{/settings/sections/{key}(key=${item.key})}" method="post" class="m-0">
                             <div th:replace="~{fragments/csrf :: csrf}"></div>
                             <input type="hidden" name="hidden" th:value="${item.hidden ? false : true}">
-                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                            <button class="btn btn-sm btn-outline-primary btn-outline-soft" type="submit"
                                     th:text="${item.hidden ? 'Show' : 'Hide'}">Hide</button>
                         </form>
                     </li>
@@ -108,12 +107,6 @@
         </div>
     </div>
 
-    <div class="mt-4">
-        <form th:action="@{/logout}" method="post" class="d-inline">
-            <div th:replace="~{fragments/csrf :: csrf}"></div>
-            <button type="submit" class="btn btn-outline-danger">Logout</button>
-        </form>
-    </div>
 </div>
 </body>
 </html>
