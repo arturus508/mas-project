@@ -55,16 +55,27 @@
             <div class="fw-semibold">No body stats yet</div>
             <div class="text-muted small">Add your first measurement to start tracking progress.</div>
         </div>
-        <ul class="list-group" th:if="${!#lists.isEmpty(bodyStats)}">
-            <li th:each="stat : ${bodyStats}" class="list-group-item d-flex align-items-center justify-content-between">
-                <div>
-                    <span class="me-3">Date: <strong th:text="${stat.dateRecorded}"></strong></span>
-                    <span class="me-3">Weight: <strong th:text="${stat.weight}"></strong> kg</span>
-                    <span>Body Fat: <strong th:text="${stat.bodyFatPercent}"></strong> %</span>
+        <ul class="list-group body-stats-list" th:if="${!#lists.isEmpty(bodyStats)}">
+            <li th:each="stat : ${bodyStats}" class="list-group-item body-stats-item">
+                <div class="stat-meta">
+                    <div class="stat-chip">
+                        <span class="stat-label">Date</span>
+                        <span class="stat-value" th:text="${stat.dateRecorded}"></span>
+                    </div>
+                    <div class="stat-chip">
+                        <span class="stat-label">Weight</span>
+                        <span class="stat-value" th:text="${stat.weight}"></span>
+                        <span class="stat-unit">kg</span>
+                    </div>
+                    <div class="stat-chip">
+                        <span class="stat-label">Body Fat</span>
+                        <span class="stat-value" th:text="${stat.bodyFatPercent}"></span>
+                        <span class="stat-unit">%</span>
+                    </div>
                 </div>
-                <form th:action="@{'/body-stats/delete/' + ${stat.bodyStatsId}}" method="post" class="d-inline">
+                <form th:action="@{'/body-stats/delete/' + ${stat.bodyStatsId}}" method="post" class="stat-actions">
                     <div th:replace="~{fragments/csrf :: csrf}"></div>
-                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                    <button type="submit" class="btn btn-ghost btn-danger btn-sm">Delete</button>
                 </form>
             </li>
         </ul>
