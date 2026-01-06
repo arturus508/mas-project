@@ -44,7 +44,11 @@
         <div class="card mb-3" th:if="${!#lists.isEmpty(bodyStats)}">
             <div class="card-header">Weight trend</div>
             <div class="card-body">
-                <canvas id="weightChart" height="120"></canvas>
+                <canvas id="weightChart" height="120"
+                        th:attr="data-weight-labels=${statsDates}, data-weight-values=${statsWeights}"
+                        data-weight-color="#4CAF50"
+                        data-weight-fill="rgba(76, 175, 80, 0.15)"
+                        data-weight-show-axis="true"></canvas>
             </div>
         </div>
         <div th:if="${#lists.isEmpty(bodyStats)}" class="alert alert-light border">
@@ -66,38 +70,6 @@
         </ul>
     </div>
 </div>
-<script th:inline="javascript">
-/*<![CDATA[*/
-  const weightLabels = /*[[${statsDates}]]*/ [];
-  const weightData = /*[[${statsWeights}]]*/ [];
-  const chartEl = document.getElementById('weightChart');
-  if (chartEl && weightLabels.length > 0) {
-    new Chart(chartEl, {
-      type: 'line',
-      data: {
-        labels: weightLabels,
-        datasets: [{
-          label: 'Weight (kg)',
-          data: weightData,
-          borderColor: '#4CAF50',
-          backgroundColor: 'rgba(76, 175, 80, 0.15)',
-          fill: true,
-          tension: 0.3,
-          pointRadius: 3
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          y: { title: { display: true, text: 'kg' } }
-        }
-      }
-    });
-  }
-/*]]>*/
-</script>
+<script th:src="@{/js/weight-charts.js}" defer></script>
 </body>
 </html>

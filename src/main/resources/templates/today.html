@@ -28,7 +28,7 @@
               <div th:replace="~{fragments/csrf :: csrf}"></div>
               <button type="submit" class="btn btn-sm btn-outline-accent">Remove</button>
             </form>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-workout" aria-label="Toggle workout section">
+            <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-workout" aria-label="Toggle workout section">
               <span class="chevron-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -144,7 +144,7 @@
           </div>
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/meals/today}">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-meals" aria-label="Toggle meals section">
+            <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-meals" aria-label="Toggle meals section">
               <span class="chevron-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -220,7 +220,7 @@
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/body-stats}" 
                th:text="${vm.todayWeight != null} ? 'Details / Edit' : 'Details'">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-body-stats" aria-label="Toggle body stats section">
+            <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-body-stats" aria-label="Toggle body stats section">
               <span class="chevron-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -259,7 +259,10 @@
               <p class="section-block-subtitle mb-1">7-day trend</p>
               <p class="section-block-subtitle text-muted mb-0">Latest entries shown; defaults to zeroed placeholders.</p>
             </div>
-            <canvas id="todayWeightChart" height="140"></canvas>
+            <canvas id="todayWeightChart" height="140"
+                    th:attr="data-weight-labels=${vm.weightDates}, data-weight-values=${vm.weightValues}"
+                    data-weight-color="#3b82f6"
+                    data-weight-fill="rgba(59, 130, 246, 0.12)"></canvas>
           </div>
 
           <div class="section-block section-block-form">
@@ -313,7 +316,7 @@
               <button class="btn btn-sm btn-secondary" type="submit">Copy</button>
             </form>
             <a class="btn btn-sm btn-secondary" th:href="@{/flow/tasks}">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-tasks" aria-label="Toggle tasks section">
+            <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-tasks" aria-label="Toggle tasks section">
               <span class="chevron-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -362,7 +365,7 @@
           </div>
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/flow/habits}">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-habits" aria-label="Toggle habits section">
+            <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-habits" aria-label="Toggle habits section">
               <span class="chevron-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -400,7 +403,7 @@
           </div>
           <div class="section-actions">
             <a class="btn btn-sm btn-secondary" th:href="@{/mind/sleep}">Details</a>
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-sleep" aria-label="Toggle sleep section">
+            <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-sleep" aria-label="Toggle sleep section">
               <span class="chevron-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -448,7 +451,7 @@
             </div>
           </div>
           <div class="section-actions">
-            <button class="btn btn-sm btn-ghost section-toggle" type="button" data-toggle-section="today-review" aria-label="Toggle review section">
+            <button class="btn btn-sm section-toggle" type="button" data-toggle-section="today-review" aria-label="Toggle review section">
               <span class="chevron-icon" aria-hidden="true"></span>
             </button>
           </div>
@@ -493,44 +496,7 @@
   </div>
 </div>
 
-<script th:inline="javascript">
-  const weightLabels = [[${vm.weightDates}]];
-  const weightValues = [[${vm.weightValues}]];
-  const ctx = document.getElementById("todayWeightChart");
-  if (ctx) {
-    new Chart(ctx, {
-      type: "line",
-      data: {
-        labels: weightLabels,
-        datasets: [{
-          label: "Weight (kg)",
-          data: weightValues,
-          borderColor: "#3b82f6",
-          backgroundColor: "rgba(59, 130, 246, 0.12)",
-          borderWidth: 2,
-          tension: 0.35,
-          pointRadius: 3,
-          pointBackgroundColor: "#3b82f6",
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          x: { display: false },
-          y: { display: false }
-        },
-        interaction: {
-          intersect: false,
-          mode: "index"
-        }
-      }
-    });
-  }
-</script>
+<script th:src="@{/js/weight-charts.js}" defer></script>
 <script th:src="@{/js/auto-submit.js}" defer></script>
 <script th:src="@{/js/section-toggle.js}" defer></script>
 </body>

@@ -195,7 +195,7 @@ public class TodayViewService {
             List<BodyStats> recent = stats.size() > 7 ? stats.subList(stats.size() - 7, stats.size()) : stats;
             recent.forEach(s -> {
                 weightDates.add(s.getDateRecorded() == null ? "" : s.getDateRecorded().toString());
-                weightValues.add(s.getWeight() == null ? 0d : s.getWeight());
+                weightValues.add(s.getWeight());
             });
         } else {
             for (int i = 0; i < 7; i++) {
