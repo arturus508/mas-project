@@ -536,15 +536,32 @@ body[data-mode="mind"] .meal-macro-pill{
   font-size: .95rem;
   font-weight: 600;
 }
+.section-block-form .section-form.meals-quick-log,
+.section-block-form .form-inline-actions.meals-quick-log{
+  max-width: none;
+  width: 100%;
+}
 .meals-quick-log.section-form{
-  max-width: 1100px;
   padding: var(--gap-3) var(--gap-4);
 }
+.meals-quick-log.form-compact{
+  grid-template-columns: minmax(0, 1fr) auto;
+  max-width: none;
+}
 .meals-quick-log .form-fields{
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--gap-3);
+  display: flex;
+  gap: var(--gap-5);
+  justify-content: center;
   align-items: stretch;
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+  flex-wrap: wrap;
+}
+.meals-quick-log .form-fields > .span-6,
+.meals-quick-log .form-fields > .span-3{
+  flex: 1 1 280px;
+  max-width: 360px;
 }
 .meals-quick-log .form-field-card{
   background: rgba(8,14,20,.32);
@@ -588,7 +605,12 @@ body[data-mode="mind"] .meals-quick-log .form-field-card{
 }
 @media (max-width: 900px){
   .meals-quick-log .form-fields{
-    grid-template-columns: 1fr;
+    justify-content: stretch;
+  }
+  .meals-quick-log .form-fields > .span-6,
+  .meals-quick-log .form-fields > .span-3{
+    flex-basis: 100%;
+    max-width: none;
   }
   .meals-quick-log .form-actions{
     padding-top: var(--gap-2);
